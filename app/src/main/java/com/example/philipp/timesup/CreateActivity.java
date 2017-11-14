@@ -46,6 +46,8 @@ public class CreateActivity extends AppCompatActivity {
             }
         });
 
+
+        //set on click listeners for checkboxes about rounds
         pantomime = (CheckBox)  findViewById(R.id.panto);
         pantomime.setOnClickListener(new View.OnClickListener() {
             @Override
