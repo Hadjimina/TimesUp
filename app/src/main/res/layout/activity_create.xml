@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/SonucScrollView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:isScrollContainer="true"
+    android:scrollbars="vertical"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    >
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -26,14 +38,13 @@
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:ems="10"
         android:inputType="time"
         android:layout_below="@id/time_round"/>
 
 
 
-    <!-- CHOOSE ROUNDS -->
+     <!--CHOOSE ROUNDS -->
 
     <TextView
         android:id="@+id/rounds"
@@ -46,7 +57,6 @@
         android:id="@+id/explain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Explain"
         android:layout_below="@id/rounds"
         android:checked="true"/>
@@ -55,36 +65,36 @@
         android:id="@+id/panto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Pantomime"
-        android:layout_below="@id/explain"/>
+        android:layout_below="@id/explain"
+        android:checked="true"/>
 
     <CheckBox
         android:id="@+id/one_word"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="one word"
-        android:layout_below="@id/panto"/>
+        android:layout_below="@id/panto"
+        android:checked="true"/>
 
     <CheckBox
         android:id="@+id/freeze"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="freeze"
-        android:layout_below="@id/one_word"/>
+        android:layout_below="@id/one_word"
+        android:checked="true"/>
 
     <CheckBox
         android:id="@+id/sound"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="sounds"
-        android:layout_below="@id/freeze"/>
+        android:layout_below="@id/freeze"
+        android:checked="true"/>
 
 
-    <!-- TEAM NAMES -->
+     <!--TEAM NAMES -->
 
     <TextView
         android:id="@+id/team_names"
@@ -95,20 +105,20 @@
 
     <EditText
         android:id="@+id/team_a"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:hint="Team A"
         android:layout_below="@id/team_names"/>
 
     <EditText
         android:id="@+id/team_b"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:hint="Team B"
         android:layout_below="@id/team_a"/>
 
 
-    <!-- WORDS PER PERSON -->
+     <!--WORDS PER PERSON -->
 
     <TextView
         android:id="@+id/words_per_pers"
@@ -121,15 +131,13 @@
         android:id="@+id/words_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:ems="10"
         android:inputType="number"
         android:layout_below="@id/words_per_pers"/>
 
 
 
-    <!-- ENTER YOUR NAME -->
-
+     <!--ENTER YOUR NAME -->
     <TextView
         android:id="@+id/enter_name"
         android:layout_width="wrap_content"
@@ -139,28 +147,25 @@
 
     <EditText
         android:id="@+id/username"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="250sp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/enter_name"/>
 
-    <!-- CANCEL AND FINISH BUTTON -->
-
+     <!-- CANCEL AND FINISH BUTTON -->
     <Button
         android:id="@+id/button_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp"
+        android:text="Cancel"
         android:layout_below="@id/username"/>
 
     <Button
         android:id="@+id/button_finish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Join"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp"
-        android:layout_below="@id/button_cancel"/>
+        android:layout_below="@id/username"
+        android:layout_toRightOf="@id/button_cancel"
+        android:text="Finish" />
 
-</LinearLayout>
+</RelativeLayout>
+</ScrollView>
