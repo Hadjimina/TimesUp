@@ -10,7 +10,7 @@ import android.os.Bundle;
 /**
  Activity which ends whole game.
  Comes after GameActivity (after all rounds played)
- Comes before CreateJoinActivity
+ Comes before StartActivity
  Shows final scores
  */
 

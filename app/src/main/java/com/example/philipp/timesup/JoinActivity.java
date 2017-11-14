@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 /**
  Activity which lets user join a game.
- Comes after CreateJoinActivity (join button)
+ Comes after StartActivity (join button)
  Comes before WordsActivity
  Lets user input a game code and name, lets them choose team afterwards
  */

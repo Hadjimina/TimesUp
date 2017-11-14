@@ -10,11 +10,12 @@ Comes before JoinActivity or CreateActivity
 Contains two buttons Join and Create
  */
 
-public class CreateJoinActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_join);
+        setContentView(R.layout.activity_start);
+
     }
 }

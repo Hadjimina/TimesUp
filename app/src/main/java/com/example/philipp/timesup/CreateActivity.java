@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 /**
 Activity to create a new game.
-Comes after CreateJoinActivity (create button)
+Comes after StartActivity (create button)
 Comes before JoinCodeActivity
 Contains settings for new game (Time per round, rounds, team names)
  */
