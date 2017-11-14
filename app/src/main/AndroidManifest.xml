@@ -16,6 +16,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".CreateActivity"/>
+        <activity android:name=".GameActivity"/>
+        <activity android:name=".GameEndActivity"/>
+        <activity android:name=".JoinActivity"/>
+        <activity android:name=".JoinCodeActivity"/>
+        <activity android:name=".RoundEndActivity"/>
+        <activity android:name=".WordsActivity"/>
     </application>
 
 </manifest>

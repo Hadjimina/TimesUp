@@ -1,18 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.philipp.timesup.CreateActivity">
+    tools:context="com.example.philipp.timesup.CreateActivity"
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/create_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="create a new game!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-</android.support.constraint.ConstraintLayout>
+    <!-- TIME PER ROUND -->
+
+    <TextView
+        android:id="@+id/time_round"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="time per round"
+        app:layout_below="create_game" />
+
+    <EditText
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="time" />
+
+
+
+    <!-- CHOOSE ROUNDS -->
+
+    <TextView
+        android:id="@+id/rounds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="rounds"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/explain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Explain" />
+
+    <CheckBox
+        android:id="@+id/panto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Pantomime" />
+
+    <CheckBox
+        android:id="@+id/one_word"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="one word" />
+
+    <CheckBox
+        android:id="@+id/freeze"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="freeze" />
+
+    <CheckBox
+        android:id="@+id/sound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="sounds" />
+
+
+    <!-- TEAM NAMES -->
+
+    <TextView
+        android:id="@+id/team_names"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="team names"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/team_a"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Team A" />
+
+    <EditText
+        android:id="@+id/team_b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Team B"/>
+
+
+    <!-- WORDS PER PERSON -->
+
+    <TextView
+        android:id="@+id/words_per_pers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="words per person"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/words_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="number" />
+
+
+
+    <!-- ENTER YOUR NAME -->
+
+    <TextView
+        android:id="@+id/enter_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="enter your name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- CANCEL AND FINISH BUTTON -->
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <Button
+        android:id="@+id/button_finish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Join"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+</LinearLayout>
