@@ -11,11 +11,7 @@
         android:id="@+id/create_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="create a new game!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="create a new game!" />
 
     <!-- TIME PER ROUND -->
 
@@ -24,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="time per round"
-        app:layout_below="create_game" />
+        android:layout_below="@id/create_game" />
 
     <EditText
         android:id="@+id/time"
@@ -32,7 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:inputType="time" />
+        android:inputType="time"
+        android:layout_below="@id/time_round"/>
 
 
 
@@ -43,45 +40,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="rounds"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_below="@id/time" />
 
     <CheckBox
         android:id="@+id/explain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Explain" />
+        android:text="Explain"
+        android:layout_below="@id/rounds"
+        android:checked="true"/>
 
     <CheckBox
         android:id="@+id/panto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Pantomime" />
+        android:text="Pantomime"
+        android:layout_below="@id/explain"/>
 
     <CheckBox
         android:id="@+id/one_word"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="one word" />
+        android:text="one word"
+        android:layout_below="@id/panto"/>
 
     <CheckBox
         android:id="@+id/freeze"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="freeze" />
+        android:text="freeze"
+        android:layout_below="@id/one_word"/>
 
     <CheckBox
         android:id="@+id/sound"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="sounds" />
+        android:text="sounds"
+        android:layout_below="@id/freeze"/>
 
 
     <!-- TEAM NAMES -->
@@ -91,22 +91,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="team names"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_below="@id/sound" />
 
     <EditText
         android:id="@+id/team_a"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:hint="Team A" />
+        android:hint="Team A"
+        android:layout_below="@id/team_names"/>
 
     <EditText
         android:id="@+id/team_b"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:hint="Team B"/>
+        android:hint="Team B"
+        android:layout_below="@id/team_a"/>
 
 
     <!-- WORDS PER PERSON -->
@@ -116,10 +115,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="words per person"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_below="@id/team_b" />
 
     <EditText
         android:id="@+id/words_number"
@@ -127,7 +123,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:inputType="number" />
+        android:inputType="number"
+        android:layout_below="@id/words_per_pers"/>
 
 
 
@@ -138,15 +135,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="enter your name"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_below="@id/words_number" />
 
     <EditText
         android:id="@+id/username"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/enter_name"/>
 
     <!-- CANCEL AND FINISH BUTTON -->
 
@@ -156,7 +151,8 @@
         android:layout_height="wrap_content"
         android:text="Create"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp" />
+        tools:layout_editor_absoluteY="16dp"
+        android:layout_below="@id/username"/>
 
     <Button
         android:id="@+id/button_finish"
@@ -164,6 +160,7 @@
         android:layout_height="wrap_content"
         android:text="Join"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp" />
+        tools:layout_editor_absoluteY="16dp"
+        android:layout_below="@id/button_cancel"/>
 
 </LinearLayout>

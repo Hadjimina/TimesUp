@@ -1,7 +1,7 @@
 package com.example.philipp.timesup;
 
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -20,6 +20,5 @@ public class JoinActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
-
     }
 }

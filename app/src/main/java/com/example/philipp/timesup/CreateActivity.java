@@ -2,6 +2,8 @@ package com.example.philipp.timesup;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.CheckBox;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -16,10 +18,16 @@ Contains settings for new game (Time per round, rounds, team names)
 
 public class CreateActivity extends AppCompatActivity {
 
+    CheckBox explain, pantomime, oneWord, freeze, sound;
+    Button cancel, finish;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+
+        //Initialize checkboxes
+        explain = (CheckBox) findViewById(R.id.explain);
 
 
     }
