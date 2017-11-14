@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 
 public class DecodeMessage {
-
     private String returnType;
     private String requestType;
     private int gameId;
@@ -80,6 +79,22 @@ public class DecodeMessage {
         }
         Log.e("Decode error", "Your key does not exist, you got null");
         return null;
+    }
+
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public int getClientId() {
+        return clientId;
     }
 
 }
