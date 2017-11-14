@@ -41,9 +41,5 @@ public class EncodeMessage {
 
     }
 
-    //entire to JSON
-    public JSONObject convertToJson(){
-        return null;
-    }
 
 }
