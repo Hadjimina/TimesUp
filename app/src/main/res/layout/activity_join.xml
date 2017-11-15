@@ -52,14 +52,14 @@
 
 
             <RadioButton
-                android:id="@+id/team_a"
+                android:id="@+id/team_a1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Team A"
                 android:visibility="invisible"/>
 
             <RadioButton
-                android:id="@+id/team_b"
+                android:id="@+id/team_b1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/team_a"
@@ -71,14 +71,14 @@
             android:id="@+id/button_join"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/radiogroup"
+            android:layout_alignParentBottom="true"
             android:text="Join Game"/>
 
         <Button
             android:id="@+id/button_go"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/radiogroup"
+            android:layout_alignParentBottom="true"
             android:text="GO!"
             android:visibility="invisible"/>
 

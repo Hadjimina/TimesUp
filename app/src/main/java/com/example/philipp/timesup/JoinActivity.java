@@ -36,43 +36,56 @@ public class JoinActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
 
-        codeEdit = (EditText) findViewById(R.id.game_code_edit);
+        //create texteditfields for code and username
+        codeEdit = findViewById(R.id.game_code_edit);
+        nameEdit = findViewById(R.id.enter_name_edit);
 
-        nameEdit = (EditText) findViewById(R.id.enter_name_edit);
-
-        joinGame = (Button) findViewById(R.id.button_join);
+        joinGame = findViewById(R.id.button_join);
         joinGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 gameCode = codeEdit.getText().toString();
                 username = nameEdit.getText().toString();
 
+                //set button to invisible
+                joinGame.setVisibility(View.GONE);
 
+                //find out if game code was set
                 if (gameCode == null || gameCode.equals("")) {
                     toast = Toast.makeText(getApplicationContext(), "please enter a code to join the game", Toast.LENGTH_LONG);
                     toast.show();
                     return;
+
+                // if game code was set, parse it and send message to server and create intent
                 } else {
                     gameId = Integer.parseInt(gameCode);
-
+                    //find out if username was set
                     if (username == null || username.equals("")) {
                         toast = Toast.makeText(getApplicationContext(), "please enter a name to join the game", Toast.LENGTH_LONG);
                         toast.show();
                         return;
+                     //if username was set, proceed
                     } else {
                         //TODO add client ID
                         //message = new EncodeMessage(gameId, clientId, username);
-                        Log.d("JOIN", "gameId is " + gameId + "/ username is " + username);
+
                         intent = new Intent(getApplicationContext(), WordsActivity.class);
+
+
+
+                        //ALL BELOW BELONGS TO CALLBACK FUNCTION
                         //TODO nachher useneh
                         //make radioButtons to join a team visible
-                        teamA = (RadioButton) findViewById(R.id.team_a);
-                        teamB = (RadioButton) findViewById(R.id.team_b);
+                        teamA = findViewById(R.id.team_a1);
+                        teamB = findViewById(R.id.team_b1);
 
-                        go = (Button) findViewById(R.id.button_go);
+                        teamA.setVisibility(View.VISIBLE);
+                        teamB.setVisibility(View.VISIBLE);
 
-                        String teamName1 = "team A";
-                        String teamName2 = "team B";
+
+                        //dummy values, will get deleted
+                        String teamName1 = "Hellö1";
+                        String teamName2 = "Hellö2";
 
                         if (teamName1 != null) {
                             teamA.setText(teamName1);
@@ -82,13 +95,38 @@ public class JoinActivity extends ServerIOActivity {
                             teamB.setText(teamName2);
                         }
 
-                        teamA.setVisibility(View.VISIBLE);
-                        teamB.setVisibility(View.VISIBLE);
 
-                        joinGame.setVisibility(View.INVISIBLE);
-
+                        //FROM HERE ON COPY CODE to end of first case of callback function
+                        go = findViewById(R.id.button_go);
                         go.setVisibility(View.VISIBLE);
+                        go.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                int teamId;
+                                if (teamA.isChecked() || teamB.isChecked()) {
+                                    //TODO check here what to do with questions
+                                    if(teamA.isChecked()){
+                                        teamId = 1;
+                                    }
+                                    else{
+                                        teamId = 0;
+                                    }
+                                    intent = new Intent(getApplicationContext(), WordsActivity.class);
 
+                                    //TODO put in shared preferences object
+                                    intent.putExtra("gameId", gameId);
+                                } else {
+                                    toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
+                                    return;
+                                }
+
+                                //TODO: find out about clientId and why teamId is an int
+                                //TODO create message for server
+                                //message = new EncodeMessage(gameId, clientId, teamId)
+                                //TODO take this out
+                                startActivity(intent);
+                            }
+                        });
                     }
                 }
             }
@@ -101,7 +139,7 @@ public class JoinActivity extends ServerIOActivity {
         int gameId;
         String teamName1, teamName2;
 
-        // if right return message from server, start new Activity
+        // if right return message from server and request type was join, start show which teams you can join
         if(message.getReturnType() == "ACK" && message.getRequestType() == "Join"){
             gameId = message.getGameId();
             teamName1 = message.getString("teamName1");
@@ -109,8 +147,8 @@ public class JoinActivity extends ServerIOActivity {
             intent.putExtra("gameId", gameId);
 
             //make radioButtons to join a team visible
-            teamA = (RadioButton) findViewById(R.id.team_a);
-            teamB = (RadioButton) findViewById(R.id.team_b);
+            teamA = findViewById(R.id.team_a1);
+            teamB = findViewById(R.id.team_b1);
 
             if (teamName1 != null) {
                 teamA.setText(teamName1);
@@ -123,15 +161,36 @@ public class JoinActivity extends ServerIOActivity {
             teamA.setVisibility(View.VISIBLE);
             teamB.setVisibility(View.VISIBLE);
 
-            joinGame.setVisibility(View.INVISIBLE);
 
-            go.setVisibility(View.VISIBLE);
+            //TODO here belongs text from above
 
+        }
+        //game code doesn't exist, show error and set joingame button to visible again
+        else if(message.getReturnType() == "error" && message.getRequestType() == "Join"){
+            //TODO
+        }
+        // if right return message from server and request type was teamjoin, proceed to next activity
+        else if(message.getReturnType() == "ACK" && message.getRequestType() == "teamJoin"){
+
+            boolean hasStarted;
+            int startTime, timePerRound;
+
+            hasStarted = message.getBoolean("hasStarted");
+            startTime = message.getInt("startTime");
+            timePerRound = message.getInt("timePerRound");
+            intent.putExtra("hasStarted", hasStarted);
+            intent.putExtra("startTime", startTime);
+            intent.putExtra("timePerRound", timePerRound);
             startActivity(intent);
         }
-        //else try to send message to server again
-        else {
-            //send message again
+        //try to send message again and show error
+        else if(message.getReturnType() == "error" && message.getRequestType() == "teamJoin"){
+            //TODO
         }
+        //show error and go back to start
+        else{
+            //TODO
+        }
+
     }
 }

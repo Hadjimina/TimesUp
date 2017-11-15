@@ -38,11 +38,11 @@ public class JoinCodeActivity extends ServerIOActivity {
         teamName1 = intent.getStringExtra("teamName1");
         teamName2 = intent.getStringExtra("teamName2");
 
-        code = (TextView) findViewById(R.id.code);
+        code = findViewById(R.id.code);
         code.setText(String.valueOf(gameId));
 
-        teamA = (RadioButton) findViewById(R.id.team_a);
-        teamB = (RadioButton) findViewById(R.id.team_b);
+        teamA = findViewById(R.id.team_a1);
+        teamB = findViewById(R.id.team_b1);
 
         if (teamName1 != null) {
             teamA.setText(teamName1);
@@ -52,7 +52,7 @@ public class JoinCodeActivity extends ServerIOActivity {
             teamB.setText(teamName2);
         }
 
-        go = (Button) findViewById(R.id.button_go);
+        go = findViewById(R.id.button_go);
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,9 +99,13 @@ public class JoinCodeActivity extends ServerIOActivity {
             intent.putExtra("timePerRound", timePerRound);
             startActivity(intent);
         }
-        //else try to send message to server again
+        //else try to send message to server again and show error
+        else if(message.getReturnType() == "error" && message.getRequestType() == "teamJoin"){
+            //TODO, same as in JoinCode
+        }
+        //show error and go back to start
         else {
-            //send message again
+            //TODO
         }
     }
 }

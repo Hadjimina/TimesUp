@@ -48,11 +48,11 @@ public class CreateActivity extends ServerIOActivity{
 
         seconds = (NumberPicker) findViewById(R.id.seconds_picker);*/
 
-        timeEdit = (EditText) findViewById(R.id.time);
+        timeEdit = findViewById(R.id.time);
 
         //set on click listeners for checkboxes about rounds
 
-        explain = (CheckBox)  findViewById(R.id.explain);
+        explain = findViewById(R.id.explain);
         explain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +60,7 @@ public class CreateActivity extends ServerIOActivity{
             }
         });
 
-        pantomime = (CheckBox)  findViewById(R.id.panto);
+        pantomime =  findViewById(R.id.panto);
         pantomime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,7 +68,7 @@ public class CreateActivity extends ServerIOActivity{
             }
         });
 
-        oneWord = (CheckBox)  findViewById(R.id.one_word);
+        oneWord = findViewById(R.id.one_word);
         oneWord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,7 +76,7 @@ public class CreateActivity extends ServerIOActivity{
             }
         });
 
-        freeze = (CheckBox)  findViewById(R.id.freeze);
+        freeze = findViewById(R.id.freeze);
         freeze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +84,7 @@ public class CreateActivity extends ServerIOActivity{
             }
         });
 
-        sounds = (CheckBox)  findViewById(R.id.sound);
+        sounds = findViewById(R.id.sound);
         sounds.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,20 +94,20 @@ public class CreateActivity extends ServerIOActivity{
 
         //EditText fields
 
-        team1Edit = (EditText) findViewById(R.id.team_a);
+        team1Edit = findViewById(R.id.team_a);
 
-        team2Edit = (EditText) findViewById(R.id.team_b);
+        team2Edit = findViewById(R.id.team_b);
 
-        usernameEdit = (EditText) findViewById(R.id.username);
+        usernameEdit = findViewById(R.id.username);
 
         //Words per Person
 
         //words = (NumberPicker) findViewById(R.id.number_picker);
 
-        wordsEdit = (EditText) findViewById(R.id.words_number);
+        wordsEdit = findViewById(R.id.words_number);
 
-        //cancel Button goes back to  StartActivity
-        cancel = (Button) findViewById(R.id.button_cancel);
+        //cancel Button goes back to StartActivity
+        cancel = findViewById(R.id.button_cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,7 +117,7 @@ public class CreateActivity extends ServerIOActivity{
         });
 
         //finish button sends information to server and waits for ack
-        finish = (Button) findViewById(R.id.button_finish);
+        finish = findViewById(R.id.button_finish);
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
