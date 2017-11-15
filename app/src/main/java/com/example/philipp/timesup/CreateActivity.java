@@ -165,22 +165,39 @@ public class CreateActivity extends ServerIOActivity{
 
                 message = new EncodeMessage(rounds, teamName1, teamName2, timePerRound, username, wordsPerPerson);
 
+
                 Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
 
+                intent.putExtra("teamName1", teamName1);
+                intent.putExtra("teamName2", teamName2);
 
-
-
+                // TODO fake gameId as long as callback not working
+                int gameId = 1;
+                intent.putExtra("gameId", gameId);
+                //TODO do send message with helper here, remove startActivity
                 startActivity(intent);
+
+
             }
         });
-
-
-
 
     }
 
     @Override
     public void callback(DecodeMessage message) {
+        int gameId;
+
+        //TODO was isch mit clientID
+        // if right return message from server, start new Activity
+        if(message.getReturnType() == "ACK" && message.getRequestType() == "new game"){
+            gameId = message.getGameId();
+            intent.putExtra("gameId", gameId);
+            startActivity(intent);
+        }
+        //else try to send message to server again
+        else {
+            //send message again
+        }
 
 
     }

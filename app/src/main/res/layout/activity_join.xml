@@ -17,10 +17,70 @@
         tools:context="com.example.philipp.timesup.CreateActivity"
         android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        <TextView
+            android:id="@+id/game_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please enter game code" />
+
+        <EditText
+            android:id="@+id/game_code_edit"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/game_code"
+            android:inputType="number"/>
+
+        <TextView
+            android:id="@+id/enter_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/game_code_edit"
+            android:text="Please enter your name" />
+
+        <EditText
+            android:id="@+id/enter_name_edit"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/enter_name" />
+
+        <RadioGroup
+            android:id="@+id/radiogroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/enter_name_edit"
+            android:orientation="vertical">
+
+
+            <RadioButton
+                android:id="@+id/team_a"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Team A"
+                android:visibility="invisible"/>
+
+            <RadioButton
+                android:id="@+id/team_b"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/team_a"
+                android:text="Team B"
+                android:visibility="invisible"/>
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/button_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/radiogroup"
+            android:text="Join Game"/>
+
+        <Button
+            android:id="@+id/button_go"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/radiogroup"
+            android:text="GO!"
+            android:visibility="invisible"/>
 
     </RelativeLayout>
 </ScrollView>
