@@ -12,7 +12,6 @@
     >
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -42,7 +41,29 @@
         android:inputType="time"
         android:layout_below="@id/time_round"/>
 
+    <!--<NumberPicker
+        android:id="@+id/minute_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/time"
+        android:layout_marginStart="22dp" />
 
+    <TextView
+        android:id="@+id/colon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=":"
+        android:layout_below="@id/create_game"
+        android:layout_toRightOf="@id/minute_picker"/>
+
+
+    <NumberPicker
+        android:id="@+id/seconds_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/time"
+        android:layout_marginStart="22dp"
+        android:layout_toRightOf="@id/colon" />-->
 
      <!--CHOOSE ROUNDS -->
 
@@ -135,6 +156,13 @@
         android:inputType="number"
         android:layout_below="@id/words_per_pers"/>
 
+    <!--<NumberPicker
+        android:id="@+id/number_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/words_number"
+        android:layout_marginStart="22dp" />-->
+
 
 
      <!--ENTER YOUR NAME -->
@@ -166,6 +194,7 @@
         android:layout_below="@id/username"
         android:layout_toRightOf="@id/button_cancel"
         android:text="Finish" />
+
 
 </RelativeLayout>
 </ScrollView>

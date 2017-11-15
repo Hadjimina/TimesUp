@@ -1,14 +1,14 @@
 package com.example.philipp.timesup;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.Toast;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -21,22 +21,36 @@ Comes before JoinCodeActivity
 Contains settings for new game (Time per round, rounds, team names)
  */
 
-public class CreateActivity extends AppCompatActivity {
+public class CreateActivity extends ServerIOActivity{
 
     //public EncodeMessage(boolean[] rounds, String teamName1, String teamName2, int timePerRound, String username, int wordsPerPerson){
     boolean[] rounds = {true,true,true,true,true};
     CheckBox explain, pantomime, oneWord, freeze, sounds;
-    EditText team1, team2, uName;
+    EditText team1Edit, team2Edit, usernameEdit, timeEdit, wordsEdit;
     String teamName1, teamName2, username;
     int timePerRound, wordsPerPerson;
+    NumberPicker minutes, seconds, words;
     Button cancel, finish;
     Intent intent;
-    SharedPreferences sharedPref;
+    Toast toast;
+    EncodeMessage message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+
+        //TODO: solve bug when pressing finish and nothing at all is filled in
+
+        //timepicker
+/*
+        minutes = (NumberPicker) findViewById(R.id.minute_picker);
+
+        seconds = (NumberPicker) findViewById(R.id.seconds_picker);*/
+
+        timeEdit = (EditText) findViewById(R.id.time);
+
+        //set on click listeners for checkboxes about rounds
 
         explain = (CheckBox)  findViewById(R.id.explain);
         explain.setOnClickListener(new View.OnClickListener() {
@@ -46,8 +60,6 @@ public class CreateActivity extends AppCompatActivity {
             }
         });
 
-
-        //set on click listeners for checkboxes about rounds
         pantomime = (CheckBox)  findViewById(R.id.panto);
         pantomime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +92,20 @@ public class CreateActivity extends AppCompatActivity {
             }
         });
 
+        //EditText fields
+
+        team1Edit = (EditText) findViewById(R.id.team_a);
+
+        team2Edit = (EditText) findViewById(R.id.team_b);
+
+        usernameEdit = (EditText) findViewById(R.id.username);
+
+        //Words per Person
+
+        //words = (NumberPicker) findViewById(R.id.number_picker);
+
+        wordsEdit = (EditText) findViewById(R.id.words_number);
+
         //cancel Button goes back to  StartActivity
         cancel = (Button) findViewById(R.id.button_cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -97,16 +123,64 @@ public class CreateActivity extends AppCompatActivity {
             public void onClick(View view) {
                 intent = new Intent(getApplicationContext(), JoinCodeActivity.class);
                 //TODO send settings to server
-                //TODO wait for callback
+
+                //read teamnames and username
+                teamName1 = team1Edit.getText().toString();
+                teamName2 = team2Edit.getText().toString();
+                username = usernameEdit.getText().toString();
+
+                if (teamName1 == null) {
+                    toast = Toast.makeText(getApplicationContext(), "Please enter Name for Team A", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+
+                if (teamName2 == null) {
+                    toast = Toast.makeText(getApplicationContext(), "Please enter Name for Team B", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+
+                if (username == null) {
+                    toast = Toast.makeText(getApplicationContext(), "Please enter a username", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+
+                timePerRound = Integer.parseInt(timeEdit.getText().toString());
+
+                wordsPerPerson = Integer.parseInt(wordsEdit.getText().toString());
+
+                if (timePerRound == 0) {
+                    toast = Toast.makeText(getApplicationContext(), "Please enter the time per round", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+
+                if (wordsPerPerson == 0) {
+                    toast = Toast.makeText(getApplicationContext(), "Please enter a number of words per person", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+
+                message = new EncodeMessage(rounds, teamName1, teamName2, timePerRound, username, wordsPerPerson);
+
+                Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
+
+
+
+
                 startActivity(intent);
             }
         });
 
 
-        //create shared preference object
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
 
+    }
+
+    @Override
+    public void callback(DecodeMessage message) {
 
 
     }
