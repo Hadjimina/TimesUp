@@ -43,6 +43,8 @@ public class JoinActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
 
+        gameId = 0;
+
         //create texteditfields for code and username
         codeEdit = findViewById(R.id.game_code_edit);
         nameEdit = findViewById(R.id.enter_name_edit);
@@ -150,7 +152,7 @@ public class JoinActivity extends ServerIOActivity {
     @Override
     public void callback(DecodeMessage message) {
 
-        int gameId;
+
         String teamName1, teamName2;
 
         //initialize shared preferences
@@ -159,37 +161,45 @@ public class JoinActivity extends ServerIOActivity {
 
         // if right return message from server and request type was join, start show which teams you can join
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(JOIN)){
-            gameId = message.getGameId();
-            teamName1 = message.getString("teamName1");
-            teamName2 = message.getString("teamName2");
+            if(!message.getBoolean("hasStarted")) {
+                gameId = message.getGameId();
+                teamName1 = message.getString("teamName1");
+                teamName2 = message.getString("teamName2");
 
-            //add to shared preferences
+                //add to shared preferences
 
-            editor.putString("teamName1", teamName1);
-            editor.putString("teamName2", teamName2);
-            editor.apply();
+                editor.putString("teamName1", teamName1);
+                editor.putString("teamName2", teamName2);
+                editor.apply();
 
 
+                intent.putExtra("gameId", gameId);
 
-            intent.putExtra("gameId", gameId);
+                //make radioButtons to join a team visible
+                teamA = findViewById(R.id.team_a1);
+                teamB = findViewById(R.id.team_b1);
 
-            //make radioButtons to join a team visible
-            teamA = findViewById(R.id.team_a1);
-            teamB = findViewById(R.id.team_b1);
+                if (teamName1 != null) {
+                    teamA.setText(teamName1);
+                }
 
-            if (teamName1 != null) {
-                teamA.setText(teamName1);
+                if (teamName2 != null) {
+                    teamB.setText(teamName2);
+                }
+
+                teamA.setVisibility(View.VISIBLE);
+                teamB.setVisibility(View.VISIBLE);
+
+
+                //TODO here belongs text from above
+
+            } //if game has already started
+            else {
+                intent = new Intent(getApplicationContext(), GameActivity.class);
+                intent.putExtra("gameId", gameId);
+                startActivity(intent);
+
             }
-
-            if (teamName2 != null) {
-                teamB.setText(teamName2);
-            }
-
-            teamA.setVisibility(View.VISIBLE);
-            teamB.setVisibility(View.VISIBLE);
-
-
-            //TODO here belongs text from above
 
         }
         //game code doesn't exist, show error and set joingame button to visible again
