@@ -38,13 +38,13 @@
 
 
             <RadioButton
-                android:id="@+id/team_a"
+                android:id="@+id/team_a1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Team A" />
 
             <RadioButton
-                android:id="@+id/team_b"
+                android:id="@+id/team_b1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/team_a"
