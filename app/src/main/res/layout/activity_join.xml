@@ -12,10 +12,10 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.example.philipp.timesup.CreateActivity"
-        android:orientation="vertical">
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:context="com.example.philipp.timesup.CreateActivity">
+
 
         <TextView
             android:id="@+id/game_code"
@@ -62,25 +62,26 @@
                 android:id="@+id/team_b1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/team_a"
+                android:layout_below="@id/team_a1"
                 android:text="Team B"
                 android:visibility="invisible"/>
         </RadioGroup>
 
-        <Button
-            android:id="@+id/button_join"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:text="Join Game"/>
 
-        <Button
-            android:id="@+id/button_go"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:text="GO!"
-            android:visibility="invisible"/>
+            <Button
+                android:id="@+id/button_join"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/radiogroup"
+                android:text="Join Game"/>
+
+            <Button
+                android:id="@+id/button_go"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/radiogroup"
+                android:text="GO!"
+                android:visibility="invisible"/>
 
     </RelativeLayout>
 </ScrollView>

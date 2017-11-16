@@ -1,13 +1,18 @@
 package com.example.philipp.timesup;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
+
+import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.JOIN;
+import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -30,6 +35,8 @@ public class JoinActivity extends ServerIOActivity {
     Toast toast;
     EncodeMessage message;
     Intent intent;
+    SharedPreferences.Editor editor;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,13 @@ public class JoinActivity extends ServerIOActivity {
             public void onClick(View view) {
                 gameCode = codeEdit.getText().toString();
                 username = nameEdit.getText().toString();
+
+
+                //add to shared Preferences
+                prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+                editor = prefs.edit();
+                editor.putString("username", username);
+                editor.apply();
 
                 //set button to invisible
                 joinGame.setVisibility(View.GONE);
@@ -139,11 +153,24 @@ public class JoinActivity extends ServerIOActivity {
         int gameId;
         String teamName1, teamName2;
 
+        //initialize shared preferences
+        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        editor = prefs.edit();
+
         // if right return message from server and request type was join, start show which teams you can join
-        if(message.getReturnType() == "ACK" && message.getRequestType() == "Join"){
+        if(message.getReturnType().equals(ACK) && message.getRequestType().equals(JOIN)){
             gameId = message.getGameId();
             teamName1 = message.getString("teamName1");
             teamName2 = message.getString("teamName2");
+
+            //add to shared preferences
+
+            editor.putString("teamName1", teamName1);
+            editor.putString("teamName2", teamName2);
+            editor.apply();
+
+
+
             intent.putExtra("gameId", gameId);
 
             //make radioButtons to join a team visible
@@ -166,25 +193,31 @@ public class JoinActivity extends ServerIOActivity {
 
         }
         //game code doesn't exist, show error and set joingame button to visible again
-        else if(message.getReturnType() == "error" && message.getRequestType() == "Join"){
+        else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(JOIN)){
             //TODO
         }
         // if right return message from server and request type was teamjoin, proceed to next activity
-        else if(message.getReturnType() == "ACK" && message.getRequestType() == "teamJoin"){
+        else if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){
 
             boolean hasStarted;
-            int startTime, timePerRound;
+            int startTime, timePerRound, wordsPerPerson;
 
             hasStarted = message.getBoolean("hasStarted");
             startTime = message.getInt("startTime");
             timePerRound = message.getInt("timePerRound");
+
+            //TODO they should add this to message (Backendguys)
+            wordsPerPerson = message.getInt("wordsPerPerson");
+            editor.putInt("wordsPerPerson", wordsPerPerson);
+            editor.apply();
+
             intent.putExtra("hasStarted", hasStarted);
             intent.putExtra("startTime", startTime);
             intent.putExtra("timePerRound", timePerRound);
             startActivity(intent);
         }
         //try to send message again and show error
-        else if(message.getReturnType() == "error" && message.getRequestType() == "teamJoin"){
+        else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
             //TODO
         }
         //show error and go back to start

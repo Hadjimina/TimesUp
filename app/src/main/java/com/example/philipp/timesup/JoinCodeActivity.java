@@ -1,12 +1,17 @@
 package com.example.philipp.timesup;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -28,6 +33,8 @@ public class JoinCodeActivity extends ServerIOActivity {
     Button go;
     EncodeMessage message;
     Toast toast;
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,20 +94,29 @@ public class JoinCodeActivity extends ServerIOActivity {
     public void callback(DecodeMessage message) {
 
         boolean hasStarted;
-        int startTime, timePerRound;
+        int startTime, timePerRound, wordsPerPerson;
+        //initialize shared preferences
+        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        editor = prefs.edit();
 
         // if right return message from server, start new Activity
-        if(message.getReturnType() == "ACK" && message.getRequestType() == "teamJoin"){
+        if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){
             hasStarted = message.getBoolean("hasStarted");
             startTime = message.getInt("startTime");
             timePerRound = message.getInt("timePerRound");
             intent.putExtra("hasStarted", hasStarted);
             intent.putExtra("startTime", startTime);
             intent.putExtra("timePerRound", timePerRound);
+
+            //TODO they should add this to message (Backendguys)
+            wordsPerPerson = message.getInt("wordsPerPerson");
+            editor.putInt("wordsPerPerson", wordsPerPerson);
+            editor.apply();
+
             startActivity(intent);
         }
         //else try to send message to server again and show error
-        else if(message.getReturnType() == "error" && message.getRequestType() == "teamJoin"){
+        else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
             //TODO, same as in JoinCode
         }
         //show error and go back to start

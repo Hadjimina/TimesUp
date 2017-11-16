@@ -1,6 +1,7 @@
 package com.example.philipp.timesup;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +10,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
+
+import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.NEWGAME;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -34,6 +38,7 @@ public class CreateActivity extends ServerIOActivity{
     Intent intent;
     Toast toast;
     EncodeMessage message;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +111,13 @@ public class CreateActivity extends ServerIOActivity{
 
         wordsEdit = findViewById(R.id.words_number);
 
+
+
+
+        //initialize shared preferences object
+        editor = getSharedPreferences("myPref", MODE_PRIVATE).edit();
+
+
         //cancel Button goes back to StartActivity
         cancel = findViewById(R.id.button_cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -124,10 +136,19 @@ public class CreateActivity extends ServerIOActivity{
                 intent = new Intent(getApplicationContext(), JoinCodeActivity.class);
                 //TODO send settings to server
 
-                //read teamnames and username
+                //read teamnames and username and add them to shared preferences
                 teamName1 = team1Edit.getText().toString();
                 teamName2 = team2Edit.getText().toString();
                 username = usernameEdit.getText().toString();
+                editor.putString("teamName1", teamName1);
+                editor.putString("teamName2", teamName2);
+                editor.putString("username", username);
+
+
+                //add rounds to shared preferences
+                editor.putString("rounds", rounds.toString());
+                Log.d("Rounds", rounds.toString());
+
 
                 if (teamName1 == null) {
                     toast = Toast.makeText(getApplicationContext(), "Please enter Name for Team A", Toast.LENGTH_LONG);
@@ -147,9 +168,15 @@ public class CreateActivity extends ServerIOActivity{
                     return;
                 }
 
-                timePerRound = Integer.parseInt(timeEdit.getText().toString());
 
+                //parse time per round and put into shared preferences
+                timePerRound = Integer.parseInt(timeEdit.getText().toString());
+                editor.putInt("timePerRound",timePerRound);
+
+
+                //parse words per person and put into shared preferences
                 wordsPerPerson = Integer.parseInt(wordsEdit.getText().toString());
+                editor.putInt("wordsPerPerson", wordsPerPerson);
 
                 if (timePerRound == 0) {
                     toast = Toast.makeText(getApplicationContext(), "Please enter the time per round", Toast.LENGTH_LONG);
@@ -165,16 +192,20 @@ public class CreateActivity extends ServerIOActivity{
 
                 message = new EncodeMessage(rounds, teamName1, teamName2, timePerRound, username, wordsPerPerson);
 
-
                 Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
 
                 intent.putExtra("teamName1", teamName1);
                 intent.putExtra("teamName2", teamName2);
 
+                //apply shared preferences
+                editor.apply();
+
                 // TODO fake gameId as long as callback not working
                 int gameId = 1;
                 intent.putExtra("gameId", gameId);
                 //TODO do send message with helper here, remove startActivity
+
+
                 startActivity(intent);
 
 
@@ -187,9 +218,8 @@ public class CreateActivity extends ServerIOActivity{
     public void callback(DecodeMessage message) {
         int gameId;
 
-        //TODO was isch mit clientID
         // if right return message from server, start new Activity
-        if(message.getReturnType() == "ACK" && message.getRequestType() == "new game"){
+        if(message.getReturnType().equals(ACK) && message.getRequestType().equals(NEWGAME)){
             gameId = message.getGameId();
             intent.putExtra("gameId", gameId);
             startActivity(intent);
