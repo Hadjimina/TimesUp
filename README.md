@@ -34,6 +34,9 @@
         protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           
+          SocketHandler handler = new SocketHandler(this);
+          handler.execute();
+          
           ...
           //Some code
           int gameId = ... //get those values through shared prefs 
@@ -41,8 +44,7 @@
           int teamId = ...
           ...
           
-          SocketHandler handler = new SocketHandler(this);
-          handler.execute();
+          
           EncodeMessage messageToSend = new EncodeMessage(gameId, clientId, teamId);
           handler.send(messageToSend);
           
