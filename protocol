@@ -2,7 +2,7 @@
 - When nothing is specified it is assumed that first the "SENDING" is executed and afterwards the "RECEIVE"
 - When we have  "BCAST" this means that the server sends this data to everyone w.o. first receiving an message
 - "SENDING" is meant as "The Android App is SENDING"
-- "RECEIVING" is meant as "The Server is RECEIVING"
+- "RECEIVING" is meant as "The he Android App is RECEIVING from the server"
 - The things we are unsure if we need them for the protocol have been omitted
 
 SENDING
