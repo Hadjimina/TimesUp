@@ -6,8 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 
 public class DecodeMessage {
     private String returnType;
@@ -17,6 +15,7 @@ public class DecodeMessage {
     private JSONObject body;
 
     public DecodeMessage(String rawMessage){
+
         try{
             JSONObject entireObject = new JSONObject(rawMessage);
             this.returnType = entireObject.getString("returnType");
@@ -96,5 +95,6 @@ public class DecodeMessage {
     public int getClientId() {
         return clientId;
     }
+
 
 }

@@ -13,6 +13,8 @@ Comes before JoinActivity or CreateActivity
 Contains two buttons Join and Create
  */
 
+
+//dummy extends just for testing
 public class StartActivity extends AppCompatActivity {
 
     Button create, join;
@@ -23,7 +25,7 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        create = (Button) findViewById(R.id.button_create);
+        create = findViewById(R.id.button_create);
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -32,7 +34,7 @@ public class StartActivity extends AppCompatActivity {
             }
         });
 
-        join = (Button) findViewById(R.id.button_join);
+        join = findViewById(R.id.button_join);
         join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,4 +44,5 @@ public class StartActivity extends AppCompatActivity {
         });
 
     }
+
 }

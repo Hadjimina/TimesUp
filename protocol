@@ -1,0 +1,229 @@
+- 000 denotes some known integer
+- When nothing is specified it is assumed that first the "SENDING" is executed and afterwards the "RECEIVE"
+- When we have  "BCAST" this means that the server sends this data to everyone w.o. first receiving an message
+- "SENDING" is meant as "The Android App is SENDING"
+- "RECEIVING" is meant as "The Server is RECEIVING"
+- The things we are unsure if we need them for the protocol have been omitted
+
+SENDING
+1. Join Game:
+(Client->Server)
+{
+    "requestType":"join",
+    "gameId":000,
+    "clientId": -1,
+    "body": {}
+}
+
+2. Join Team:
+(Client->Server)
+The value in "teamToJoin" is some teamId we got when we joined the game
+{
+    "requestType":"joinTeam",
+    "gameId": 000,
+    "clientId": 000,
+    "body":
+    {
+        "teamToJoin": 000
+    }
+}
+
+3. New Game
+(Client->Server)
+{
+    "requestType":"newGame",
+    "gameId":-1,
+    "clientId": -1,
+    "body":
+    {
+        "teamName1": "someName",
+        "teamName2": "someName",
+        "timePerRound": 000,
+        "wordsPerPerson": 000
+        "username": "someName",
+        "rounds": [true,false,false,true,true],
+
+    }
+}
+
+4. Ready
+(Client->Server)
+{
+    "requestType":"ready",
+    "gameId":000,
+    "clientId": 000,
+    "body":
+    {
+        "wordList" : ["word1", "word2",....]
+    }
+}
+
+5. Unready
+(Client->Server)
+{
+    "requestType":"unready",
+    "gameId":000,
+    "clientId": 000,
+    "body":{}
+}
+
+6. BCAST Setup:
+(Server->Client)
+{
+    "requestType":"ack",
+    "gameId":000,
+    "clientId": 000,
+    "body":{}
+}
+
+7. BCAST startRound:
+(Server->Client)
+{
+    "requestType":"ack",
+    "gameId":000,
+    "clientId": 000,
+    "body":{}
+}
+
+8. Next round:
+(Client->Server)
+{
+    "requestType":"nextRound",
+    "gameId":000,
+    "clientId": 000,
+    "body":{}
+}
+
+9. Round finished:
+(Client->Server)
+{
+    "requestType":"roundFinished",
+    "gameId":000,
+    "clientId": 000,
+    "body":
+    {
+        "wordIndex":000,
+        "phaseNr": 000
+    }
+}
+
+
+RECIEVING
+1. Join Game
+(Client->Server)
+{
+    "returnType":"ACK",
+    "requestType":"Join",
+    "clientId": 000,
+    "gameId":000,
+    "body":
+    {
+        "teamName1":"someName1",
+        "teamName2":"someName2",
+        "teamId1":000,
+        "teamId2":000
+    }
+}
+
+2. Join Team
+(Client->Server)
+Meaning of startTime ?
+{
+    "returnType":"ACK",
+    "requestType":"teamJoin",
+    "clientId": 000,
+    "gameId":000,
+    "body":
+    {
+        "hastStarted": false,
+        "startTime": -1,
+        "timePerRound": 60,
+        "wordsPerPerson"
+    }
+}
+
+3. New Game
+(Client->Server)
+{
+    "returnType":"ACK",
+    "requestType":"newGame",
+    "clientId": 000,
+    "gameId":000,
+    "body": {}
+}
+
+4. Ready
+(Client->Server)
+{
+    "returnType":"ACK",
+    "requestType":"ready",
+    "clientId": 000,
+    "gameId":000,
+    "body": {}
+}
+
+5. Unready
+(Client->Server)
+Deletes wordlist of the current client on the server
+{
+    "returnType":"ACK",
+    "requestType":"unready",
+    "clientId": 000,
+    "gameId":000,
+    "body": {}
+}
+
+6. BCAST Setup
+(Server->Clients)
+The wordlist is ordered in the way the player have to guess the words!
+{
+    "returnType":"setup",
+    "requestType":"",
+    "clientId": 000,
+    "gameId":000,
+    "body":
+    {
+        wordList: [word1, word2, word3,...]
+    }
+}
+
+7. BCAST Start round / next Round:
+(Server->Client)
+startTime has to be handled somehow ???
+activeTeam is the id of the currently guessing Team
+wordIndex is the current start index in the wordlist
+{
+    "returnType":"starRound",
+    "requestType":"",
+    "clientId": 000,
+    "gameId":000,
+    "body":
+    {
+        "startTime": 000,
+        "activeTeam":000,
+        "activePlayer":"someName",
+        "phaseNumber": 000,
+        "wordIndex":000
+    }
+}
+
+8. next Round:
+(Server->Client)
+goto 7
+
+9. Round finished
+(one Client->Server->BCAST to all clients)
+if the game is over the phase wil be "over"
+{
+    "returnType":"ACK",
+    "requestType":"roundFinished",
+    "clientId": 000,
+    "gameId":000,
+    "body":
+    {
+        "scoreTeam1": 000,
+        "scoreTeam2": 000,
+        "nextPlayer": "someName",
+        "nextPhase": "somePhase"
+    }
+}
