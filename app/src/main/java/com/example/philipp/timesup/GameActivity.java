@@ -19,9 +19,14 @@ import android.os.Bundle;
 
 public class GameActivity extends AppCompatActivity {
 
+    static int playerType; // Explain(0)-, Guess(1)- or Watchtype(2)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        if(playerType == 0){
+            setContentView(R.layout.activity_game_explainer);
+        }
     }
 }

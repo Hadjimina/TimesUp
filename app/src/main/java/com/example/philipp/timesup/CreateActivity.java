@@ -190,7 +190,7 @@ public class CreateActivity extends ServerIOActivity{
                     return;
                 }
 
-                message = new EncodeMessage(rounds, teamName1, teamName2, timePerRound, username, wordsPerPerson);
+                message = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
 
                 Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
 
