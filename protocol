@@ -102,8 +102,8 @@ The value in "teamToJoin" is some teamId we got when we joined the game
     "clientId": 000,
     "body":
     {
-        "wordIndex":000,
-        "phaseNr": 000
+    	"phaseNr": 000,
+        "wordIndex":000
     }
 }
 

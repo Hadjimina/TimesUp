@@ -14,7 +14,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_marginBottom="20sp"
-        android:text="HELLO"
+        android:text="Chätzli"
         android:textSize="50sp"
         android:visibility="invisible"
         />

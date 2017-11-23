@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -26,10 +27,14 @@ import static android.view.View.VISIBLE;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId;
+    static int activeTeam, gameId, clientId, wordsPerPerson, wordIndex, count;
     String activePlayer;
     SharedPreferences sharedPrefs;
     String username;
+    String[] words;
+    TextView word;
+    SocketHandler handler;
+
 
 
     @Override
@@ -41,20 +46,49 @@ public class GameActivity extends ServerIOActivity {
         Intent intent = getIntent();
         gameId = intent.getIntExtra("gameId", -1);
         clientId = intent.getIntExtra("clientId", -1);
-        //TODO: get wordarray and active player from intent of GameEndActivity
+        //TODO: get wordarray & active player & wordIndex from intent of GameEndActivity
+        //wordIndex = intent.getIntExtra("wordIndex", -1);
 
         //get username
         sharedPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         username = sharedPrefs.getString("username", null);
+        wordsPerPerson = sharedPrefs.getInt("wordsPerPerson", 0);
+        words = new String[wordsPerPerson];
+
+
+        playerType = 0;
+        count = 0;
+
+        handler = new SocketHandler(this);
 
 
         if (playerType == 0) {
             TextView discipline = findViewById(R.id.discipline);
-            TextView word = findViewById(R.id.wordToGuess);
+            word = findViewById(R.id.wordToGuess);
             word.setVisibility(VISIBLE);
             discipline.setVisibility((VISIBLE));
             Button nextButton = findViewById(R.id.nextButton);
             nextButton.setVisibility(VISIBLE);
+            word.setText(words[wordIndex]);
+            nextButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    wordIndex++;
+                    if(wordIndex < words.length){
+                        word.setText(words[wordIndex]);
+                    }
+                    else{
+                        word.setText("No more words..");
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        handler.execute();
+
+                    }
+                }
+            });
+
         }
         else if(playerType == 1) {
             TextView guessInstruction = findViewById(R.id.guessInstruction);
@@ -81,7 +115,7 @@ public class GameActivity extends ServerIOActivity {
             }
 
             public void onFinish() {
-                timer.setText("done!");
+                timer.setText("stop!");
             }
         }.start();
 
@@ -90,11 +124,6 @@ public class GameActivity extends ServerIOActivity {
     @Override
     public void callback(DecodeMessage message) {
         //new round
-        if (message.getReturnType().equals("startRound")) {
-            activeTeam = message.getInt("activeTeam");
-            activePlayer = message.getString("activePlayer");
-            if (activePlayer.equals(username)) {playerType = 0;}
-            
-        }
+
     }
 }
