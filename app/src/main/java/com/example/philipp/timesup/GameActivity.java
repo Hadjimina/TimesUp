@@ -1,6 +1,9 @@
 package com.example.philipp.timesup;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -22,10 +25,11 @@ import static android.view.View.VISIBLE;
 
 public class GameActivity extends ServerIOActivity {
 
-    static int playerType; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam;
+    static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
+    static int activeTeam, gameId, clientId;
     String activePlayer;
-
+    SharedPreferences sharedPrefs;
+    String username;
 
 
     @Override
@@ -33,6 +37,15 @@ public class GameActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        //get gameId and clientId
+        Intent intent = getIntent();
+        gameId = intent.getIntExtra("gameId", -1);
+        clientId = intent.getIntExtra("clientId", -1);
+        //TODO: get wordarray and active player from intent of GameEndActivity
+
+        //get username
+        sharedPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        username = sharedPrefs.getString("username", null);
 
 
         if (playerType == 0) {
@@ -54,13 +67,34 @@ public class GameActivity extends ServerIOActivity {
         else{
             System.out.println("ERROR: NO ALLOWED playerType");
         }
+
+
+
+        //setup timer
+        final TextView timer = findViewById(R.id.timer);
+        timer.setText("00:30");
+
+        new CountDownTimer(30000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                timer.setText("00:" + millisUntilFinished / 1000);
+            }
+
+            public void onFinish() {
+                timer.setText("done!");
+            }
+        }.start();
+
     }
 
     @Override
     public void callback(DecodeMessage message) {
-        if (message.getReturnType().equals("startRound")){
+        //new round
+        if (message.getReturnType().equals("startRound")) {
             activeTeam = message.getInt("activeTeam");
             activePlayer = message.getString("activePlayer");
+            if (activePlayer.equals(username)) {playerType = 0;}
+            
         }
     }
 }

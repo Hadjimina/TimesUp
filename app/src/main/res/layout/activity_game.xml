@@ -61,5 +61,16 @@
         android:visibility="invisible"
         />
 
+    <TextView
+        android:id="@+id/timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/discipline"
+        android:layout_marginBottom="20sp"
+        android:textSize="50sp"
+
+        />
+
 
 </RelativeLayout>

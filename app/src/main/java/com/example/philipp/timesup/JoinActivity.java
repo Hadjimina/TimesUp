@@ -31,7 +31,7 @@ public class JoinActivity extends ServerIOActivity {
     Button joinGame, go;
     RadioButton teamA, teamB;
     String gameCode, username;
-    int gameId;
+    int gameId, clientId;
     Toast toast;
     EncodeMessage message;
     Intent intent;
@@ -165,11 +165,17 @@ public class JoinActivity extends ServerIOActivity {
                 gameId = message.getGameId();
                 teamName1 = message.getString("teamName1");
                 teamName2 = message.getString("teamName2");
+                int teamId1 = message.getInt("teamId1");
+                int teamId2 = message.getInt("teamId2");
+                clientId = message.getInt("clientId");
 
                 //add to shared preferences
 
                 editor.putString("teamName1", teamName1);
                 editor.putString("teamName2", teamName2);
+                editor.putInt("teamId1", teamId1);
+                editor.putInt("teamId2", teamId2);
+                editor.putInt("clientId", clientId);
                 editor.apply();
 
 
