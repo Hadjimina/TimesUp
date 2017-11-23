@@ -27,7 +27,7 @@ import static android.view.View.VISIBLE;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId, wordsPerPerson, wordIndex, count;
+    static int activeTeam, gameId, clientId, wordsPerPerson, wordIndex, count, phaseNr;
     String activePlayer;
     SharedPreferences sharedPrefs;
     String username;
@@ -46,7 +46,7 @@ public class GameActivity extends ServerIOActivity {
         Intent intent = getIntent();
         gameId = intent.getIntExtra("gameId", -1);
         clientId = intent.getIntExtra("clientId", -1);
-        //TODO: get wordarray & active player & wordIndex from intent of GameEndActivity
+        //TODO: get wordarray & active player & wordIndex & phaseNumber from intent of GameEndActivity
         //wordIndex = intent.getIntExtra("wordIndex", -1);
 
         //get username
@@ -84,7 +84,9 @@ public class GameActivity extends ServerIOActivity {
                             e.printStackTrace();
                         }
                         handler.execute();
-
+                        EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
+                        Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
+                        startActivity(intent);
                     }
                 }
             });
@@ -124,6 +126,10 @@ public class GameActivity extends ServerIOActivity {
     @Override
     public void callback(DecodeMessage message) {
         //new round
+        if(message.getReturnType().equals("ACK") && message.getRequestType().equals("roundFinished")){
+            Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
+            startActivity(intent);
+        }
 
     }
 }
