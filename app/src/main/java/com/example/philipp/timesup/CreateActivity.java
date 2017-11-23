@@ -168,17 +168,18 @@ public class CreateActivity extends ServerIOActivity{
                     return;
                 }
 
-
-                //parse time per round and put into shared preferences
-                timePerRound = Integer.parseInt(timeEdit.getText().toString());
-                editor.putInt("timePerRound",timePerRound);
+                if (timeEdit != null && !timeEdit.equals("")) {
+                    //parse time per round and put into shared preferences
+                    timePerRound = Integer.parseInt(timeEdit.getText().toString());
+                    editor.putInt("timePerRound", timePerRound);
+                }
 
 
                 //parse words per person and put into shared preferences
                 wordsPerPerson = Integer.parseInt(wordsEdit.getText().toString());
                 editor.putInt("wordsPerPerson", wordsPerPerson);
 
-                if (timePerRound == 0) {
+                if (timePerRound == 0 || timeEdit == null && timeEdit.equals("")) {
                     toast = Toast.makeText(getApplicationContext(), "Please enter the time per round", Toast.LENGTH_LONG);
                     toast.show();
                     return;
