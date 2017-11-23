@@ -193,7 +193,7 @@ startTime has to be handled somehow ???
 activeTeam is the id of the currently guessing Team
 wordIndex is the current start index in the wordlist
 {
-    "returnType":"starRound",
+    "returnType":"startRound",
     "requestType":"",
     "clientId": 000,
     "gameId":000,
