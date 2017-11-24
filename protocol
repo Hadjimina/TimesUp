@@ -102,8 +102,8 @@ The value in "teamToJoin" is some teamId we got when we joined the game
     "clientId": 000,
     "body":
     {
-        "wordIndex":000,
-        "phaseNr": 000
+    	"phaseNr": 000,
+        "wordIndex":000
     }
 }
 
@@ -193,7 +193,7 @@ startTime has to be handled somehow ???
 activeTeam is the id of the currently guessing Team
 wordIndex is the current start index in the wordlist
 {
-    "returnType":"starRound",
+    "returnType":"startRound",
     "requestType":"",
     "clientId": 000,
     "gameId":000,
