@@ -12,8 +12,9 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
         tools:context="com.example.philipp.timesup.CreateActivity">
 
 
@@ -21,67 +22,87 @@
             android:id="@+id/game_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please enter game code" />
+            android:text="@string/enter_game_code"
+            android:textSize="16sp"
+            android:textColor="#000000"/>
 
         <EditText
             android:id="@+id/game_code_edit"
-            android:layout_width="250sp"
+            android:layout_width="350sp"
             android:layout_height="wrap_content"
             android:layout_below="@id/game_code"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/game_code_hint"/>
 
         <TextView
             android:id="@+id/enter_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/game_code_edit"
-            android:text="Please enter your name" />
+            android:text="@string/enter_name"
+            android:textSize="16sp"
+            android:textColor="#000000"/>
 
         <EditText
             android:id="@+id/enter_name_edit"
-            android:layout_width="250sp"
+            android:layout_width="350sp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/enter_name" />
+            android:layout_below="@id/enter_name"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/username"/>
+
+        <TextView
+            android:id="@+id/team"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/enter_name_edit"
+            android:text="@string/select_team"
+            android:textSize="16sp"
+            android:layout_marginBottom="10dp"
+            android:textColor="#000000"
+            android:visibility="invisible"/>
 
         <RadioGroup
             android:id="@+id/radiogroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/enter_name_edit"
-            android:orientation="vertical">
-
+            android:layout_below="@+id/team"
+            android:orientation="vertical"
+            android:layout_marginBottom="20dp">
 
             <RadioButton
                 android:id="@+id/team_a1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Team A"
+                android:text="@string/team_a"
                 android:visibility="invisible"/>
 
             <RadioButton
                 android:id="@+id/team_b1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/team_a1"
-                android:text="Team B"
+                android:text="@string/team_b"
                 android:visibility="invisible"/>
         </RadioGroup>
 
 
             <Button
                 android:id="@+id/button_join"
-                android:layout_width="wrap_content"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/radiogroup"
-                android:text="Join Game"/>
+                android:text="@string/join_game"
+                android:layout_marginBottom="50dp"/>
 
             <Button
                 android:id="@+id/button_go"
-                android:layout_width="wrap_content"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/radiogroup"
-                android:text="GO!"
-                android:visibility="invisible"/>
+                android:text="@string/go"
+                android:visibility="invisible"
+                android:layout_marginBottom="50dp"/>
 
     </RelativeLayout>
 </ScrollView>

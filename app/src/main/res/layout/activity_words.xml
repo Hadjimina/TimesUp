@@ -1,37 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="30dp"
     tools:context="com.example.philipp.timesup.WordsActivity">
 
     <TextView
         android:id="@+id/enter_words"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter words"
-         />
+        android:text="@string/enter_words"
+        android:labelFor="@+id/enter_word_edit"
+        android:textSize="16sp"
+        android:textColor="#000000" />
 
     <EditText
-        android:id="@+id/enter_word_edit"
+        android:id="@id/enter_word_edit"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@id/enter_words"
+        android:inputType="text"/>
+
+    <TextView
+        android:id="@+id/number_of_words"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/enter_words" />
+        android:textSize="14sp"
+        android:layout_below="@id/enter_word_edit"
+        android:textColor="#000000" />
 
     <Button
         android:id="@+id/button_enter"
-        android:layout_width="wrap_content"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/enter_word_edit"
-        android:text="Enter" />
+        android:layout_marginTop="100dp"
+        android:layout_below="@id/number_of_words"
+        android:text="@string/enter" />
 
     <Button
         android:id="@+id/button_ready"
-        android:layout_width="wrap_content"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/enter_word_edit"
+        android:layout_marginTop="100dp"
+        android:layout_below="@id/number_of_words"
         android:visibility="invisible"
-        android:text="Ready" />
+        android:text="@string/ready" />
 
 </RelativeLayout>

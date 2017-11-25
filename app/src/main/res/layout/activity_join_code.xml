@@ -13,7 +13,8 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
         tools:context="com.example.philipp.timesup.CreateActivity"
         android:orientation="vertical">
 
@@ -21,19 +22,36 @@
             android:id="@+id/text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="code for your game" />
+            android:layout_marginBottom="10dp"
+            android:text="@string/game_code"
+            android:textSize="16sp"
+            android:textColor="#000000"/>
 
         <TextView
             android:id="@+id/code"
+            android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/text1" />
+            android:layout_below="@id/text1"
+            android:layout_marginBottom="20dp"
+            android:textSize="22sp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:id="@+id/select_team"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/code"
+            android:text="@string/select_team"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:textColor="#000000"/>
 
         <RadioGroup
             android:id="@+id/radiogroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/code"
+            android:layout_below="@+id/select_team"
             android:orientation="vertical">
 
 
@@ -41,22 +59,22 @@
                 android:id="@+id/team_a1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Team A" />
+                android:text="@string/team_a" />
 
             <RadioButton
                 android:id="@+id/team_b1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/team_a"
-                android:text="Team B" />
+                android:layout_marginBottom="30dp"
+                android:text="@string/team_b" />
         </RadioGroup>
 
         <Button
             android:id="@+id/button_go"
-            android:layout_width="wrap_content"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/radiogroup"
-            android:text="GO!"/>
+            android:text="@string/go"/>
     </RelativeLayout>
 
 </ScrollView>

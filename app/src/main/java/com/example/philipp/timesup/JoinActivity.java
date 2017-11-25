@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
@@ -27,6 +28,7 @@ import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 
 public class JoinActivity extends ServerIOActivity {
 
+    TextView team;
     EditText codeEdit, nameEdit;
     Button joinGame, go;
     RadioButton teamA, teamB;
@@ -63,14 +65,10 @@ public class JoinActivity extends ServerIOActivity {
                 editor.putString("username", username);
                 editor.apply();
 
-                //set button to invisible
-                joinGame.setVisibility(View.GONE);
-
                 //find out if game code was set
                 if (gameCode == null || gameCode.equals("")) {
                     toast = Toast.makeText(getApplicationContext(), "please enter a code to join the game", Toast.LENGTH_LONG);
                     toast.show();
-                    return;
 
                 // if game code was set, parse it and send message to server and create intent
                 } else {
@@ -79,9 +77,12 @@ public class JoinActivity extends ServerIOActivity {
                     if (username == null || username.equals("")) {
                         toast = Toast.makeText(getApplicationContext(), "please enter a name to join the game", Toast.LENGTH_LONG);
                         toast.show();
-                        return;
                      //if username was set, proceed
                     } else {
+
+                        //set button to invisible
+                        joinGame.setVisibility(View.GONE);
+
                         //TODO add client ID
                         //message = new EncodeMessage(gameId, clientId, username);
 
@@ -90,15 +91,16 @@ public class JoinActivity extends ServerIOActivity {
 
 
                         //ALL BELOW BELONGS TO CALLBACK FUNCTION
-                        //TODO nachher useneh
                         //make radioButtons to join a team visible
                         teamA = findViewById(R.id.team_a1);
                         teamB = findViewById(R.id.team_b1);
+                        team = findViewById(R.id.team);
 
+                        team.setVisibility(View.VISIBLE);
                         teamA.setVisibility(View.VISIBLE);
                         teamB.setVisibility(View.VISIBLE);
 
-
+                        //TODO nachher useneh
                         //dummy values, will get deleted
                         String teamName1 = "Hellö1";
                         String teamName2 = "Hellö2";
@@ -133,6 +135,7 @@ public class JoinActivity extends ServerIOActivity {
                                     intent.putExtra("gameId", gameId);
                                 } else {
                                     toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
+                                    toast.show();
                                     return;
                                 }
 
