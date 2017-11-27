@@ -73,7 +73,13 @@ The value in "teamToJoin" is some teamId we got when we joined the game
     "requestType":"ack",
     "gameId":000,
     "clientId": 000,
-    "body":{}
+    "body":
+    {
+        "teamName1":"someName1",
+        "teamName2":"someName2",
+        "teamId1":000,
+        "teamId2":000
+    }
 }
 
 7. BCAST startRound:
