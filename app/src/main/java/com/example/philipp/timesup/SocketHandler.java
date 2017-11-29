@@ -18,21 +18,27 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     private WebSocketClient webSocketClient;
     private URI uri;
 
-    public SocketHandler(ServerIOActivity callbackActivity){
-        this.callbackActivity = callbackActivity;
+    public SocketHandler(){
 
-        Log.i("Websocket", "initialized");
+        Log.i("Websocket", "initialized without callback!");
+
         //Initialize Socket
         try {
             this.uri = new URI(SERVER_IP);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+
+        this.execute();
     }
 
     public void sendMessage(EncodeMessage messageToSend){
         webSocketClient.send(messageToSend.toJSONString());
         Log.i("Websocket", "Sent " + messageToSend.toJSONString());
+    }
+
+    public void setCallbackActivity(ServerIOActivity callbackActivity){
+        this.callbackActivity = callbackActivity;
     }
 
     @Override
