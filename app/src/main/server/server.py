@@ -45,7 +45,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 teamName1 = body["teamName1"]
                 teamName2 = body["teamName2"]
                 timePerRound = body["timePerRound"]
-                username = body["username"]
                 wordsPerPerson = body["wordsPerPerson"]
 
             # In case any of the lookups would fail --> return error message
@@ -87,7 +86,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             games[gameId][0] = queue.Queue()
 
             # Do client logic
-            client(self.request, gameId, clientId, username)
+            client(self.request, gameId, clientId)
 
         # Case 2: New client connection to game
         elif requestType == "join":
@@ -152,8 +151,11 @@ class RequestHandler(socketserver.BaseRequestHandler):
             message = encodeJoinMessage(gameId, clientId, teamName1, teamName2)
             self.request.sendall(message.encode())
 
+            # Send username and clientId to gameThread
+            gameQueues[gameId].put(("newClient", username, clientId))
+
             # Do client logic
-            client(self.request, gameId, clientId, username)
+            client(self.request, gameId, clientId)
 
         # Case 3: A message for an existing game was received.
         else:
@@ -163,7 +165,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             return
 
 
-def client(request, gameId, clientId, username):
+def client(request, gameId, clientId):
 
     socket_active = True
     while True:
@@ -182,7 +184,7 @@ def client(request, gameId, clientId, username):
                 else:
 
                     # Function that handles the message
-                    handleClientMessage(request, message, gameId, clientId, username)
+                    handleClientMessage(request, message, gameId, clientId)
         try:
             # Get an item from the queue
             item = games[gameId][clientId].get_nowait()
@@ -193,7 +195,7 @@ def client(request, gameId, clientId, username):
             else:
 
                 # Function that handles the item
-                handleQueueItem(request, item, gameId, clientId, username)
+                handleQueueItem(request, item, gameId, clientId)
 
         # If the queue was empty, do nothing
         except queue.Empty:
@@ -207,7 +209,7 @@ def client(request, gameId, clientId, username):
             break
 
 
-def handleClientMessage(request, rawMessage, gameId, clientId, username):
+def handleClientMessage(request, rawMessage, gameId, clientId):
     message = json.load(rawMessage)
 
     messageType = None
@@ -332,7 +334,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId, username):
         return False
 
 
-def handleQueueItem(request, item, gameId, clientId, username):
+def handleQueueItem(request, item, gameId, clientId):
     (requestType, data) = item
 
     if requestType == "teamJoinAck":
@@ -391,6 +393,7 @@ def handleQueueItem(request, item, gameId, clientId, username):
 
 def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerson):
     users = list()  # This is the list of users in this game
+    usernames = dict()  # This contains the mapping between the clientIds and the usernames
     team1 = deque()  # Players of team1 (clientId)
     team2 = deque()  # Players of team2 (clientId)
     submittedWords = dict()  # Players that have already submitted words
@@ -429,9 +432,9 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
         if messageType == "teamToJoin":
 
-            # Add user to the users list
-            if clientId not in users:
-                users.append(clientId)
+            # Make sure player is not already in a team
+            if clientId in team1 or clientId in team2:
+                games[gameId][clientId].put("error", ["player is already in a team", messageType])
 
             # Put player into the team (can only be 1 or 2)
             if data == 1:
@@ -446,6 +449,10 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             # Check if the client has already submitted words
             if clientId in submittedWords.keys():
                 games[gameId][clientId].put("error", ["client has already submitted words", messageType])
+            elif clientId not in usernames.keys():
+                games[gameId][clientId].put("error", ["client has not submitted username", messageType])
+            elif (clientId not in team1) or (clientId not in team2):
+                games[gameId][clientId].put("error", ["client is not in a team", messageType])
             else:
 
                 # Add the words to the dict
@@ -570,9 +577,14 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     nextPlayer = team2.popleft()
                     team2.append(nextPlayer)
 
+                # Find the name of the next player
+                nextPlayerName = usernames.get(nextPlayer)
+                if nextPlayerName is None:
+                    games[gameId][clientId].put("error", ["client has no username", messageType])
+
                 # Broadcast next player and score to all players
                 for user in users:
-                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
+                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayerName, nextPhase])
 
                 # If game is completely done, stop the gameThread
                 if nextPhase == -1:
@@ -591,6 +603,17 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             if clientId == activePlayer:
                 for user in users:
                     games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
+
+        elif messageType == "newClient":
+
+            # Add user to the users list
+            if clientId not in users:
+                users.append(clientId)
+            else:
+                games[gameId][clientId].put("error", ["clientId is already in users", messageType])
+
+            # Save new user into the usernames dictionary
+            usernames[clientId] = data
 
         else:
             games[gameId][clientId].put("error", ["unknown messageType", messageType])
