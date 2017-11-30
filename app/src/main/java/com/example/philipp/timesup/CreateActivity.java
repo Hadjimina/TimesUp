@@ -37,8 +37,9 @@ public class CreateActivity extends ServerIOActivity{
     Button cancel, finish;
     Intent intent;
     Toast toast;
-    EncodeMessage message;
+    EncodeMessage sendMessage;
     SharedPreferences.Editor editor;
+    SocketHandler socketHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +118,11 @@ public class CreateActivity extends ServerIOActivity{
         //initialize shared preferences object
         editor = getSharedPreferences("myPref", MODE_PRIVATE).edit();
 
+        //initialize server stuff
+        socketHandler = new SocketHandler(this);
+
+        socketHandler.execute();
+
 
         //cancel Button goes back to StartActivity
         cancel = findViewById(R.id.button_cancel);
@@ -191,23 +197,24 @@ public class CreateActivity extends ServerIOActivity{
                     return;
                 }
 
-                message = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
-
                 Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
 
+                //add things to intent
                 intent.putExtra("teamName1", teamName1);
                 intent.putExtra("teamName2", teamName2);
 
                 //apply shared preferences
                 editor.apply();
 
+                //Send message to server
+                sendMessage = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
+                socketHandler.sendMessage(sendMessage);
+
                 // TODO fake gameId as long as callback not working
                 int gameId = 1;
                 intent.putExtra("gameId", gameId);
                 //TODO do send message with helper here, remove startActivity
 
-
-                startActivity(intent);
 
 
             }
@@ -217,17 +224,26 @@ public class CreateActivity extends ServerIOActivity{
 
     @Override
     public void callback(DecodeMessage message) {
-        int gameId;
+        int gameId, clientId;
 
         // if right return message from server, start new Activity
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(NEWGAME)){
+
             gameId = message.getGameId();
-            intent.putExtra("gameId", gameId);
+            clientId = message.getClientId();
+
+            //add retrieved information to sharedPreferences
+            editor.putInt("gameId", gameId);
+            editor.putInt("clientId", clientId);
+            editor.apply();
+
             startActivity(intent);
         }
         //else try to send message to server again
         else {
-            //send message again
+            socketHandler.sendMessage(sendMessage);
+            toast = Toast.makeText(getApplicationContext(), "error contacting server, trying to send message again", Toast.LENGTH_LONG);
+            toast.show();
         }
 
 
