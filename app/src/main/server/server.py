@@ -1,27 +1,23 @@
-import socket
+import datetime
 import threading
 import socketserver
-import _thread
 import json
 import queue
 import random
+import select
+from collections import deque
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        # Read the size of the message
-        size = int(self.request.recv(4))
-
         # Read the message
-        receivedData = self.request.recv(size).strip()
+        receivedData = self.request.recv(1024).strip()
 
         # Turn into a JSON (a dict)
-        d = json.load(receivedData)
+        d = json.load(receivedData.decode())
 
         # Get requestType (None if non-existent)
         requestType = d.get("requestType")
-
-        # Case distinction on the type of request
 
         # Case 0: No requestType specified --> return error message
         if requestType is None:
@@ -39,291 +35,567 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 gameId = random.randrange(0, 9999)
 
             # Create a new empty queue for the new gameId
-            games[gameId] = queue.Queue()
-            b = d["body"]
+            games[gameId] = dict()
+            gameQueues[gameId] = dict()
 
-            # Creating a new game starts a new gameThread
+            # Read out all values from the request
             try:
-                newGameThread = threading.Thread(target=gameThread,
-                                                 args=(gameId,
-                                                       self.request,
-                                                       b["rounds"],
-                                                       b["teamName1"],
-                                                       b["teamName2"],
-                                                       b["timePerRound"],
-                                                       b["username"],
-                                                       b["wordsPerPerson"]))
+                body = d["body"]
+                rounds = body["rounds"]
+                teamName1 = body["teamName1"]
+                teamName2 = body["teamName2"]
+                timePerRound = body["timePerRound"]
+                username = body["username"]
+                wordsPerPerson = body["wordsPerPerson"]
 
             # In case any of the lookups would fail --> return error message
             except KeyError:
                 message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format in the body")
+                                             errorMessage="Wrong format in the body",
+                                             gameId=gameId)
                 self.request.sendall(message.encode())
                 return
 
-            # Start new thread and let it run after handler has returned
-            newGameThread.daemon = True
+            # Creating a new game starts a new gameThread
+            newGameThread = threading.Thread(target=gameThread,
+                                             args=(gameId,
+                                                   rounds,
+                                                   teamName1,
+                                                   teamName2,
+                                                   timePerRound,
+                                                   wordsPerPerson))
+
+            # Put team names into the dict
+            games[gameId]["teamName1"] = teamName1
+            games[gameId]["teamName2"] = teamName2
+
+            # Start new thread
             newGameThread.start()
 
-        # Case 2: A message for an existing game was received.
-        else:
-            # Test if no gameId was specified --> return error message
+            # The host has clientId 0
+            clientId = 0
+            games[gameId]["userCount"] = 1
+
+            # Setup communication queue
+            games[gameId][0] = queue.Queue()
+
+            # Send back the gameId (host has clientId 0)
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2)
+            self.request.sendall(message.encode())
+
+            # Initialize game thread communication queue
+            games[gameId][0] = queue.Queue()
+
+            # Do client logic
+            client(self.request, gameId, clientId, username)
+
+        # Case 2: New client connection to game
+        elif requestType == "join":
+
+            # Test if gameId is valid
             gameId = d.get("gameId")
             if gameId is None:
                 message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="gameId not found")
+                                             errorMessage="no gameId specified")
+                self.request.sendall(message.encode())
+                return
+            if gameId not in games.keys():
+                message = encodeErrorMessage(requestType=requestType,
+                                             errorMessage="gameId not known",
+                                             gameId=gameId)
                 self.request.sendall(message.encode())
                 return
 
-            # We already have a game with that gameId --> put data into gameQueue
-            else:
-                games[gameId].put((d, self.client_address, self.request))
+            # Get the next clientId
+            clientId = games[gameId].get("userCount")
+            if clientId is None:
+                message = encodeErrorMessage(requestType=requestType,
+                                             errorMessage="userCount not known",
+                                             gameId=gameId)
+                self.request.sendall(message.encode())
+                return
+            games[gameId]["userCount"] += 1
+
+            # Get the teamNames
+            teamName1 = games[gameId].get("teamName1")
+            teamName2 = games[gameId].get("teamName2")
+            if teamName1 is None or teamName2 is None:
+                message = encodeErrorMessage(requestType=requestType,
+                                             errorMessage="teamNames not set",
+                                             gameId=gameId,
+                                             clientId=clientId)
+                self.request.sendall(message.encode())
+                return
+
+            # Get username
+            body = d.get("body")
+            if body is None:
+                message = encodeErrorMessage(requestType=requestType,
+                                             errorMessage="no body sent",
+                                             gameId=gameId,
+                                             clientId=clientId)
+                self.request.sendall(message.encode())
+                return
+            username = body.get("username")
+            if username is None:
+                message = encodeErrorMessage(requestType=requestType,
+                                             errorMessage="no username specified",
+                                             gameId=gameId,
+                                             clientId=clientId)
+                self.request.sendall(message.encode())
+                return
+
+            # Setup communication queue
+            games[gameId][clientId] = queue.Queue()
+
+            # Send ACK back the client
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2)
+            self.request.sendall(message.encode())
+
+            # Do client logic
+            client(self.request, gameId, clientId, username)
+
+        # Case 3: A message for an existing game was received.
+        else:
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="unknown requestType")
+            self.request.sendall(message.encode())
+            return
 
 
-def periodicLog(clientQueues=None):
-    print("currently connected are:")
-    for k in clientQueues.keys():
-        print(k)
+def client(request, gameId, clientId, username):
 
-
-def clientThread(queue, request):
-
-    # Initialize fields
-    team = 0
-
+    socket_active = True
     while True:
-        (messageType, content) = queue.get()
-        if messageType == "teamJoin":
-            team = content;
+
+        if socket_active:
+
+            # See for changes for TIMEOUT long
+            r, w, x = select.select([request], [], [], TIMEOUT)
+            if r:
+                # If something changed, read
+                message = request.recv(1024)
+
+                # If the message is None, the socket is broken
+                if not message:
+                    socket_active = False
+                else:
+
+                    # Function that handles the message
+                    handleClientMessage(request, message, gameId, clientId, username)
+        try:
+            # Get an item from the queue
+            item = games[gameId][clientId].get_nowait()
+
+            # Ignore empty items
+            if item is None:
+                pass
+            else:
+
+                # Function that handles the item
+                handleQueueItem(request, item, gameId, clientId, username)
+
+        # If the queue was empty, do nothing
+        except queue.Empty:
+            pass
+
+        # If socket is broken, stop
+        if not socket_active:
+
+            # Tell the game that the connection to the client has been closed
+            gameQueues[gameId].put(("clientLost", None, clientId))
+            break
 
 
-def gameThread(gameId, hostRequest, rounds, teamName1, teamName2, timePerRound,
-               hostUsername, wordsPerPerson):
-    # Send back the gameId
-    message = encodeJoinMessage(gameId, 0, teamName1, teamName2)
-    hostRequest.sendall(message.encode())
+def handleClientMessage(request, rawMessage, gameId, clientId, username):
+    message = json.load(rawMessage)
 
+    messageType = None
+    # Get fields from message
+    try:
+        requestType = message["requestType"]
+        if gameId == message["gameId"] and clientId == message["clientId"]:
+            body = message["body"]
+        else:
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="gameId or clientId do not match",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+    except KeyError:
+        if messageType is None:
+            message = encodeErrorMessage(requestType="",
+                                         errorMessage="failed to parse message",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+        else:
+            message = encodeErrorMessage(requestType=messageType,
+                                         errorMessage="failed to parse message",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+
+    if requestType == "joinTeam":
+
+        # Find out which team to join
+        teamToJoin = body.get("teamToJoin")
+        if teamToJoin is None:
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="teamToJoin unspecified",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+
+        if teamToJoin == 1 or teamToJoin == 2:
+
+            # Tell the gameThread what team the player wants to join
+            gameQueues[gameId].put(("teamToJoin", teamToJoin, clientId))
+        else:
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="teamToJoin must be 1 or 2",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+
+    elif requestType == "ready":
+
+        # Make sure wordList is valid
+        wordList = body.get("wordList")
+        if wordList is None:
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="wordList missing",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+        if not isinstance(list, wordList):
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="wordList is not a list",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+
+        # Forward to gameThread
+        gameQueues[gameId].put(requestType, wordList, clientId)
+
+    elif requestType == "unready":
+
+        # Forward to gameThread
+        gameQueues[gameId].put(requestType, None, clientId)
+
+    elif requestType == "ack":
+
+        # Forward to gameThread
+        gameQueues[gameId].put(requestType, None, clientId)
+
+    elif requestType == "nextRound":
+
+        # Forward to gameThread
+        gameQueues[gameId].put(requestType, None, clientId)
+
+    elif requestType == "roundFinished":
+
+        # Check message validity
+        phaseNumber = body.get("phaseNumber")
+        if phaseNumber is None:
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="phaseNumber is missing",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+
+        wordIndex = body.get("wordIndex")
+        if wordIndex is None:
+            message = encodeErrorMessage(requestType=requestType,
+                                         errorMessage="wordIndex is missing",
+                                         gameId=gameId,
+                                         clientId=clientId)
+            request.sendall(message.encode())
+            return False
+
+        # Forward to gameThread
+        gameQueues[gameId].put(requestType, (phaseNumber, wordIndex), clientId)
+    else:
+        message = encodeErrorMessage(requestType=requestType,
+                                     errorMessage="unknown requestType",
+                                     gameId=gameId,
+                                     clientId=clientId)
+        request.sendall(message.encode())
+        return False
+
+
+def handleQueueItem(request, item, gameId, clientId, username):
+    (requestType, data) = item
+
+    if requestType == "teamJoinAck":
+        [hasStarted, startTime, timePerRound, wordsPerPerson] = data
+        message = encodeTeamJoinAck(gameId=gameId,
+                                    clientId=clientId,
+                                    hasStarted=hasStarted,
+                                    startTime=startTime,
+                                    timePerRound=timePerRound,
+                                    wordsPerPerson=wordsPerPerson)
+        request.sendall(message.encode())
+
+    elif requestType == "error":
+        [errorMessage, requestTypeThatFailed] = data
+        message = encodeErrorMessage(requestType=requestTypeThatFailed,
+                                     errorMessage=errorMessage,
+                                     gameId=gameId,
+                                     clientId=clientId)
+        request.sendall(message.encode())
+
+    elif requestType == "ack":
+        [ackResponse] = data
+        message = encodeAckMessage(requestType=ackResponse,
+                                   gameId=gameId,
+                                   clientId=clientId)
+        request.sendall(message.encode())
+
+    elif requestType == "setup":
+        wordList = data
+        message = encodeSetupMessage(gameId=gameId,
+                                     clientId=clientId,
+                                     wordList=wordList)
+        request.sendall(message.encode())
+
+    elif requestType == "startRound":
+        [startTime, activeTeam, activePlayer, phaseNumber, wordIndex] = data
+        message = encodeStartRoundMessage(startTime=startTime,
+                                          activeTeam=activeTeam,
+                                          activePlayer=activePlayer,
+                                          phaseNumber=phaseNumber,
+                                          wordIndex=wordIndex)
+        request.sendall(message.encode())
+
+    elif requestType == "roundFinished":
+        [scoreTeam1, scoreTeam2, nextPlayer, nextPhase] = data
+        message = encodeRoundFinishedMessage(scoreTeam1=scoreTeam1,
+                                             scoreTeam2=scoreTeam2,
+                                             nextPlayer=nextPlayer,
+                                             nextPhase=nextPhase)
+        request.sendall(message.encode())
+
+        # Check if the phase was the last one
+        if nextPhase == -1:
+            return
+
+
+def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerson):
     users = list()  # This is the list of users in this game
-    team1 = list()  # Players of team1 (clientId)
-    team2 = list()  # Players of team2 (clientId)
-    hasSubmittedWords = dict()  # Players that have already submitted words
+    team1 = deque()  # Players of team1 (clientId)
+    team2 = deque()  # Players of team2 (clientId)
+    submittedWords = dict()  # Players that have already submitted words
     globalWordList = list()  # List of all words
     readyCount = 0  # The number of players that are ready
     hasStarted = False  # Indicates if the game has already started
     startTime = -1  # Indicates the time the game has started (-1 if not yet)
+    userCount = 0  # Indicated how many users are currently connected
+    phaseNumber = -1  # Specified which phase the game is currently in
+    scoreTeam1 = 0  # Current score for team 1
+    scoreTeam2 = 0  # Current score for team 2
+    activeTeam = -1  # Specifies which team is currently active
+    activePlayer = -1  # Specifies which player is currently active
+    nextPlayer = -1  # Specifies which player is active next
+    nextPhase = 0  # Specified the next phase to be played
+    phases = list()  # A list of all played phases in this game
 
-    # Create a dict of pairs of queues, that handle the communication between the
-    # game thread and the client threads.
-    clientQueues = dict()
+    # Initialization
 
-    # Host is the first user
-    userCount = 0
-    users.append((hostUsername, userCount))
-
-    # Initialize empty queues for communication
-    clientQueues[userCount] = queue.Queue()
-    hostThread = threading.Thread(target=clientThread,
-                                  args=(clientQueues[userCount], hostRequest))
-    hostThread.start()
-
-    # Increase Id counter
-    userCount += 1
+    # Find starting phase
+    if rounds[0]:
+        phases.append(1)
+    elif rounds[1]:
+        phases.append(2)
+    elif rounds[2]:
+        phases.append(3)
+    elif rounds[3]:
+        phases.append(4)
+    elif rounds[4]:
+        phases.append(5)
 
     while True:
+
         # Wait for something to be written in the queue
-        (newMessage, clientAddress, clientRequest) = games[gameId].get()
+        (messageType, data, clientId) = gameQueues[gameId].get()
 
-        # Handle internal messages
-        if clientRequest is None:
-            continue
+        if messageType == "teamToJoin":
 
-        # Handle the new message
-        requestType = newMessage.get("requestType")
+            # Add user to the users list
+            if clientId not in users:
+                users.append(clientId)
 
-        if requestType is None:
-            message = encodeErrorMessage(requestType="",
-                                         errorMessage="Wrong format (no requestType)")
-            clientRequest.sendall(message.encode())
-            continue
-
-        elif requestType == "join":
-            print("new connection received to {}".format(clientAddress))
-
-            username = newMessage.get("username")
-            if username is None:
-                message = encodeErrorMessage(requestType="",
-                                             errorMessage="Wrong format (no username specified)")
-                clientRequest.sendall(message.encode())
-                continue
-
-            users.append((username, userCount))
-
-            # Initialize empty queues for communication
-            clientQueues[userCount] = queue.Queue()
-
-            # Send back the acknowledgement
-            ackMessage = encodeJoinMessage(gameId, userCount, teamName1, teamName2)
-            clientRequest.sendall(ackMessage.encode())
-
-            # Create a new user thread and start
-            newUserThread = threading.Thread(target=clientThread,
-                                             args=(clientQueues[userCount], clientRequest))
-            newUserThread.start()
-            continue
-
-        elif requestType == "joinTeam":
-
-            # Make sure the clientId was sent
-            clientId = newMessage.get("clientId")
-            if clientId is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (no clientId)")
-                clientRequest.sendall(message.encode())
-                continue
-
-            # Make sure the clientId is known
-            receiveQueue = clientQueues.get(clientId)
-            if receiveQueue is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (clientId not saved)")
-                clientRequest.sendall(message.encode())
-                continue
-
-            # Make sure the message has a body
-            body = newMessage.get("body")
-            if body is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (no body)")
-                clientRequest.sendall(message.encode())
-                continue
-
-            # Make sure the body has teamToJoin
-            temp = body.get("teamToJoin")
-            if temp is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (no teamToJoin)")
-                clientRequest.sendall(message.encode())
-                continue
-
-            # Set the team
-            elif temp == 1 and clientId not in team1:
+            # Put player into the team (can only be 1 or 2)
+            if data == 1:
                 team1.append(clientId)
-                receiveQueue.put(("teamJoin", 1))
-            elif temp == 2 and clientId not in team2:
+            elif data == 2:
                 team2.append(clientId)
-                receiveQueue.put(("teamJoin", 2))
+            # Acknowledge the team assignment
+            games[gameId][clientId].put("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson])
+
+        elif messageType == "ready":
+
+            # Check if the client has already submitted words
+            if clientId in submittedWords.keys():
+                games[gameId][clientId].put("error", ["client has already submitted words", messageType])
             else:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (unknown team)")
-                clientRequest.sendall(message.encode())
-                continue
 
-        elif requestType == "ready":
-            # Make sure the message has a clientId
-            clientId = newMessage.get(clientId)
-            if clientId is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (no clientId)")
-                clientRequest.sendall(message.encode())
-                continue
+                # Add the words to the dict
+                submittedWords[clientId] = data
 
-            # Make sure the message has a body
-            body = newMessage.get("body")
-            if body is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (no body)")
-                clientRequest.sendall(message.encode())
-                continue
+                # One more player is ready
+                readyCount += 1
 
-            wordList = body.get("wordList")
-            if wordList is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (no wordList)")
-                clientRequest.sendall(message.encode())
-                continue
+                # Acknowledge wordList
+                games[gameId][clientId].put("ack", ["ready"])
 
-            # Make sure client has not yet submitted words
-            if clientId in hasSubmittedWords.keys():
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (already submitted words)")
-                clientRequest.sendall(message.encode())
-                continue
+                # Test if everybody is ready
+                if userCount == readyCount:
 
-            # Make sure the clientId is known
-            receiveQueue = clientQueues.get(clientId)
-            if receiveQueue is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (clientId not saved)")
-                clientRequest.sendall(message.encode())
-                continue
+                    # If everybody is ready, create the globalWordList
+                    for words in submittedWords.items():
+                        globalWordList.append(words)
 
-            # Save words to the dict and wait
-            hasSubmittedWords[clientId] = wordList
-            receiveQueue.put(("ready", True))
+                    # Start with the first word
+                    wordIndex = 0
 
-            # One more player is ready
-            readyCount += 1
+                    # Get a permutation the word list and player lists
+                    random.shuffle(globalWordList)
+                    random.shuffle(team1)
+                    random.shuffle(team2)
 
-            # Check if the game is already running
-            if hasStarted:
-                message = encodeTeamJoinAck(timePerRound=timePerRound,
-                                            clientId=clientId,
-                                            gameId=gameId,
-                                            wordsPerPerson=wordsPerPerson,
-                                            hasStarted=True,
-                                            startTime=startTime)
-                clientRequest.sendall(message.encode())
-                continue
+                    # Give a notification to all users
+                    for user in users:
+                        games[gameId][user].put("setup", globalWordList)
+
+                    # Non-deterministic choice which team starts
+                    if bool(random.getrandbits(1)):
+                        activeTeam = 1
+                        activePlayer = team1[0]
+                    else:
+                        activeTeam = 2
+                        activePlayer = team2[0]
+
+                    # Get the current time
+                    startTime = datetime.time()
+
+                    # Send start signal to all users
+                    for user in users:
+                        games[gameId][user].put("startRound",
+                                                [startTime, activeTeam, activePlayer, phaseNumber, wordIndex])
+
+        elif messageType == "unready":
+
+            # Check if the player has submitted words
+            if clientId not in submittedWords.keys():
+                games[gameId][clientId].put("error", ["client not submitted words", messageType])
             else:
-                message = encodeTeamJoinAck(timePerRound=timePerRound,
-                                            clientId=clientId,
-                                            gameId=gameId,
-                                            wordsPerPerson=wordsPerPerson)
-                clientRequest.sendall(message.encode())
 
-            # Check if game can be started
-            if readyCount == userCount:
+                # If yes, delete them.
+                del submittedWords[clientId]
 
-                # Make the global list of words
-                for words in hasSubmittedWords.items():
-                    globalWordList.append(words)
+                # One less player ready
+                readyCount -= 1
 
-                # Todo Start game
+                # Acknowledge unready
+                games[gameId][clientId].put("ack", ["unready"])
 
-        elif requestType == "unready":
-            # Make sure the message has a clientId
-            clientId = newMessage.get(clientId)
-            if clientId is None:
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Wrong format (no clientId)")
-                clientRequest.sendall(message.encode())
-                continue
+        elif messageType == "ack":
 
-            # Make sure player was ready
-            if clientId not in hasSubmittedWords.keys():
-                message = encodeErrorMessage(requestType=requestType,
-                                             errorMessage="Cannot unready before being ready")
-                clientRequest.sendall(message.encode())
-                continue
-
-            # Delete items from that player
-            del hasSubmittedWords[clientId]
-
-            # One less player is ready
-            readyCount -= 1
-
-        elif requestType == "ack":
+            # Do we really need this?
             pass
-        elif requestType == "nextRound":
-            pass
-        elif requestType == "roundFinished":
-            pass
+
+        elif messageType == "nextRound":
+            # Get the current time
+            startTime = datetime.time()
+
+            # Send start signal to all users
+            for user in users:
+                games[gameId][user].put("startRound",
+                                        [startTime, activeTeam, activePlayer, phaseNumber, wordIndex])
+
+        elif messageType == "roundFinished":
+            (newPhaseNumber, newWordIndex) = data
+            if newPhaseNumber != phaseNumber:
+                games[gameId][clientId].put("error", ["wrong phaseNumber", messageType])
+            elif newWordIndex <= wordIndex or newWordIndex > len(globalWordList):
+                games[gameId][clientId].put("error", ["impossible wordIndex", messageType])
+            elif clientId not in team1 and clientId not in team2:
+                games[gameId][clientId].put("error", ["unknown team", messageType])
+            else:
+
+                if clientId in team1:
+                    scoreTeam1 += (newWordIndex - wordIndex)
+                    activeTeam = 2
+                elif clientId in team2:
+                    scoreTeam2 += (newWordIndex - wordIndex)
+                    activeTeam = 1
+
+                # Check if round finished
+                if newWordIndex == wordIndex:
+
+                    # Check if all phases finished
+                    if not phases:
+                        nextPhase = -1
+                    else:
+                        nextPhase = phases.pop()
+
+                        # Get a new permutation the word list
+                        random.shuffle(globalWordList)
+
+                        # Give a notification to all users
+                        for user in users:
+                            games[gameId][user].put("setup", globalWordList)
+
+                    wordIndex = 0
+
+                # Otherwise continue with the same phase but the new index
+                else:
+                    nextPhase = phaseNumber
+                    wordIndex = newWordIndex
+
+                # Get the next active player
+                if activeTeam == 1:
+                    nextPlayer = team1.popleft()
+                    team1.append(nextPlayer)
+                elif activeTeam == 2:
+                    nextPlayer = team2.popleft()
+                    team2.append(nextPlayer)
+
+                # Broadcast next player and score to all players
+                for user in users:
+                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
+
+                # If game is completely done, stop the gameThread
+                if nextPhase == -1:
+                    return
+
+        elif messageType == "clientLost":
+
+            # Remove client from all lists
+            users.remove(clientId)
+            if clientId in team1:
+                team1.remove(clientId)
+            if clientId in team2:
+                team2.remove(clientId)
+
+            # If active player was lost stop the round
+            if clientId == activePlayer:
+                for user in users:
+                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
+
         else:
-            message = encodeErrorMessage(requestType=requestType,
-                                         errorMessage="Unknown requestType")
-            clientRequest.sendall(message.encode())
+            games[gameId][clientId].put("error", ["unknown messageType", messageType])
 
-            # Loop all over again
+    # Loop all over again
 
 
 # JSON encoding functions
@@ -355,7 +627,7 @@ def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
     return json.dumps(message)
 
 
-def encodeTeamJoinAck(timePerRound, gameId, clientId, wordsPerPerson, hasStarted=False, startTime=-1):
+def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wordsPerPerson):
     message = dict()
     message["returnType"] = "ACK"
     message["requestType"] = "teamJoin"
@@ -370,9 +642,70 @@ def encodeTeamJoinAck(timePerRound, gameId, clientId, wordsPerPerson, hasStarted
     return json.dumps(message)
 
 
+def encodeAckMessage(requestType, gameId, clientId):
+    message = dict()
+    message["returnType"] = "ACK"
+    message["requestType"] = requestType
+    message["gameId"] = gameId
+    message["clientId"] = clientId
+    body = dict()
+    message["body"] = body
+    return json.dumps(message)
+
+
+def encodeSetupMessage(gameId, clientId, wordList):
+    message = dict()
+    message["returnType"] = "setup"
+    message["requestType"] = ""
+    message["gameId"] = gameId
+    message["clientId"] = clientId
+    body = dict()
+    body["wordList"] = wordList
+    message["body"] = body
+    return json.dumps(message)
+
+
+def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlayer, phaseNumber, wordIndex):
+    message = dict()
+    message["returnType"] = "startRound"
+    message["requestType"] = ""
+    message["gameId"] = gameId
+    message["clientId"] = clientId
+    body = dict()
+    body["startTime"] = startTime
+    body["activeTeam"] = activeTeam
+    body["activePlayer"] = activePlayer
+    body["phaseNumber"] = phaseNumber
+    body["wordIndex"] = wordIndex
+    message["body"] = body
+    return json.dumps(message)
+
+
+def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPlayer, nextPhase):
+    message = dict()
+    message["returnType"] = "roundFinished"
+    message["requestType"] = "roundFinished"
+    message["gameId"] = gameId
+    message["clientId"] = clientId
+    body = dict()
+    body["scoreTeam1"] = scoreTeam1
+    body["scoreTeam2"] = scoreTeam2
+    body["nextPlayer"] = nextPlayer
+    body["nextPhase"] = nextPhase
+    message["body"] = body
+    return json.dumps(message)
+
+
 if __name__ == "__main__":
     # Dict that maps gameIDs to queues
     games = dict()
+    gameQueues = dict()
+
+    # Client Socket Waiting Time
+    TIMEOUT = 0.1
+
+    # Concurrency locks
+    userCountLock = threading.Lock()
 
     # Default values
     HOST = ""
