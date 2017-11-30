@@ -55,7 +55,6 @@ public class JoinActivity extends ServerIOActivity {
         joinGame = findViewById(R.id.button_join);
 
         //initialise server connection
-
         socketHandler = new SocketHandler(this);
         socketHandler.execute();
 
@@ -178,7 +177,8 @@ public class JoinActivity extends ServerIOActivity {
         }
         //game code doesn't exist, show error and set joingame button to visible again
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(JOIN)){
-            //TODO
+            toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
+            toast.show();
         }
         // if right return message from server and request type was teamjoin, proceed to next activity
         else if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){

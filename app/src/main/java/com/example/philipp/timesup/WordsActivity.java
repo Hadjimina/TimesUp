@@ -9,6 +9,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.READY;
+import static com.example.philipp.timesup.NetworkHelper.UNREADY;
+
 /**
  * Created by MammaGiulietta on 11.11.17.
  *
@@ -21,7 +26,7 @@ import android.widget.Toast;
 public class WordsActivity extends ServerIOActivity {
 
     SharedPreferences prefs;
-    int wordsPerPerson;
+    int wordsPerPerson, gameId, clientId;
     String [] wordsArray;
     String numberOfWordsString, getWordsString1, getWordsString2;
     int counter = 0;
@@ -31,16 +36,23 @@ public class WordsActivity extends ServerIOActivity {
     Boolean readyAnswer = false;
     Intent intent;
     Toast toast;
+    EncodeMessage sendMessage;
+    SocketHandler socketHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_words);
 
-
         //get WordsPerPerson from shared preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
+        gameId = prefs.getInt("gameId", 0);
+        clientId = prefs.getInt("clientId", 0);
+
+        //initialise server connection
+        socketHandler = new SocketHandler(this);
+        socketHandler.execute();
 
         //initialize array for words
         wordsArray = new String[wordsPerPerson];
@@ -60,6 +72,7 @@ public class WordsActivity extends ServerIOActivity {
         editText = findViewById(R.id.enter_word_edit);
 
         //set on click listener for enterbutton
+        //TODO shouldn't this be a toggle button? to make "unready" thing happening
         enterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,7 +99,7 @@ public class WordsActivity extends ServerIOActivity {
                     editText.setVisibility(View.INVISIBLE);
                     enterButton.setVisibility(View.INVISIBLE);
                     readyButton.setVisibility(View.VISIBLE);
-                    //TODO send message to server with request type unready and gameid, clientid (shouldn't it be words list here?)
+
                 }
             }
         });
@@ -101,7 +114,9 @@ public class WordsActivity extends ServerIOActivity {
                 if (readyAnswer){
                     intent = new Intent(getApplicationContext(), RoundEndActivity.class);
 
-                    //TODO send message to server
+                    //create message and send it to server
+                    sendMessage = new EncodeMessage(gameId, clientId, wordsArray);
+                    socketHandler.sendMessage(sendMessage);
                 }
                 else {
                     //do nothing
@@ -119,19 +134,26 @@ public class WordsActivity extends ServerIOActivity {
     public void callback(DecodeMessage message) {
 
         //if callback from unready, set global variable to true so that user can click on the readybutton
-        if (message.getRequestType().equals("unready") && message.getReturnType().equals("ACK")){
+        if (message.getRequestType().equals(UNREADY) && message.getReturnType().equals(ACK)){
             readyAnswer = true;
         }
-        else if (message.getRequestType().equals("unready") && message.getReturnType().equals("error")){
-            //TODO errorhandling
+        else if (message.getRequestType().equals(UNREADY) && message.getReturnType().equals(ERROR)){
+            toast = Toast.makeText(getApplicationContext(), "error with being unready a team", Toast.LENGTH_LONG);
+            toast.show();
+            socketHandler.sendMessage(sendMessage);
         }
-        else if (message.getRequestType().equals("ready") && message.getReturnType().equals("ACK")){
+        else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ACK)){
 
-            //get from message which role you will have
+            //TODO get from message which role you will have
             startActivity(intent);
         }
-        else if (message.getRequestType().equals("ready") && message.getReturnType().equals("error")){
-            //TODO errorhandling
+        else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
+            toast = Toast.makeText(getApplicationContext(), "error with being ready a team", Toast.LENGTH_LONG);
+            toast.show();
+            socketHandler.sendMessage(sendMessage);
+        } else {
+            toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
+            toast.show();
         }
 
     }

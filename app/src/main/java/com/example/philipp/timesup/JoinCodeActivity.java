@@ -28,19 +28,22 @@ import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 public class JoinCodeActivity extends ServerIOActivity {
     TextView code;
     Intent intent;
-    int gameId;
+    int gameId, clientId;
     String teamName1, teamName2;
     RadioButton teamA, teamB;
     Button go;
-    EncodeMessage message;
+    EncodeMessage sendMessage;
     Toast toast;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+    SocketHandler socketHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_code);
+
+        //TODO change this to get info from sharedPrefs?
         intent = getIntent();
         gameId = intent.getIntExtra("gameId", 0);
         teamName1 = intent.getStringExtra("teamName1");
@@ -48,6 +51,14 @@ public class JoinCodeActivity extends ServerIOActivity {
 
         code = findViewById(R.id.code);
         code.setText(String.valueOf(gameId));
+
+        //retrieve information from shared Preferences
+        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        clientId = prefs.getInt("clientId", 0);
+
+        //initialise server connection
+        socketHandler = new SocketHandler(this);
+        socketHandler.execute();
 
         teamA = findViewById(R.id.team_a1);
         Log.d("TAG", teamA.toString());
@@ -74,7 +85,6 @@ public class JoinCodeActivity extends ServerIOActivity {
                     else{
                         teamId = 0;
                     }
-                    intent = new Intent(getApplicationContext(), WordsActivity.class);
 
                     //TODO put in shared preferences object
                     intent.putExtra("gameId", gameId);
@@ -83,11 +93,10 @@ public class JoinCodeActivity extends ServerIOActivity {
                     return;
                 }
 
-                //TODO: find out about clientId and why teamId is an int
-                //TODO create message for server
-                //message = new EncodeMessage(gameId, clientId, teamId)
-                //TODO take this out
-                startActivity(intent);
+                //create message and send it to server
+                sendMessage = new EncodeMessage(gameId, clientId, teamId);
+                socketHandler.sendMessage(sendMessage);
+
             }
         });
     }
@@ -97,6 +106,7 @@ public class JoinCodeActivity extends ServerIOActivity {
 
         boolean hasStarted;
         int startTime, timePerRound, wordsPerPerson;
+
         //initialize shared preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         editor = prefs.edit();
@@ -106,6 +116,9 @@ public class JoinCodeActivity extends ServerIOActivity {
             hasStarted = message.getBoolean("hasStarted");
             startTime = message.getInt("startTime");
             timePerRound = message.getInt("timePerRound");
+
+            //cretae intent and add extras
+            intent = new Intent(getApplicationContext(), WordsActivity.class);
             intent.putExtra("hasStarted", hasStarted);
             intent.putExtra("startTime", startTime);
             intent.putExtra("timePerRound", timePerRound);
@@ -119,11 +132,14 @@ public class JoinCodeActivity extends ServerIOActivity {
         }
         //else try to send message to server again and show error
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
-            //TODO, same as in JoinCode
+            toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
+            toast.show();
+            socketHandler.sendMessage(sendMessage);
         }
         //show error and go back to start
         else {
-            //TODO
+            toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
+            toast.show();
         }
     }
 }

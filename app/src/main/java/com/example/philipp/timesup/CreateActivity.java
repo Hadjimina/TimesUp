@@ -237,6 +237,8 @@ public class CreateActivity extends ServerIOActivity{
             editor.putInt("clientId", clientId);
             editor.apply();
 
+            //TODO put clientId in sharedPrefs or intent?
+
             startActivity(intent);
         }
         //else try to send message to server again
