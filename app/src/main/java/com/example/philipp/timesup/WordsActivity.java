@@ -3,6 +3,7 @@ package com.example.philipp.timesup;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,16 +25,14 @@ import static com.example.philipp.timesup.NetworkHelper.UNREADY;
  */
 
 public class WordsActivity extends ServerIOActivity {
-
     SharedPreferences prefs;
     int wordsPerPerson, gameId, clientId;
     String [] wordsArray;
     String numberOfWordsString, getWordsString1, getWordsString2;
     int counter = 0;
-    Button enterButton, readyButton;
+    Button enterButton;
     TextView numberOfWords, enterWords;
     EditText editText;
-    Boolean readyAnswer = false;
     Intent intent;
     Toast toast;
     EncodeMessage sendMessage;
@@ -44,7 +43,7 @@ public class WordsActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_words);
 
-        //get WordsPerPerson from shared preferences
+        //get information from shared preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
         gameId = prefs.getInt("gameId", 0);
@@ -64,6 +63,7 @@ public class WordsActivity extends ServerIOActivity {
         numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
         numberOfWords.setText(numberOfWordsString);
 
+        //set view for textedit
         enterWords = findViewById(R.id.enter_words);
 
 
@@ -71,13 +71,18 @@ public class WordsActivity extends ServerIOActivity {
         enterButton = findViewById(R.id.button_enter);
         editText = findViewById(R.id.enter_word_edit);
 
+
+        //initialze intent
+        intent = new Intent(getApplicationContext(), RoundEndActivity.class);
+
         //set on click listener for enterbutton
         //TODO shouldn't this be a toggle button? to make "unready" thing happening
         enterButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 // array isn't full yet
-                if (counter <  wordsPerPerson - 1){
+                if (counter <  wordsPerPerson-1){
                     //check if editTex is not empty
                     if (!String.valueOf(editText.getText()).equals("")) {
                         //add word to array and clear edittext
@@ -93,37 +98,34 @@ public class WordsActivity extends ServerIOActivity {
                 }
                 //array is full, so send message to server
                 else {
+                    //add word to array
+                    wordsArray[counter] = String.valueOf(editText.getText());
+                    counter++;
                     numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                     numberOfWords.setText(numberOfWordsString);
-                    enterWords.setVisibility(View.INVISIBLE);
-                    editText.setVisibility(View.INVISIBLE);
-                    enterButton.setVisibility(View.INVISIBLE);
-                    readyButton.setVisibility(View.VISIBLE);
+                    enterWords.setText("Are those words correct?");
+                    enterButton.setText("Yes");
+                    editText.setText(wordsArray[0].toString());
+                    editText.append("\n");
 
-                }
-            }
-        });
+                    for(int i = 1; i < wordsPerPerson; i++){
+                        editText.append(wordsArray[i].toString() + "\n");
 
-        //initialize readybutton
-        readyButton = findViewById(R.id.button_ready);
+                    }
+                    for(int i = 0; i < wordsPerPerson; i++){
+                        int start = editText.getLayout().getLineStart(i);
+                        int end = editText.getLayout().getLineEnd(i);
+                        wordsArray[i] = editText.getText().subSequence(start, end).toString();
 
-        //set onclicklistener for readybutton
-        readyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (readyAnswer){
-                    intent = new Intent(getApplicationContext(), RoundEndActivity.class);
+                    }
 
-                    //create message and send it to server
+
+                    //Send message to server
                     sendMessage = new EncodeMessage(gameId, clientId, wordsArray);
                     socketHandler.sendMessage(sendMessage);
                 }
-                else {
-                    //do nothing
-                }
             }
         });
-
 
 
 
@@ -133,22 +135,14 @@ public class WordsActivity extends ServerIOActivity {
     @Override
     public void callback(DecodeMessage message) {
 
-        //if callback from unready, set global variable to true so that user can click on the readybutton
-        if (message.getRequestType().equals(UNREADY) && message.getReturnType().equals(ACK)){
-            readyAnswer = true;
-        }
-        else if (message.getRequestType().equals(UNREADY) && message.getReturnType().equals(ERROR)){
-            toast = Toast.makeText(getApplicationContext(), "error with being unready a team", Toast.LENGTH_LONG);
-            toast.show();
-            socketHandler.sendMessage(sendMessage);
-        }
-        else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ACK)){
+
+        if (message.getRequestType().equals(READY) && message.getReturnType().equals(ACK)){
 
             //TODO get from message which role you will have
             startActivity(intent);
         }
         else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
-            toast = Toast.makeText(getApplicationContext(), "error with being ready a team", Toast.LENGTH_LONG);
+            toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
             toast.show();
             socketHandler.sendMessage(sendMessage);
         } else {

@@ -43,23 +43,24 @@ public class JoinCodeActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_code);
 
-        //TODO change this to get info from sharedPrefs?
-        intent = getIntent();
-        gameId = intent.getIntExtra("gameId", 0);
-        teamName1 = intent.getStringExtra("teamName1");
-        teamName2 = intent.getStringExtra("teamName2");
-
-        code = findViewById(R.id.code);
-        code.setText(String.valueOf(gameId));
 
         //retrieve information from shared Preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         clientId = prefs.getInt("clientId", 0);
+        teamName1 = prefs.getString("teamName1", "team1");
+        teamName2 = prefs.getString("teamName2", "team2");
+        gameId = prefs.getInt("gameId", -1);
+
+        //set code to join the game
+        code = findViewById(R.id.code);
+        code.setText(String.valueOf(gameId));
+
 
         //initialise server connection
         socketHandler = new SocketHandler(this);
         socketHandler.execute();
 
+        //set texts for teamA and teamB buttons
         teamA = findViewById(R.id.team_a1);
         Log.d("TAG", teamA.toString());
         teamB = findViewById(R.id.team_b1);
@@ -72,13 +73,13 @@ public class JoinCodeActivity extends ServerIOActivity {
             teamB.setText(teamName2);
         }
 
+        //set go button
         go = findViewById(R.id.button_go);
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int teamId;
                 if (teamA.isChecked() || teamB.isChecked()) {
-                    //TODO check here what to do with questions
                     if(teamA.isChecked()){
                         teamId = 1;
                     }
@@ -86,8 +87,6 @@ public class JoinCodeActivity extends ServerIOActivity {
                         teamId = 0;
                     }
 
-                    //TODO put in shared preferences object
-                    intent.putExtra("gameId", gameId);
                 } else {
                     toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
                     return;
@@ -123,11 +122,12 @@ public class JoinCodeActivity extends ServerIOActivity {
             intent.putExtra("startTime", startTime);
             intent.putExtra("timePerRound", timePerRound);
 
-            //TODO they should add this to message (Backendguys)
+            //put wordsPerPerson into shared preferences
             wordsPerPerson = message.getInt("wordsPerPerson");
             editor.putInt("wordsPerPerson", wordsPerPerson);
             editor.apply();
 
+            //start next activity
             startActivity(intent);
         }
         //else try to send message to server again and show error

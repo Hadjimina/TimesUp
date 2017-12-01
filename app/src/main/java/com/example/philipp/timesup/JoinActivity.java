@@ -89,7 +89,7 @@ public class JoinActivity extends ServerIOActivity {
                         //set button to invisible
                         joinGame.setVisibility(View.GONE);
 
-                        //TODO add client ID
+                        //send message to server
                         message = new EncodeMessage(gameId, username);
                         socketHandler.sendMessage(message);
 
@@ -153,7 +153,6 @@ public class JoinActivity extends ServerIOActivity {
                 public void onClick(View view) {
                     int teamId;
                     if (teamA.isChecked() || teamB.isChecked()) {
-                        //TODO check here what to do with questions
                         if(teamA.isChecked()){
                             teamId = 1;
                         }

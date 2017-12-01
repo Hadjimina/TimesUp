@@ -140,7 +140,6 @@ public class CreateActivity extends ServerIOActivity{
             @Override
             public void onClick(View view) {
                 intent = new Intent(getApplicationContext(), JoinCodeActivity.class);
-                //TODO send settings to server
 
                 //read teamnames and username and add them to shared preferences
                 teamName1 = team1Edit.getText().toString();
@@ -210,11 +209,6 @@ public class CreateActivity extends ServerIOActivity{
                 sendMessage = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
                 socketHandler.sendMessage(sendMessage);
 
-                // TODO fake gameId as long as callback not working
-                int gameId = 1;
-                intent.putExtra("gameId", gameId);
-                //TODO do send message with helper here, remove startActivity
-
 
 
             }
@@ -237,7 +231,6 @@ public class CreateActivity extends ServerIOActivity{
             editor.putInt("clientId", clientId);
             editor.apply();
 
-            //TODO put clientId in sharedPrefs or intent?
 
             startActivity(intent);
         }
