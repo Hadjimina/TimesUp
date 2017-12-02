@@ -83,6 +83,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Case 1: New game requested
         elif requestType == "newGame":
+            print("received requestType {}".format(requestType))
 
             # Create a "random" game id
             gameId = random.randrange(0, 9999)
@@ -145,6 +146,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Case 2: New client connection to game
         elif requestType == "join":
+            print("received requestType {}".format(requestType))
 
             # Test if gameId is valid
             gameId = d.get("gameId")
@@ -694,6 +696,7 @@ def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1=1, teamId2
 
 
 def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
+    print(errorMessage)
     message = dict()
     message["returnType"] = "error"
     message["requestType"] = requestType
