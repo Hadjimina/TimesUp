@@ -1,4 +1,6 @@
+import base64
 import datetime
+import hashlib
 import threading
 import socketserver
 import json
@@ -9,7 +11,21 @@ from collections import deque
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
+    handshake = (
+        "HTTP/1.1 101 Web Socket Protocol Handshake\r\n"
+        "Upgrade: WebSocket\r\n"
+        "Connection: Upgrade\r\n"
+        "Sec-WebSocket-Accept: %(acceptstring)s\r\n"
+        "Server: TestTest\r\n"
+        "Access-Control-Allow-Origin: http://localhost\r\n"
+        "Access-Control-Allow-Credentials: true\r\n"
+        "\r\n"
+    )
+
+    MAGICGUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+
     def handle(self):
+        handshaken = False
 
         ipAddress, port = self.client_address
 
@@ -19,8 +35,21 @@ class RequestHandler(socketserver.BaseRequestHandler):
         receivedData = self.request.recv(1024).strip()
         print("received {}".format(receivedData.decode()))
 
-        self.request.sendall(str(port).encode())
-        
+        if not handshaken:
+            parts = receivedData.split('\r\n\r\n', 1)
+            for line in parts[0].split('\r\n')[1:]:
+                name, value = line.split(': ', 1)
+
+                # If this is the key
+                if name.lower() == "sec-websocket-key":
+                    # Append the standard GUID and get digest
+                    combined = value + self.MAGICGUID
+                    response = base64.b64encode(hashlib.sha1(combined).digest())
+
+                    # Replace the placeholder in the handshake response
+                    handshake = self.handshake % {'acceptstring': response}
+
+            self.request.sendall(self.handshake)
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
@@ -731,10 +760,6 @@ def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPla
     body["nextPhase"] = nextPhase
     message["body"] = body
     return json.dumps(message)
-
-
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    pass
 
 
 if __name__ == "__main__":
