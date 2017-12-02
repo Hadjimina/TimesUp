@@ -21,7 +21,7 @@ public class EncodeMessage {
             roundsJSON.put(b);
         }
 
-        JSONObject body = new JSONObject();
+        body = new JSONObject();
 
         try {
             body.put("teamName1", teamName1);

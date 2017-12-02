@@ -59,7 +59,7 @@ public class GameActivity extends ServerIOActivity {
         playerType = 0;
         count = 0;
 
-        handler = new SocketHandler(this);
+        //handler = new SocketHandler(this);
 
 
         if (playerType == 0) {

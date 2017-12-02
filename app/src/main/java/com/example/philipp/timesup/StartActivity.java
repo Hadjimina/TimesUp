@@ -29,7 +29,8 @@ public class StartActivity extends AppCompatActivity {
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                intent = new Intent(getApplicationContext(), CreateActivity.class);
+                //change to createGame class
+                intent = new Intent(getApplicationContext(), ServerTesting.class);
                 startActivity(intent);
             }
         });

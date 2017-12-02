@@ -37,10 +37,9 @@
         <activity android:name=".JoinCodeActivity" />
         <activity android:name=".RoundEndActivity" />
         <activity android:name=".WordsActivity" />
-        <activity
-            android:name=".ServerTesting"
-            android:label="@string/title_activity_server_testing"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <!--change-->
+        <activity android:name=".ServerTesting" />
+
     </application>
 
 </manifest>

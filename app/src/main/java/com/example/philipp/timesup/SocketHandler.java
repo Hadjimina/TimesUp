@@ -3,20 +3,25 @@ package com.example.philipp.timesup;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
 public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>{
 
-    private static final String SERVER_IP = "<TO BE SET>";
+    //private static final String SERVER_IP = "echo.websocket.org";
+    private static final String SERVER_IP = "46.101.97.34";
+    private String SERVER_PORT = "9999";
 
     private ServerIOActivity callbackActivity;
-    private WebSocketClient webSocketClient;
+    //private WebSocketClient webSocketClient;
+    private Socket socket;
     private URI uri;
+    private String response;
+    private  PrintWriter output;
 
     public SocketHandler(){
 
@@ -24,7 +29,7 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
 
         //Initialize Socket
         try {
-            this.uri = new URI(SERVER_IP);
+            this.uri = new URI(SERVER_IP+SERVER_PORT);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -33,7 +38,16 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     }
 
     public void sendMessage(EncodeMessage messageToSend){
-        webSocketClient.send(messageToSend.toJSONString());
+        //webSocketClient.send(messageToSend.toJSONString());
+        try{
+            OutputStream out = socket.getOutputStream();
+            PrintWriter output = new PrintWriter(out);
+            output.println(messageToSend.toJSONString());
+            out.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         Log.i("Websocket", "Sent " + messageToSend.toJSONString());
     }
 
@@ -41,40 +55,32 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
         this.callbackActivity = callbackActivity;
     }
 
+    //cancel async, reinitalize & restart
+    public void resetPort(String port){
+
+        this.cancel(true);
+        SERVER_PORT = port;
+        try {
+            uri = new URI(SERVER_IP+SERVER_PORT);
+            this.execute();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     protected DecodeMessage doInBackground(Void... params) {
 
 
+        NetClient nc = new NetClient(SERVER_IP, Integer.parseInt(SERVER_PORT));
+        nc.sendDataWithString("{}");
 
-        webSocketClient = new WebSocketClient(uri) {
-
-            @Override
-            public void onOpen(ServerHandshake serverHandshake) {
-                Log.i("Websocket", "Opened");
-            }
-
-            @Override
-            public void onMessage(String message) {
-
-                Log.i("Websocket", "Got" + message);
-                DecodeMessage messageResponse = new DecodeMessage(message);
-                publishProgress(messageResponse);
-
-            }
-
-            @Override
-            public void onClose(int i, String s, boolean b) {
-                Log.i("Websocket", "Closed " + s);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.i("Websocket", "Error " + e.getMessage());
-            }
-        };
-        webSocketClient.connect();
+        String r = nc.receiveDataFromServer();
+        Log.i("websocket Data", r);
 
         return null;
+
     }
 
     @Override
@@ -86,6 +92,7 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     @Override
     protected void onProgressUpdate(DecodeMessage... values) {
         super.onProgressUpdate(values);
+
         callbackActivity.callback(values[0]);
     }
 
