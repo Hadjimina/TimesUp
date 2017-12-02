@@ -61,11 +61,16 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         print("new connection to {} at port {}".format(ipAddress, port))
 
-        self.request.sendall("you are connected to port {}".format(port).encode())
+        newMessage = "you are connected to port {}".format(port).encode()
+
+        self.request.sendall(len(newMessage))
+        self.request.sendall(newMessage)
 
         time.sleep(2)
 
-        self.request.sendall("you are still connected to port {}".format(port).encode())
+        newMessage = "you are still connected to port {}".format(port).encode()
+        self.request.sendall(len(newMessage))
+        self.request.sendall(newMessage)
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
