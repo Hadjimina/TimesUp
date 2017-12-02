@@ -56,9 +56,12 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             self.request.sendall(self.handshake)
         '''
-        print("new connection to {}".format(self.client_address))
 
-        self.request.sendall("test".encode())
+        ipAddress, port = self.client_address
+
+        print("new connection to {} at port {}".format(ipAddress, port))
+
+        self.request.sendall("you are connected to port {}".format(port).encode())
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
