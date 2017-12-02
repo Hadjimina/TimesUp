@@ -11,6 +11,8 @@ from collections import deque
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
+
+    '''
     handshake = (
         "HTTP/1.1 101 Web Socket Protocol Handshake\r\n"
         "Upgrade: WebSocket\r\n"
@@ -23,8 +25,11 @@ class RequestHandler(socketserver.BaseRequestHandler):
     )
 
     MAGICGUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+    handshaken = False
+    '''
 
     def handle(self):
+        '''
         handshaken = False
 
         ipAddress, port = self.client_address
@@ -50,6 +55,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                     handshake = self.handshake % {'acceptstring': response}
 
             self.request.sendall(self.handshake)
+        '''
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
