@@ -10,6 +10,9 @@ from collections import deque
 
 class RequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
+
+        print("new connection to {}".format(self.client_address))
+
         # Read the message
         receivedData = self.request.recv(1024).strip()
 
