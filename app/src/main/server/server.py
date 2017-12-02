@@ -18,7 +18,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
         # Read the message
         receivedData = self.request.recv(1024).strip()
         print("received {}".format(receivedData.decode()))
-        
+
         self.request.sendall(str(port).encode())
 
         # Read the message
