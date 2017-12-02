@@ -56,6 +56,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             self.request.sendall(self.handshake)
         '''
+        print("new connection to {}".format(self.client_address))
+
+        self.request.sendall("test".encode())
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
