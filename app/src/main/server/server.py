@@ -11,12 +11,15 @@ from collections import deque
 class RequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
 
+        ipAddress, port = self.client_address
+
         print("new connection to {}".format(self.client_address))
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
-
         print("received {}".format(receivedData.decode()))
+        
+        self.request.sendall(str(port).encode())
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
