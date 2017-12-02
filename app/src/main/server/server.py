@@ -18,6 +18,11 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         print("received {}".format(receivedData.decode()))
 
+        # Read the message
+        receivedData = self.request.recv(1024).strip()
+
+        print("received {}".format(receivedData.decode()))
+
         # Turn into a JSON (a dict)
         d = json.load(receivedData.decode())
 
