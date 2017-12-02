@@ -69,7 +69,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
         print("received {}".format(receivedData.decode()))
 
         # Turn into a JSON (a dict)
-        d = json.load(receivedData.decode())
+        d = json.loads(receivedData.decode())
 
         # Get requestType (None if non-existent)
         requestType = d.get("requestType")
