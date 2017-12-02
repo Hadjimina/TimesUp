@@ -734,7 +734,7 @@ if __name__ == "__main__":
     # Default values
     HOST = ""
     PORT = 9999
-
+    '''
     server = ThreadedTCPServer((HOST, PORT), RequestHandler)
     with server:
         ip, port = server.server_address
@@ -746,4 +746,3 @@ if __name__ == "__main__":
     # handles the request
     with socketserver.ThreadingTCPServer((HOST, PORT), RequestHandler) as server:
         server.serve_forever()
-'''
