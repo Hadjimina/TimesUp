@@ -1,5 +1,5 @@
 import base64
-import datetime
+import time
 import hashlib
 import threading
 import socketserver
@@ -62,6 +62,10 @@ class RequestHandler(socketserver.BaseRequestHandler):
         print("new connection to {} at port {}".format(ipAddress, port))
 
         self.request.sendall("you are connected to port {}".format(port).encode())
+
+        time.sleep(2)
+
+        self.request.sendall("you are still connected to port {}".format(port).encode())
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
