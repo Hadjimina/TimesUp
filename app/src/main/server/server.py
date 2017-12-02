@@ -63,13 +63,13 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         newMessage = "you are connected to port {}".format(port).encode()
 
-        self.request.sendall(len(newMessage))
+        self.request.sendall(str(len(newMessage)).encode())
         self.request.sendall(newMessage)
 
         time.sleep(2)
 
         newMessage = "you are still connected to port {}".format(port).encode()
-        self.request.sendall(len(newMessage))
+        self.request.sendall(str(len(newMessage)).encode())
         self.request.sendall(newMessage)
 
         # Read the message
