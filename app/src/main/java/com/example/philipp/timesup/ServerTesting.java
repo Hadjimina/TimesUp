@@ -18,7 +18,6 @@ public class ServerTesting extends ServerIOActivity {
         NetworkHelper.handler = new SocketHandler();
         NetworkHelper.handler.setCallbackActivity(this);
 
-        //NetworkHelper.handler.execute();
 
         Button newGame = (Button) findViewById(R.id.button_create_game);
         Button joinGame = (Button) findViewById(R.id.button_join_game);
