@@ -3,9 +3,6 @@ package com.example.philipp.timesup;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -18,10 +15,9 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
 
     private ServerIOActivity callbackActivity;
     //private WebSocketClient webSocketClient;
-    private Socket socket;
+    private NetClient nc;
     private URI uri;
-    private String response;
-    private  PrintWriter output;
+
 
     public SocketHandler(){
 
@@ -38,16 +34,8 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     }
 
     public void sendMessage(EncodeMessage messageToSend){
-        //webSocketClient.send(messageToSend.toJSONString());
-        try{
-            OutputStream out = socket.getOutputStream();
-            PrintWriter output = new PrintWriter(out);
-            output.println(messageToSend.toJSONString());
-            out.flush();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
 
+        nc.sendDataWithString(messageToSend.toJSONString());
         Log.i("Websocket", "Sent " + messageToSend.toJSONString());
     }
 
@@ -73,8 +61,7 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     protected DecodeMessage doInBackground(Void... params) {
 
 
-        NetClient nc = new NetClient(SERVER_IP, Integer.parseInt(SERVER_PORT));
-        nc.sendDataWithString("{}");
+        nc = new NetClient(SERVER_IP, Integer.parseInt(SERVER_PORT));
 
         String r = nc.receiveDataFromServer();
         Log.i("websocket Data", r);
