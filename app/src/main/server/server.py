@@ -20,6 +20,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
         print("received {}".format(receivedData.decode()))
 
         self.request.sendall(str(port).encode())
+        
 
         # Read the message
         receivedData = self.request.recv(1024).strip()
