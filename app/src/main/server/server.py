@@ -719,6 +719,10 @@ def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPla
     return json.dumps(message)
 
 
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    pass
+
+
 if __name__ == "__main__":
     # Dict that maps gameIDs to queues
     games = dict()
@@ -727,14 +731,19 @@ if __name__ == "__main__":
     # Client Socket Waiting Time
     TIMEOUT = 0.1
 
-    # Concurrency locks
-    userCountLock = threading.Lock()
-
     # Default values
     HOST = ""
     PORT = 9999
 
+    server = ThreadedTCPServer((HOST, PORT), RequestHandler)
+    with server:
+        ip, port = server.server_address
+        serverThread = threading.Thread(target=server.serve_forever)
+        serverThread.daemon = True
+        serverThread.start()
+'''
     # Wait for incoming connections and start a new thread RequestHandler that
     # handles the request
     with socketserver.ThreadingTCPServer((HOST, PORT), RequestHandler) as server:
         server.serve_forever()
+'''
