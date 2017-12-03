@@ -96,6 +96,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             # Send back the gameId (host has clientId 0)
             message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
+            print("sent message: \n {}".format(message))
 
             # Initialize game thread communication queue
             games[gameId][0] = queue.Queue()
