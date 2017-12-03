@@ -103,7 +103,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             print("sent message: \n {}".format(message))
 
             # Send message to ensure client side does not crash
-            self.request.sendall("new port is hopefully working".encode())
+            self.request.sendall("new port is hopefully working \q".encode())
 
             # Initialize game thread communication queue
             games[gameId][0] = queue.Queue()
