@@ -1,6 +1,6 @@
-import base64
+
 import time
-import hashlib
+import datetime
 import threading
 import socketserver
 import json
@@ -12,68 +12,18 @@ from collections import deque
 
 class RequestHandler(socketserver.BaseRequestHandler):
 
-    '''
-    handshake = (
-        "HTTP/1.1 101 Web Socket Protocol Handshake\r\n"
-        "Upgrade: WebSocket\r\n"
-        "Connection: Upgrade\r\n"
-        "Sec-WebSocket-Accept: %(acceptstring)s\r\n"
-        "Server: TestTest\r\n"
-        "Access-Control-Allow-Origin: http://localhost\r\n"
-        "Access-Control-Allow-Credentials: true\r\n"
-        "\r\n"
-    )
-
-    MAGICGUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-    handshaken = False
-    '''
-
     def handle(self):
-        '''
-        handshaken = False
-
-        ipAddress, port = self.client_address
-
-        print("new connection to {}".format(self.client_address))
-
-        # Read the message
-        receivedData = self.request.recv(1024).strip()
-        print("received {}".format(receivedData.decode()))
-
-        if not handshaken:
-            parts = receivedData.split('\r\n\r\n', 1)
-            for line in parts[0].split('\r\n')[1:]:
-                name, value = line.split(': ', 1)
-
-                # If this is the key
-                if name.lower() == "sec-websocket-key":
-                    # Append the standard GUID and get digest
-                    combined = value + self.MAGICGUID
-                    response = base64.b64encode(hashlib.sha1(combined).digest())
-
-                    # Replace the placeholder in the handshake response
-                    handshake = self.handshake % {'acceptstring': response}
-
-            self.request.sendall(self.handshake)
-        '''
 
         ipAddress, port = self.client_address
 
         print("new connection to {} at port {}".format(ipAddress, port))
 
-        newMessage = "you are connected to port {}".format(port).encode()
-
-        self.request.sendall(str(len(newMessage)).encode())
-        self.request.sendall(newMessage)
-
-        time.sleep(2)
-
-        newMessage = "you are still connected to port {}".format(port).encode()
-        self.request.sendall(str(len(newMessage)).encode())
-        self.request.sendall(newMessage)
-
         # Read the message
-        receivedData = self.request.recv(1024).strip()
+        length = int(self.request.recv(4).decode())
+
+        print("length {}".format(length.decode()))
+
+        receivedData = self.request.recv(length)
 
         print("received {}".format(receivedData.decode()))
 
@@ -144,7 +94,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             games[gameId][0] = queue.Queue()
 
             # Send back the gameId (host has clientId 0)
-            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2)
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
 
             # Initialize game thread communication queue
@@ -214,7 +164,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             games[gameId][clientId] = queue.Queue()
 
             # Send ACK back the client
-            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2)
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
 
             # Send username and clientId to gameThread
@@ -242,7 +192,13 @@ def client(request, gameId, clientId):
             r, w, x = select.select([request], [], [], TIMEOUT)
             if r:
                 # If something changed, read
-                message = request.recv(1024)
+                length = int(request.recv(4).decode())
+
+                print("length {}".format(length.decode()))
+
+                message = request.recv(length)
+
+                print("received {}".format(message.decode()))
 
                 # If the message is None, the socket is broken
                 if not message:
@@ -689,7 +645,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
 # JSON encoding functions
 
-def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1=1, teamId2=2):
+def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1, teamId2, port):
     message = dict()
     message["returnType"] = "ACK"
     message["requestType"] = "newGame"
@@ -700,8 +656,9 @@ def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1=1, teamId2
     body["teamName2"] = teamName2
     body["teamId1"] = teamId1
     body["teamId2"] = teamId2
+    body["port"] = port
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
@@ -714,7 +671,7 @@ def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
     body = dict()
     body["errorType"] = errorMessage
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wordsPerPerson):
@@ -729,7 +686,7 @@ def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wor
     body["timePerRound"] = timePerRound
     body["wordsPerPerson"] = wordsPerPerson
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeAckMessage(requestType, gameId, clientId):
@@ -740,7 +697,7 @@ def encodeAckMessage(requestType, gameId, clientId):
     message["clientId"] = clientId
     body = dict()
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeSetupMessage(gameId, clientId, wordList):
@@ -752,7 +709,7 @@ def encodeSetupMessage(gameId, clientId, wordList):
     body = dict()
     body["wordList"] = wordList
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlayer, phaseNumber, wordIndex):
@@ -768,7 +725,7 @@ def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlaye
     body["phaseNumber"] = phaseNumber
     body["wordIndex"] = wordIndex
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPlayer, nextPhase):
@@ -783,7 +740,7 @@ def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPla
     body["nextPlayer"] = nextPlayer
     body["nextPhase"] = nextPhase
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 if __name__ == "__main__":
