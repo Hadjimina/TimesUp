@@ -203,11 +203,12 @@ def client(request, gameId, clientId):
             r, w, x = select.select([request], [], [], TIMEOUT)
             if r:
                 # If something changed, read
-                length = int(request.recv(4).decode())
+
+                length = request.recv(4).decode()
 
                 print("length {}".format(length))
 
-                message = request.recv(length)
+                message = request.recv(int(length))
 
                 print("received {}".format(message.decode()))
 
