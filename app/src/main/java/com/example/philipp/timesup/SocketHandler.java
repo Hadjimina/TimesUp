@@ -14,8 +14,6 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
 
     private ServerIOActivity callbackActivity;
     private NetClient nc;
-    private String toSend;
-    private boolean messageAvailable;
 
     public SocketHandler() {
 
@@ -47,6 +45,9 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
 
     }
 
+
+
+
     @Override
     protected DecodeMessage doInBackground(Void... params) {
 
@@ -60,11 +61,13 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
             while (true) {
 
                 //get message
-                while (!messageAvailable && (charsRead = nc.getBufferedReader().read(buffer)) != -1) {
+                while (nc.getBufferedReader() != null && (charsRead = nc.getBufferedReader().read(buffer)) != -1) {
                     message += new String(buffer).substring(0, charsRead);
                     if (message.substring(message.length() - 2).equals("\\q")) {
                         DecodeMessage decodeMessage = new DecodeMessage(message.substring(0, message.length() - 2));
+
                         publishProgress(decodeMessage);
+
 
                         //reset values
                         message = "";
@@ -92,14 +95,7 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     protected void onProgressUpdate(DecodeMessage... values) {
         super.onProgressUpdate(values);
 
-        //Only execute callback if the port is not changed
-        if (values[0].getBody() != null && values[0].getBody().has("port")){
-            initNetClient(String.valueOf(values[0].getInt("port")));
-            Log.i("Websocket", "Port changed. Communicating on "+ SERVER_PORT);
-        }else{
-            callbackActivity.callback(values[0]);
-        }
-
+        callbackActivity.callback(values[0]);
     }
 
 }

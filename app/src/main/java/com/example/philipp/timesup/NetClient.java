@@ -39,6 +39,7 @@ public class NetClient {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             }
         } catch (IOException e) {
+            //TODO add error message
             e.printStackTrace();
         }
     }
@@ -46,6 +47,7 @@ public class NetClient {
     public BufferedReader getBufferedReader() {
         return in;
     }
+
 
     private void disConnectWithServer() {
         if (socket != null) {
@@ -64,11 +66,10 @@ public class NetClient {
     public void sendDataWithString(String message) {
         if (message != null) {
 
-            //only send messages smaller than 1024 bytes
 
             //prepend size of string (padded)
             String length = String.valueOf(message.length());
-            length = String.format("%4s", length).replace(' ', '0');
+            length = String.format("%4s", length);
 
             out.write(length + message);
             out.flush();

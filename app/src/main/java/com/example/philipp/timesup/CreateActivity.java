@@ -209,7 +209,6 @@ public class CreateActivity extends ServerIOActivity{
 
                 startActivity(intent);
 
-
             }
         });
 

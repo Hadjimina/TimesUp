@@ -34,7 +34,7 @@ public class StartActivity extends ServerIOActivity {
                 setCallbackActivity(StartActivity.this);
 
                 //change to createGame class
-                intent = new Intent(getApplicationContext(), ServerTesting.class);
+                intent = new Intent(getApplicationContext(), CreateActivity.class);
                 startActivity(intent);
             }
         });

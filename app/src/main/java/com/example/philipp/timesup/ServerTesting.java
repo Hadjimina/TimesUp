@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class ServerTesting extends ServerIOActivity {
 
@@ -30,7 +31,6 @@ public class ServerTesting extends ServerIOActivity {
             public void onClick(View v){
                 //String teamName1, String teamName2, int timePerRound, int wordsPerPerson, String username, boolean[] rounds )
                 EncodeMessage msg = new EncodeMessage("TeamName1", "TeamName2", 60, 3, "philipp", new boolean[]{true,true,true,true,true});
-                Log.i("Message",msg.toJSONString());
                 sendMessage(msg);
 
             }
@@ -42,6 +42,10 @@ public class ServerTesting extends ServerIOActivity {
 
     @Override
     public void callback(DecodeMessage message) {
+
+        Toast.makeText(this, "SERVER RESPONSE: "+message.getRawString(),
+                Toast.LENGTH_LONG).show();
+
         Log.i("SERVER RESPONSE:", message.getRawString());
 
         gameID = message.getGameId();

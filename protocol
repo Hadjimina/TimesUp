@@ -155,10 +155,7 @@ Meaning of startTime ?
     "requestType":"newGame",
     "clientId": 000,
     "gameId":000,
-    "body":
-    {
-        "port" : 000
-    }
+    "body": {}
 }
 
 4. Ready
