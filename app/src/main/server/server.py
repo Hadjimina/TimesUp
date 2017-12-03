@@ -46,7 +46,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             # Create a "random" game id
             gameId = random.randrange(0, 9999)
-            while gameId not in games.keys():
+            while gameId in games.keys():
                 gameId = random.randrange(0, 9999)
 
             print("created new gameId {}".format(gameId))
