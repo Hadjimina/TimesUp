@@ -244,7 +244,7 @@ def client(request, gameId, clientId):
 
 
 def handleClientMessage(request, rawMessage, gameId, clientId):
-    message = json.load(rawMessage)
+    message = json.loads(rawMessage)
 
     messageType = None
     # Get fields from message
