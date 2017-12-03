@@ -53,7 +53,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             # Create a new empty queue for the new gameId
             games[gameId] = dict()
-            gameQueues[gameId] = dict()
+            gameQueues[gameId] = queue.Queue()
 
             # Read out all values from the request
             try:
