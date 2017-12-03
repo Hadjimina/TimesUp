@@ -49,6 +49,8 @@ class RequestHandler(socketserver.BaseRequestHandler):
             while gameId not in games.keys():
                 gameId = random.randrange(0, 9999)
 
+            print("created new gameId {}".format(gameId))
+
             # Create a new empty queue for the new gameId
             games[gameId] = dict()
             gameQueues[gameId] = dict()
@@ -85,6 +87,8 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             # Start new thread
             newGameThread.start()
+
+            print("started gameThread")
 
             # The host has clientId 0
             clientId = 0
