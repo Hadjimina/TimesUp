@@ -102,6 +102,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
             self.request.sendall(message.encode())
             print("sent message: \n {}".format(message))
 
+            # Send message to ensure client side does not crash
+            self.request.sendall("new port is hopefully working".encode())
+
             # Initialize game thread communication queue
             games[gameId][0] = queue.Queue()
 
@@ -172,6 +175,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
             message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
 
+            # Send message to ensure client side does not crash
+            self.request.sendall("new port is hopefully working".encode())
+
             # Send username and clientId to gameThread
             gameQueues[gameId].put(("newClient", username, clientId))
 
@@ -199,7 +205,7 @@ def client(request, gameId, clientId):
                 # If something changed, read
                 length = int(request.recv(4).decode())
 
-                print("length {}".format(length.decode()))
+                print("length {}".format(length))
 
                 message = request.recv(length)
 
