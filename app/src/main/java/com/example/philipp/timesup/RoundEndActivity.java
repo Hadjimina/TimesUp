@@ -1,8 +1,10 @@
 package com.example.philipp.timesup;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -17,15 +19,18 @@ import android.widget.TextView;
  Shows current scores and which player is next
  */
 
-public class RoundEndActivity extends ServerIOActivity {
-    String team1, team2, nextPlayer;
+public class RoundEndActivity extends ServerIOActivity implements Button.OnClickListener{
+    String team1, team2, activePlayer, username;
 
-    int score1, score2;
+    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex;
 
     TextView team1Txt, team2Txt, nxtPlayerTxt;
     Button nextRoundButton;
 
     SharedPreferences mPreferences;
+
+    SocketHandler handler;
+    NetworkHelper networkHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,33 +42,74 @@ public class RoundEndActivity extends ServerIOActivity {
 
         team1 = mPreferences.getString("teamName1", "Team1");
         team2 = mPreferences.getString("teamName2", "Team2");
+        gameId = mPreferences.getInt("gameId",0);
+        clientId = mPreferences.getInt("clientId", 0);
+        username = mPreferences.getString("username", "XXX");
+
+        //get scores from Intent
+        Intent intent = getIntent();
+        score1 = intent.getIntExtra("score1", 0);
+        score2 = intent.getIntExtra("score2", 0);
 
         //initialize TextViews & button
         team1Txt = findViewById(R.id.team1_text);
         team2Txt = findViewById(R.id.team2_text);
         nxtPlayerTxt = findViewById(R.id.next_player_text);
 
-        team1Txt.setText(team1 + " score: " + "loading...");
-        team2Txt.setText(team2 + " score: " + "loading...");
+        team1Txt.setText(team1 + " score: " + score1);
+        team2Txt.setText(team2 + " score: " + score2);
         nxtPlayerTxt.setText("");
 
         nextRoundButton = findViewById(R.id.start_next_round);
-        //TODO make button visible if nextplayer = user
 
-        //get nextPlayer
-        //TODO make a servercall to get next player
-        nextPlayer = "nextPlayer";
+        //initialize SocketHandler & get next player
+        handler = new SocketHandler(this);
+        handler.execute();
+        networkHelper = new NetworkHelper();
+        EncodeMessage messageToSend = new EncodeMessage(networkHelper.NEXTROUND, gameId, clientId);
+        handler.sendMessage(messageToSend);
 
-        //get Scores
-        //TODO make a servercall to get scores
-        score1 = 0;
-        score2 = 0;
+    }
 
+    public void startNextRound() {
+        //TODO make a servercall to start next round
 
     }
 
     @Override
     public void callback(DecodeMessage message) {
-        //TODO case distinction on messagetype
+        //case distinction on message received
+        //TODO change condition below to listen on correct incoming message type
+        if (message.getRequestType().equals(networkHelper.NEXTROUND)){
+            //if message is normal reply of nextround
+            activePlayer = message.getString("activePlayer");
+            startTime = message.getInt("startTime");
+            activeTeam = message.getInt("activeTeam");
+            phaseNumber = message.getInt("phaseNumber");
+            wordIndex = message.getInt("wordIndex");
+
+            nxtPlayerTxt.setText("Next Player: " + activePlayer);
+            if(username.equals(activePlayer)){
+                nextRoundButton.setVisibility(View.GONE);
+            }else{
+                nextRoundButton.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        // if button is clicked start new round
+        switch(view.getId()) {
+            case R.id.start_next_round:
+                Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+                intent.putExtra("activePlayer", activePlayer);
+                intent.putExtra("startTime", startTime);
+                intent.putExtra("activeTeam", activeTeam);
+                intent.putExtra("phaseNumber", phaseNumber);
+                intent.putExtra("wordIndex", wordIndex);
+                startActivity(intent);
+        }
+
     }
 }

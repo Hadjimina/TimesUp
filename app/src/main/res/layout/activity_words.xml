@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:layout_below="@id/enter_words"
-        android:inputType="text"/>
+        android:inputType="text|textMultiLine"/>
 
     <TextView
         android:id="@+id/number_of_words"
@@ -35,17 +35,9 @@
         android:id="@+id/button_enter"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="15dp"
         android:layout_below="@id/number_of_words"
         android:text="@string/enter" />
 
-    <Button
-        android:id="@+id/button_ready"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:layout_below="@id/number_of_words"
-        android:visibility="invisible"
-        android:text="@string/ready" />
 
 </RelativeLayout>
