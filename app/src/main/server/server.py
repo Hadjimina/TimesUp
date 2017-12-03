@@ -21,7 +21,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
         # Read the message
         length = int(self.request.recv(4).decode())
 
-        print("length {}".format(length.decode()))
+        print("length {}".format(length))
 
         receivedData = self.request.recv(length)
 
