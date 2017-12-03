@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage> {
 
-    //private static final String SERVER_IP = "echo.websocket.org";
     private static final String SERVER_IP = "46.101.97.34";
     private String SERVER_PORT = "9999";
 
@@ -40,24 +39,18 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
         this.callbackActivity = callbackActivity;
     }
 
-    //cancel async, reinitalize & restart
-    /*public void resetPort(String port){
+    // (re)initialize netClient
+    public void initNetClient(String port){
 
-        this.cancel(true);
         SERVER_PORT = port;
-        try {
-            uri = new URI(SERVER_IP+SERVER_PORT);
-            this.execute();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        nc = new NetClient(SERVER_IP, Integer.parseInt(SERVER_PORT));
 
-    }*/
+    }
 
     @Override
     protected DecodeMessage doInBackground(Void... params) {
 
-        nc = new NetClient(SERVER_IP, Integer.parseInt(SERVER_PORT));
+        initNetClient(SERVER_PORT);
 
         String message = "";
         int charsRead = 0;
@@ -98,7 +91,15 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     @Override
     protected void onProgressUpdate(DecodeMessage... values) {
         super.onProgressUpdate(values);
-        callbackActivity.callback(values[0]);
+
+        //Only execute callback if the port is not changed
+        if (values[0].getBody() != null && values[0].getBody().has("port")){
+            initNetClient(String.valueOf(values[0].getInt("port")));
+            Log.i("Websocket", "Port changed. Communicating on "+ SERVER_PORT);
+        }else{
+            callbackActivity.callback(values[0]);
+        }
+
     }
 
 }

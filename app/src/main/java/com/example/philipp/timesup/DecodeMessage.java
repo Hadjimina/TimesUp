@@ -105,4 +105,7 @@ public class DecodeMessage {
         return raw;
     }
 
+    public JSONObject getBody() {
+        return body;
+    }
 }

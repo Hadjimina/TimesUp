@@ -21,6 +21,7 @@ public class NetClient {
 
     /**
      * Constructor with Host, Port and MAC Address
+     *
      * @param host
      * @param port
      */
@@ -42,7 +43,7 @@ public class NetClient {
         }
     }
 
-    public BufferedReader getBufferedReader(){
+    public BufferedReader getBufferedReader() {
         return in;
     }
 
@@ -62,12 +63,20 @@ public class NetClient {
 
     public void sendDataWithString(String message) {
         if (message != null) {
-            Log.i("Websocket sending", message);
-            out.write(message);
+
+            //only send messages smaller than 1024 bytes
+
+            //prepend size of string (padded)
+            String length = String.valueOf(message.length());
+            length = String.format("%4s", length).replace(' ', '0');
+
+            out.write(length + message);
             out.flush();
+            Log.i("Websocket sending", message);
+
+
         }
     }
-
 
 
 }

@@ -14,9 +14,7 @@ public class ServerTesting extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_testing);
 
-
-        NetworkHelper.handler = new SocketHandler();
-        NetworkHelper.handler.setCallbackActivity(this);
+        setCallbackActivity(this);
 
 
         Button newGame = (Button) findViewById(R.id.button_create_game);
@@ -33,7 +31,7 @@ public class ServerTesting extends ServerIOActivity {
                 //String teamName1, String teamName2, int timePerRound, int wordsPerPerson, String username, boolean[] rounds )
                 EncodeMessage msg = new EncodeMessage("TeamName1", "TeamName2", 60, 3, "philipp", new boolean[]{true,true,true,true,true});
                 Log.i("Message",msg.toJSONString());
-                NetworkHelper.handler.sendMessage(msg);
+                sendMessage(msg);
 
             }
         });
