@@ -218,7 +218,7 @@ def client(request, gameId, clientId):
                 else:
 
                     # Function that handles the message
-                    handleClientMessage(request, message, gameId, clientId)
+                    handleClientMessage(request, message.decode(), gameId, clientId)
         try:
             # Get an item from the queue
             item = games[gameId][clientId].get_nowait()
