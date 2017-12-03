@@ -118,10 +118,6 @@ public class CreateActivity extends ServerIOActivity{
         //initialize shared preferences object
         editor = getSharedPreferences("myPref", MODE_PRIVATE).edit();
 
-        //initialize server stuff
-        socketHandler = new SocketHandler(this);
-
-        socketHandler.execute();
 
 
         //cancel Button goes back to StartActivity
@@ -208,8 +204,6 @@ public class CreateActivity extends ServerIOActivity{
                 //Send message to server
                 sendMessage = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
                 socketHandler.sendMessage(sendMessage);
-
-
 
                 startActivity(intent);
 
