@@ -39,13 +39,13 @@ public class CreateActivity extends ServerIOActivity{
     Toast toast;
     EncodeMessage sendMessage;
     SharedPreferences.Editor editor;
-    SocketHandler socketHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        setCallbackActivity(this);
         //TODO: solve bug when pressing finish and nothing at all is filled in
 
         //timepicker
@@ -203,10 +203,7 @@ public class CreateActivity extends ServerIOActivity{
 
                 //Send message to server
                 sendMessage = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
-                socketHandler.sendMessage(sendMessage);
-
-                startActivity(intent);
-
+                sendMessage(sendMessage);
 
             }
         });
@@ -216,6 +213,7 @@ public class CreateActivity extends ServerIOActivity{
     @Override
     public void callback(DecodeMessage message) {
         int gameId, clientId;
+        Log.i("callback","creatActivity");
 
         // if right return message from server, start new Activity
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(NEWGAME)){
@@ -226,14 +224,14 @@ public class CreateActivity extends ServerIOActivity{
             //add retrieved information to sharedPreferences
             editor.putInt("gameId", gameId);
             editor.putInt("clientId", clientId);
-            editor.apply();
 
+            editor.apply();
 
             startActivity(intent);
         }
         //else try to send message to server again
         else {
-            socketHandler.sendMessage(sendMessage);
+            sendMessage(sendMessage);
             toast = Toast.makeText(getApplicationContext(), "error contacting server, trying to send message again", Toast.LENGTH_LONG);
             toast.show();
         }

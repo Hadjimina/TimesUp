@@ -21,7 +21,6 @@ public class EncodeMessage {
             roundsJSON.put(b);
         }
 
-        body = new JSONObject();
 
         try {
             body.put("teamName1", teamName1);
@@ -95,6 +94,7 @@ public class EncodeMessage {
     }
 
     private void setHeader(String requestType, int gameId, int clientId){
+        this.body = new JSONObject();
         this.requestType = requestType;
         this.gameId = gameId;
         this.clientId = clientId;

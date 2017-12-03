@@ -3,6 +3,7 @@ package com.example.philipp.timesup;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,7 +40,6 @@ public class JoinActivity extends ServerIOActivity {
     Intent intent;
     SharedPreferences.Editor editor;
     SharedPreferences prefs;
-    SocketHandler socketHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +55,7 @@ public class JoinActivity extends ServerIOActivity {
         joinGame = findViewById(R.id.button_join);
 
         //initialise server connection
-        socketHandler = new SocketHandler(this);
-        socketHandler.execute();
+        setCallbackActivity(this);
 
         joinGame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +90,7 @@ public class JoinActivity extends ServerIOActivity {
 
                         //send message to server
                         message = new EncodeMessage(gameId, username);
-                        socketHandler.sendMessage(message);
+                        sendMessage(message);
 
                         intent = new Intent(getApplicationContext(), WordsActivity.class);
 
@@ -106,7 +105,7 @@ public class JoinActivity extends ServerIOActivity {
 
     @Override
     public void callback(DecodeMessage message) {
-
+        Log.i("callback","joinactivity");
         String teamName1, teamName2;
 
         //initialize shared preferences
@@ -162,7 +161,7 @@ public class JoinActivity extends ServerIOActivity {
 
                         //Send message to server
                         sendMessage = new EncodeMessage(gameId, clientId, teamId);
-                        socketHandler.sendMessage(sendMessage);
+                        sendMessage(sendMessage);
 
                     } else {
                         toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
@@ -211,7 +210,7 @@ public class JoinActivity extends ServerIOActivity {
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
             toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
             toast.show();
-            socketHandler.sendMessage(sendMessage);
+            sendMessage(sendMessage);
         }
         //show error and go back to start
         else{

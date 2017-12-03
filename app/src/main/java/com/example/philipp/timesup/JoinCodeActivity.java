@@ -36,7 +36,7 @@ public class JoinCodeActivity extends ServerIOActivity {
     Toast toast;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
-    SocketHandler socketHandler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +57,7 @@ public class JoinCodeActivity extends ServerIOActivity {
 
 
         //initialise server connection
-        socketHandler = new SocketHandler(this);
-        socketHandler.execute();
+        setCallbackActivity(this);
 
         //set texts for teamA and teamB buttons
         teamA = findViewById(R.id.team_a1);
@@ -94,7 +93,7 @@ public class JoinCodeActivity extends ServerIOActivity {
 
                 //create message and send it to server
                 sendMessage = new EncodeMessage(gameId, clientId, teamId);
-                socketHandler.sendMessage(sendMessage);
+                sendMessage(sendMessage);
 
             }
         });
@@ -134,7 +133,7 @@ public class JoinCodeActivity extends ServerIOActivity {
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
             toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
             toast.show();
-            socketHandler.sendMessage(sendMessage);
+            sendMessage(sendMessage);
         }
         //show error and go back to start
         else {
