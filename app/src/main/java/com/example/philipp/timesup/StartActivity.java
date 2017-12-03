@@ -2,6 +2,7 @@ package com.example.philipp.timesup;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -24,6 +25,8 @@ public class StartActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+
+
         create = findViewById(R.id.button_create);
         create.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,6 +46,10 @@ public class StartActivity extends ServerIOActivity {
         join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //initialize connection
+                NetworkHelper.handler = new SocketHandler();
+                setCallbackActivity(StartActivity.this);
+
                 intent = new Intent(getApplicationContext(), JoinActivity.class);
                 startActivity(intent);
             }
@@ -52,6 +59,6 @@ public class StartActivity extends ServerIOActivity {
 
     @Override
     public void callback(DecodeMessage message) {
-
+        Log.i("callback","start");
     }
 }

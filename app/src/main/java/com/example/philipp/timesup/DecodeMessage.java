@@ -22,7 +22,8 @@ public class DecodeMessage {
             this.raw = rawMessage;
             //
 
-            JSONObject entireObject = new JSONObject(rawMessage);
+            Log.i("decode", rawMessage);
+            JSONObject entireObject = new JSONObject(rawMessage.trim());
             this.returnType = entireObject.getString("returnType");
             this.requestType = entireObject.getString("requestType");
             this.gameId = entireObject.getInt("gameId");

@@ -95,6 +95,7 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     protected void onProgressUpdate(DecodeMessage... values) {
         super.onProgressUpdate(values);
 
+        Log.i("websocket", "Got message: "+values[0].getRawString());
         callbackActivity.callback(values[0]);
     }
 

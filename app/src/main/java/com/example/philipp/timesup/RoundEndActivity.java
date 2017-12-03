@@ -63,8 +63,7 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
         nextRoundButton = findViewById(R.id.start_next_round);
 
         //initialize SocketHandler & get next player
-        handler = new SocketHandler(this);
-        handler.execute();
+        setCallbackActivity(this);
         networkHelper = new NetworkHelper();
         EncodeMessage messageToSend = new EncodeMessage(networkHelper.NEXTROUND, gameId, clientId);
         handler.sendMessage(messageToSend);
