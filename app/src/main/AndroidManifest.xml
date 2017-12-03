@@ -12,26 +12,32 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+
         <activity android:name=".StartActivity" android:label="Time's Up!">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateActivity" android:label="Create a Game"/>
+        <activity
+            android:name=".CreateActivity"
+            android:label="Create a Game" />
         <activity android:name=".GameActivity">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+
         <activity android:name=".GameEndActivity"/>
         <activity android:name=".JoinActivity" android:label="Join a Game"/>
         <activity android:name=".JoinCodeActivity"/>
         <activity android:name=".RoundEndActivity"/>
         <activity android:name=".WordsActivity" >
+
 
 
     </application>

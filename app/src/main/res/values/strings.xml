@@ -40,5 +40,6 @@
     <string name="one_word">One Word</string>
     <string name="freeze">Freeze</string>
     <string name="sounds">Sounds</string>
+    <string name="title_activity_server_testing">ServerTesting</string>
 
 </resources>

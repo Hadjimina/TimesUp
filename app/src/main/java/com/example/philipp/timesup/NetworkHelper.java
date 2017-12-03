@@ -31,4 +31,10 @@ public class NetworkHelper {
     public static String ROUNDFINISHED = "roundFinished";
 
     public static String NEXTROUND = "nextRound";
+
+    public static SocketHandler handler;
+
+    public void setCallback(ServerIOActivity activity){
+        handler.setCallbackActivity(activity);
+    }
 }

@@ -21,13 +21,13 @@ public class EncodeMessage {
             roundsJSON.put(b);
         }
 
-        JSONObject body = new JSONObject();
+        body = new JSONObject();
 
         try {
             body.put("teamName1", teamName1);
             body.put("teamName2", teamName2);
             body.put("timePerRound", timePerRound);
-            body.put("timePerRound", wordsPerPerson);
+            body.put("wordsPerPerson", wordsPerPerson);
             body.put("username", username);
             body.put("rounds", roundsJSON);
         } catch (JSONException e) {

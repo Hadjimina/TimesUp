@@ -2,7 +2,6 @@ package com.example.philipp.timesup;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
@@ -15,7 +14,7 @@ Contains two buttons Join and Create
 
 
 //dummy extends just for testing
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends ServerIOActivity {
 
     Button create, join;
     Intent intent;
@@ -29,6 +28,12 @@ public class StartActivity extends AppCompatActivity {
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //initialize connection
+                NetworkHelper.handler = new SocketHandler();
+                setCallbackActivity(StartActivity.this);
+
+                //change to createGame class
                 intent = new Intent(getApplicationContext(), CreateActivity.class);
                 startActivity(intent);
             }
@@ -45,4 +50,8 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void callback(DecodeMessage message) {
+
+    }
 }

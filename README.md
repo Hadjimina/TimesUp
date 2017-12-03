@@ -10,14 +10,12 @@
     - If you want to access something in the body of the message you have to "get its type". 
       - Example you want to get a String array value with name "wordList": `message.getStringArray("wordList")` returns the wordList as a String array
       - Example you want to get a String value with name "activePlayer": `message.getString("activePlayer")` returns the activePlayer value as a String array
-2. Instantiate an Object of class `SocketHandler` and pass your current Class/Activity to its constructor (we use this to bind the callback function)
-  - `SocketHandler handler = new SocketHandler(this);`
-3. Start the Asynctask of the handler
-  - `handler.execute()`
-  - **DO NOT CALL** `handler.get()`
-    - This would execute the asynctask on the main thread, will return nothing and will probably crash
+2. Change the callback activity to the current activity
+  - `setCallbackActivity(this);`
+    - setCallbackActivity() gets inhertied from ServerIOActivity
 4. Send encoded messages to the server
-  - `handler.send(encodedMessage)`
+  - `sendMessage(encodeMessage)`
+    - sendMessage() get inherited from ServerIOActivity
   - Here encodedMessage is an object of class EncodeMessage which is basically the counterpart of DecodeMessage
   - Again check the protocol to see what kind of things it is used for (this time the "SENDING" part)
   - You can simply put all the data you need to send into the constructor of the EncodeMessage, the rest will be handled by the implementation of the constructor.
@@ -34,8 +32,7 @@
         protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           
-          SocketHandler handler = new SocketHandler(this);
-          handler.execute();
+          setCallbackActivity(this);
           
           ...
           //Some code
@@ -46,7 +43,7 @@
           
           
           EncodeMessage messageToSend = new EncodeMessage(gameId, clientId, teamId);
-          handler.send(messageToSend);
+          sendMessage(messageToSend);
           
         }
         
