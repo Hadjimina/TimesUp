@@ -12,6 +12,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.NEWGAME;
 
 /**
@@ -116,7 +117,7 @@ public class CreateActivity extends ServerIOActivity{
 
 
         //initialize shared preferences object
-        editor = getSharedPreferences("myPref", MODE_PRIVATE).edit();
+        editor = getSharedPreferences(MYPREFS, MODE_PRIVATE).edit();
 
 
 
@@ -194,10 +195,6 @@ public class CreateActivity extends ServerIOActivity{
 
                 Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
 
-                //add things to intent
-                intent.putExtra("teamName1", teamName1);
-                intent.putExtra("teamName2", teamName2);
-
                 //apply shared preferences
                 editor.apply();
 
@@ -220,7 +217,8 @@ public class CreateActivity extends ServerIOActivity{
 
             gameId = message.getGameId();
             clientId = message.getClientId();
-
+            Log.d("TAGmessage", "gameId: " + gameId);
+            Log.d("TAGmessage", "clientId: " + clientId);
             //add retrieved information to sharedPreferences
             editor.putInt("gameId", gameId);
             editor.putInt("clientId", clientId);

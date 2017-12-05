@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 
 /**
@@ -83,7 +84,7 @@ public class JoinCodeActivity extends ServerIOActivity {
                         teamId = 1;
                     }
                     else{
-                        teamId = 0;
+                        teamId = 2;
                     }
 
                 } else {
@@ -106,8 +107,11 @@ public class JoinCodeActivity extends ServerIOActivity {
         int startTime, timePerRound, wordsPerPerson;
 
         //initialize shared preferences
-        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
         editor = prefs.edit();
+
+        Log.d("TAGmessagetype", message.getReturnType());
+        Log.d("TAGmessagetype", message.getRequestType());
 
         // if right return message from server, start new Activity
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){

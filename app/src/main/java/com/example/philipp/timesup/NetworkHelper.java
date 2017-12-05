@@ -18,7 +18,7 @@ public class NetworkHelper {
 
     public static String NEWGAME = "newGame";
 
-    public static String TEAMJOIN = "teamJoin";
+    public static String TEAMJOIN = "joinTeam";
 
     public static String READY = "ready";
 
@@ -31,6 +31,8 @@ public class NetworkHelper {
     public static String ROUNDFINISHED = "roundFinished";
 
     public static String NEXTROUND = "nextRound";
+
+    public static String MYPREFS = "myPrefs";
 
     public static SocketHandler handler;
 

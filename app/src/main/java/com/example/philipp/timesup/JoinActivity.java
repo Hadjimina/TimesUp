@@ -14,6 +14,7 @@ import android.widget.Toast;
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
 import static com.example.philipp.timesup.NetworkHelper.JOIN;
+import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 
 /**
@@ -65,7 +66,7 @@ public class JoinActivity extends ServerIOActivity {
 
 
                 //add to shared Preferences
-                prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+                prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
                 editor = prefs.edit();
                 editor.putString("username", username);
                 editor.apply();
@@ -109,7 +110,7 @@ public class JoinActivity extends ServerIOActivity {
         String teamName1, teamName2;
 
         //initialize shared preferences
-        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
         editor = prefs.edit();
 
         // if right return message from server and request type was join, start show which teams you can join
