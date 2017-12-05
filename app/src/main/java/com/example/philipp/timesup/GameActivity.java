@@ -42,6 +42,8 @@ public class GameActivity extends ServerIOActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        handler = new SocketHandler();
+        handler.setCallbackActivity(this);
 
         //get gameId and clientId
         Intent intent = getIntent();
@@ -61,7 +63,10 @@ public class GameActivity extends ServerIOActivity {
         count = 0;
 
         //handler = new SocketHandler(this);
-
+        words = new String[3];
+        words[0] = "chätzli";
+        words[1] = "hund";
+        words[2] = "david";
 
         if (playerType == 0) {
             TextView discipline = findViewById(R.id.discipline);
@@ -84,10 +89,7 @@ public class GameActivity extends ServerIOActivity {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        handler.execute();
-                        EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
-                        Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
-                        startActivity(intent);
+                        finishRound();
                     }
                 }
             });
@@ -119,16 +121,31 @@ public class GameActivity extends ServerIOActivity {
 
             public void onFinish() {
                 timer.setText("stop!");
+                if (playerType == 0){ finishRound();}
             }
         }.start();
 
+    }
+
+    void finishRound(){
+       phaseNr = 2;
+       EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
+       handler.sendMessage(message);
     }
 
     @Override
     public void callback(DecodeMessage message) {
         //new round
         if(message.getReturnType().equals("ACK") && message.getRequestType().equals("roundFinished")){
+            int scoreTeam1 = message.getInt("scoreTeam1");
+            int scoreTeam2 = message.getInt("scoreTeam2");
+            String nextPlayer = message.getString("nextPlayer");
+            int nextPhase = message.getInt("nexPhase");
             Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
+            intent.putExtra("scoreTeam1", scoreTeam1);
+            intent.putExtra("scoreTeam2", scoreTeam2);
+            intent.putExtra("nextPlayer", nextPlayer);
+            intent.putExtra("nextPhase", nextPhase);
             startActivity(intent);
         }
 
