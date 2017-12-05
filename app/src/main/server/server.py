@@ -1,3 +1,5 @@
+
+import time
 import datetime
 import threading
 import socketserver
@@ -9,12 +11,24 @@ from collections import deque
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
+
     def handle(self):
+
+        ipAddress, port = self.client_address
+
+        print("new connection to {} at port {}".format(ipAddress, port))
+
         # Read the message
-        receivedData = self.request.recv(1024).strip()
+        length = int(self.request.recv(4).decode())
+
+        print("length {}".format(length))
+
+        receivedData = self.request.recv(length)
+
+        print("received {}".format(receivedData.decode()))
 
         # Turn into a JSON (a dict)
-        d = json.load(receivedData.decode())
+        d = json.loads(receivedData.decode())
 
         # Get requestType (None if non-existent)
         requestType = d.get("requestType")
@@ -28,15 +42,18 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Case 1: New game requested
         elif requestType == "newGame":
+            print("received requestType {}".format(requestType))
 
             # Create a "random" game id
             gameId = random.randrange(0, 9999)
-            while gameId not in games.keys():
+            while gameId in games.keys():
                 gameId = random.randrange(0, 9999)
+
+            print("created new gameId {}".format(gameId))
 
             # Create a new empty queue for the new gameId
             games[gameId] = dict()
-            gameQueues[gameId] = dict()
+            gameQueues[gameId] = queue.Queue()
 
             # Read out all values from the request
             try:
@@ -45,7 +62,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 teamName1 = body["teamName1"]
                 teamName2 = body["teamName2"]
                 timePerRound = body["timePerRound"]
-                username = body["username"]
                 wordsPerPerson = body["wordsPerPerson"]
 
             # In case any of the lookups would fail --> return error message
@@ -72,6 +88,8 @@ class RequestHandler(socketserver.BaseRequestHandler):
             # Start new thread
             newGameThread.start()
 
+            print("started gameThread")
+
             # The host has clientId 0
             clientId = 0
             games[gameId]["userCount"] = 1
@@ -80,17 +98,19 @@ class RequestHandler(socketserver.BaseRequestHandler):
             games[gameId][0] = queue.Queue()
 
             # Send back the gameId (host has clientId 0)
-            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2)
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
+            print("sent message: \n {}".format(message))
 
             # Initialize game thread communication queue
             games[gameId][0] = queue.Queue()
 
             # Do client logic
-            client(self.request, gameId, clientId, username)
+            client(self.request, gameId, clientId)
 
         # Case 2: New client connection to game
         elif requestType == "join":
+            print("received requestType {}".format(requestType))
 
             # Test if gameId is valid
             gameId = d.get("gameId")
@@ -149,11 +169,14 @@ class RequestHandler(socketserver.BaseRequestHandler):
             games[gameId][clientId] = queue.Queue()
 
             # Send ACK back the client
-            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2)
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
 
+            # Send username and clientId to gameThread
+            gameQueues[gameId].put(("newClient", username, clientId))
+
             # Do client logic
-            client(self.request, gameId, clientId, username)
+            client(self.request, gameId, clientId)
 
         # Case 3: A message for an existing game was received.
         else:
@@ -163,52 +186,61 @@ class RequestHandler(socketserver.BaseRequestHandler):
             return
 
 
-def client(request, gameId, clientId, username):
+def client(request, gameId, clientId):
+    try:
+        socket_active = True
+        while True:
 
-    socket_active = True
-    while True:
+            if socket_active:
 
-        if socket_active:
+                # See for changes for TIMEOUT long
+                r, w, x = select.select([request], [], [], TIMEOUT)
+                if r:
+                    # If something changed, read
 
-            # See for changes for TIMEOUT long
-            r, w, x = select.select([request], [], [], TIMEOUT)
-            if r:
-                # If something changed, read
-                message = request.recv(1024)
+                    length = request.recv(4).decode()
 
-                # If the message is None, the socket is broken
-                if not message:
-                    socket_active = False
+                    print("length {}".format(length))
+
+                    message = request.recv(int(length))
+
+                    print("received {}".format(message.decode()))
+
+                    # If the message is None, the socket is broken
+                    if not message:
+                        socket_active = False
+                    else:
+
+                        # Function that handles the message
+                        handleClientMessage(request, message.decode(), gameId, clientId)
+            try:
+                # Get an item from the queue
+                item = games[gameId][clientId].get_nowait()
+
+                # Ignore empty items
+                if item is None:
+                    pass
                 else:
 
-                    # Function that handles the message
-                    handleClientMessage(request, message, gameId, clientId, username)
-        try:
-            # Get an item from the queue
-            item = games[gameId][clientId].get_nowait()
+                    # Function that handles the item
+                    handleQueueItem(request, item, gameId, clientId)
 
-            # Ignore empty items
-            if item is None:
+            # If the queue was empty, do nothing
+            except queue.Empty:
                 pass
-            else:
 
-                # Function that handles the item
-                handleQueueItem(request, item, gameId, clientId, username)
+            # If socket is broken, stop
+            if not socket_active:
 
-        # If the queue was empty, do nothing
-        except queue.Empty:
-            pass
-
-        # If socket is broken, stop
-        if not socket_active:
-
-            # Tell the game that the connection to the client has been closed
-            gameQueues[gameId].put(("clientLost", None, clientId))
-            break
+                # Tell the game that the connection to the client has been closed
+                gameQueues[gameId].put(("clientLost", None, clientId))
+                break
+    except Exception:
+        gameQueues[gameId].put(("clientLost", None, clientId))
 
 
-def handleClientMessage(request, rawMessage, gameId, clientId, username):
-    message = json.load(rawMessage)
+def handleClientMessage(request, rawMessage, gameId, clientId):
+    message = json.loads(rawMessage)
 
     messageType = None
     # Get fields from message
@@ -332,7 +364,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId, username):
         return False
 
 
-def handleQueueItem(request, item, gameId, clientId, username):
+def handleQueueItem(request, item, gameId, clientId):
     (requestType, data) = item
 
     if requestType == "teamJoinAck":
@@ -391,6 +423,7 @@ def handleQueueItem(request, item, gameId, clientId, username):
 
 def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerson):
     users = list()  # This is the list of users in this game
+    usernames = dict()  # This contains the mapping between the clientIds and the usernames
     team1 = deque()  # Players of team1 (clientId)
     team2 = deque()  # Players of team2 (clientId)
     submittedWords = dict()  # Players that have already submitted words
@@ -429,9 +462,9 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
         if messageType == "teamToJoin":
 
-            # Add user to the users list
-            if clientId not in users:
-                users.append(clientId)
+            # Make sure player is not already in a team
+            if clientId in team1 or clientId in team2:
+                games[gameId][clientId].put("error", ["player is already in a team", messageType])
 
             # Put player into the team (can only be 1 or 2)
             if data == 1:
@@ -446,6 +479,10 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             # Check if the client has already submitted words
             if clientId in submittedWords.keys():
                 games[gameId][clientId].put("error", ["client has already submitted words", messageType])
+            elif clientId not in usernames.keys():
+                games[gameId][clientId].put("error", ["client has not submitted username", messageType])
+            elif (clientId not in team1) or (clientId not in team2):
+                games[gameId][clientId].put("error", ["client is not in a team", messageType])
             else:
 
                 # Add the words to the dict
@@ -570,9 +607,14 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     nextPlayer = team2.popleft()
                     team2.append(nextPlayer)
 
+                # Find the name of the next player
+                nextPlayerName = usernames.get(nextPlayer)
+                if nextPlayerName is None:
+                    games[gameId][clientId].put("error", ["client has no username", messageType])
+
                 # Broadcast next player and score to all players
                 for user in users:
-                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
+                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayerName, nextPhase])
 
                 # If game is completely done, stop the gameThread
                 if nextPhase == -1:
@@ -592,6 +634,17 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 for user in users:
                     games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
 
+        elif messageType == "newClient":
+
+            # Add user to the users list
+            if clientId not in users:
+                users.append(clientId)
+            else:
+                games[gameId][clientId].put("error", ["clientId is already in users", messageType])
+
+            # Save new user into the usernames dictionary
+            usernames[clientId] = data
+
         else:
             games[gameId][clientId].put("error", ["unknown messageType", messageType])
 
@@ -600,7 +653,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
 # JSON encoding functions
 
-def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1=1, teamId2=2):
+def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1, teamId2, port):
     message = dict()
     message["returnType"] = "ACK"
     message["requestType"] = "newGame"
@@ -611,11 +664,13 @@ def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1=1, teamId2
     body["teamName2"] = teamName2
     body["teamId1"] = teamId1
     body["teamId2"] = teamId2
+    body["port"] = port
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
+    print(errorMessage)
     message = dict()
     message["returnType"] = "error"
     message["requestType"] = requestType
@@ -624,7 +679,7 @@ def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
     body = dict()
     body["errorType"] = errorMessage
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wordsPerPerson):
@@ -639,7 +694,7 @@ def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wor
     body["timePerRound"] = timePerRound
     body["wordsPerPerson"] = wordsPerPerson
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeAckMessage(requestType, gameId, clientId):
@@ -650,7 +705,7 @@ def encodeAckMessage(requestType, gameId, clientId):
     message["clientId"] = clientId
     body = dict()
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeSetupMessage(gameId, clientId, wordList):
@@ -662,7 +717,7 @@ def encodeSetupMessage(gameId, clientId, wordList):
     body = dict()
     body["wordList"] = wordList
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlayer, phaseNumber, wordIndex):
@@ -678,7 +733,7 @@ def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlaye
     body["phaseNumber"] = phaseNumber
     body["wordIndex"] = wordIndex
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPlayer, nextPhase):
@@ -693,7 +748,7 @@ def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPla
     body["nextPlayer"] = nextPlayer
     body["nextPhase"] = nextPhase
     message["body"] = body
-    return json.dumps(message)
+    return json.dumps(message) + "\q"
 
 
 if __name__ == "__main__":
@@ -704,13 +759,17 @@ if __name__ == "__main__":
     # Client Socket Waiting Time
     TIMEOUT = 0.1
 
-    # Concurrency locks
-    userCountLock = threading.Lock()
-
     # Default values
     HOST = ""
     PORT = 9999
-
+    '''
+    server = ThreadedTCPServer((HOST, PORT), RequestHandler)
+    with server:
+        ip, port = server.server_address
+        serverThread = threading.Thread(target=server.serve_forever)
+        serverThread.daemon = True
+        serverThread.start()
+'''
     # Wait for incoming connections and start a new thread RequestHandler that
     # handles the request
     with socketserver.ThreadingTCPServer((HOST, PORT), RequestHandler) as server:

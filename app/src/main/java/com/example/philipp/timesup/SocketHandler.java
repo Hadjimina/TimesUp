@@ -3,73 +3,87 @@ package com.example.philipp.timesup;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.util.Arrays;
 
 
-public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>{
+public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage> {
 
-    private static final String SERVER_IP = "<TO BE SET>";
+    private static final String SERVER_IP = "46.101.97.34";
+    private String SERVER_PORT = "9999";
 
     private ServerIOActivity callbackActivity;
-    private WebSocketClient webSocketClient;
-    private URI uri;
+    private NetClient nc;
 
-    public SocketHandler(ServerIOActivity callbackActivity){
+    public SocketHandler() {
+
+        Log.i("Websocket", "initialized without callback!");
+        this.execute();
+    }
+
+    public void sendMessage(final EncodeMessage messageToSend) {
+
+        Thread sendingThread = new Thread(new Runnable() {
+            public void run() {
+                nc.sendDataWithString(messageToSend.toJSONString());
+            }
+        });
+
+        sendingThread.start();
+
+    }
+
+    public void setCallbackActivity(ServerIOActivity callbackActivity) {
         this.callbackActivity = callbackActivity;
-
-        Log.i("Websocket", "initialized");
-        //Initialize Socket
-        try {
-            this.uri = new URI(SERVER_IP);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
     }
 
-    public void sendMessage(EncodeMessage messageToSend){
-        webSocketClient.send(messageToSend.toJSONString());
-        Log.i("Websocket", "Sent " + messageToSend.toJSONString());
+    // (re)initialize netClient
+    public void initNetClient(String port){
+
+        SERVER_PORT = port;
+        nc = new NetClient(SERVER_IP, Integer.parseInt(SERVER_PORT));
+
     }
+
+
+
 
     @Override
     protected DecodeMessage doInBackground(Void... params) {
 
+        initNetClient(SERVER_PORT);
+
+        String message = "";
+        int charsRead = 0;
+        char[] buffer = new char[512];
+
+        try {
+            while (true) {
+
+                //get message
+                while (nc.getBufferedReader() != null && (charsRead = nc.getBufferedReader().read(buffer)) != -1) {
+                    message += new String(buffer).substring(0, charsRead);
+                    if (message.substring(message.length() - 2).equals("\\q")) {
+                        DecodeMessage decodeMessage = new DecodeMessage(message.substring(0, message.length() - 2));
+
+                        publishProgress(decodeMessage);
 
 
-        webSocketClient = new WebSocketClient(uri) {
-
-            @Override
-            public void onOpen(ServerHandshake serverHandshake) {
-                Log.i("Websocket", "Opened");
+                        //reset values
+                        message = "";
+                        charsRead = 0;
+                        Arrays.fill(buffer, Character.MIN_VALUE);
+                    }
+                }
             }
 
-            @Override
-            public void onMessage(String message) {
-
-                Log.i("Websocket", "Got" + message);
-                DecodeMessage messageResponse = new DecodeMessage(message);
-                publishProgress(messageResponse);
-
-            }
-
-            @Override
-            public void onClose(int i, String s, boolean b) {
-                Log.i("Websocket", "Closed " + s);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.i("Websocket", "Error " + e.getMessage());
-            }
-        };
-        webSocketClient.connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return null;
     }
+
 
     @Override
     protected void onPostExecute(DecodeMessage o) {
@@ -80,6 +94,8 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     @Override
     protected void onProgressUpdate(DecodeMessage... values) {
         super.onProgressUpdate(values);
+
+        Log.i("websocket", "Got message: "+values[0].getRawString());
         callbackActivity.callback(values[0]);
     }
 

@@ -13,11 +13,17 @@ public class DecodeMessage {
     private int gameId;
     private int clientId;
     private JSONObject body;
+    private String raw;
 
     public DecodeMessage(String rawMessage){
 
         try{
-            JSONObject entireObject = new JSONObject(rawMessage);
+            //COULD BE DELETED IN THE END
+            this.raw = rawMessage;
+            //
+
+            Log.i("decode", rawMessage);
+            JSONObject entireObject = new JSONObject(rawMessage.trim());
             this.returnType = entireObject.getString("returnType");
             this.requestType = entireObject.getString("requestType");
             this.gameId = entireObject.getInt("gameId");
@@ -96,5 +102,11 @@ public class DecodeMessage {
         return clientId;
     }
 
+    public String getRawString(){
+        return raw;
+    }
 
+    public JSONObject getBody() {
+        return body;
+    }
 }

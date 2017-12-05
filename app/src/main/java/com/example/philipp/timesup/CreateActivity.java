@@ -12,6 +12,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.NEWGAME;
 
 /**
@@ -37,7 +38,7 @@ public class CreateActivity extends ServerIOActivity{
     Button cancel, finish;
     Intent intent;
     Toast toast;
-    EncodeMessage message;
+    EncodeMessage sendMessage;
     SharedPreferences.Editor editor;
 
     @Override
@@ -45,6 +46,7 @@ public class CreateActivity extends ServerIOActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        setCallbackActivity(this);
         //TODO: solve bug when pressing finish and nothing at all is filled in
 
         //timepicker
@@ -115,7 +117,8 @@ public class CreateActivity extends ServerIOActivity{
 
 
         //initialize shared preferences object
-        editor = getSharedPreferences("myPref", MODE_PRIVATE).edit();
+        editor = getSharedPreferences(MYPREFS, MODE_PRIVATE).edit();
+
 
 
         //cancel Button goes back to StartActivity
@@ -134,7 +137,6 @@ public class CreateActivity extends ServerIOActivity{
             @Override
             public void onClick(View view) {
                 intent = new Intent(getApplicationContext(), JoinCodeActivity.class);
-                //TODO send settings to server
 
                 //read teamnames and username and add them to shared preferences
                 teamName1 = team1Edit.getText().toString();
@@ -191,24 +193,14 @@ public class CreateActivity extends ServerIOActivity{
                     return;
                 }
 
-                message = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
-
                 Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
-
-                intent.putExtra("teamName1", teamName1);
-                intent.putExtra("teamName2", teamName2);
 
                 //apply shared preferences
                 editor.apply();
 
-                // TODO fake gameId as long as callback not working
-                int gameId = 1;
-                intent.putExtra("gameId", gameId);
-                //TODO do send message with helper here, remove startActivity
-
-
-                startActivity(intent);
-
+                //Send message to server
+                sendMessage = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
+                sendMessage(sendMessage);
 
             }
         });
@@ -217,17 +209,29 @@ public class CreateActivity extends ServerIOActivity{
 
     @Override
     public void callback(DecodeMessage message) {
-        int gameId;
+        int gameId, clientId;
+        Log.i("callback","creatActivity");
 
         // if right return message from server, start new Activity
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(NEWGAME)){
+
             gameId = message.getGameId();
-            intent.putExtra("gameId", gameId);
+            clientId = message.getClientId();
+            Log.d("TAGmessage", "gameId: " + gameId);
+            Log.d("TAGmessage", "clientId: " + clientId);
+            //add retrieved information to sharedPreferences
+            editor.putInt("gameId", gameId);
+            editor.putInt("clientId", clientId);
+
+            editor.apply();
+
             startActivity(intent);
         }
         //else try to send message to server again
         else {
-            //send message again
+            sendMessage(sendMessage);
+            toast = Toast.makeText(getApplicationContext(), "error contacting server, trying to send message again", Toast.LENGTH_LONG);
+            toast.show();
         }
 
 

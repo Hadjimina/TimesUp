@@ -3,6 +3,7 @@ package com.example.philipp.timesup;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
 import static com.example.philipp.timesup.NetworkHelper.JOIN;
+import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 
 /**
@@ -35,7 +37,7 @@ public class JoinActivity extends ServerIOActivity {
     String gameCode, username;
     int gameId, clientId;
     Toast toast;
-    EncodeMessage message;
+    EncodeMessage message, sendMessage;
     Intent intent;
     SharedPreferences.Editor editor;
     SharedPreferences prefs;
@@ -52,6 +54,10 @@ public class JoinActivity extends ServerIOActivity {
         nameEdit = findViewById(R.id.enter_name_edit);
 
         joinGame = findViewById(R.id.button_join);
+
+        //initialise server connection
+        setCallbackActivity(this);
+
         joinGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,7 +66,7 @@ public class JoinActivity extends ServerIOActivity {
 
 
                 //add to shared Preferences
-                prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+                prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
                 editor = prefs.edit();
                 editor.putString("username", username);
                 editor.apply();
@@ -83,69 +89,15 @@ public class JoinActivity extends ServerIOActivity {
                         //set button to invisible
                         joinGame.setVisibility(View.GONE);
 
-                        //TODO add client ID
-                        //message = new EncodeMessage(gameId, clientId, username);
+                        //send message to server
+                        message = new EncodeMessage(gameId, username);
+                        sendMessage(message);
 
                         intent = new Intent(getApplicationContext(), WordsActivity.class);
 
 
 
-                        //ALL BELOW BELONGS TO CALLBACK FUNCTION
-                        //make radioButtons to join a team visible
-                        teamA = findViewById(R.id.team_a1);
-                        teamB = findViewById(R.id.team_b1);
-                        team = findViewById(R.id.team);
 
-                        team.setVisibility(View.VISIBLE);
-                        teamA.setVisibility(View.VISIBLE);
-                        teamB.setVisibility(View.VISIBLE);
-
-                        //TODO nachher useneh
-                        //dummy values, will get deleted
-                        String teamName1 = "Hellö1";
-                        String teamName2 = "Hellö2";
-
-                        if (teamName1 != null) {
-                            teamA.setText(teamName1);
-                        }
-
-                        if (teamName2 != null) {
-                            teamB.setText(teamName2);
-                        }
-
-
-                        //FROM HERE ON COPY CODE to end of first case of callback function
-                        go = findViewById(R.id.button_go);
-                        go.setVisibility(View.VISIBLE);
-                        go.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                int teamId;
-                                if (teamA.isChecked() || teamB.isChecked()) {
-                                    //TODO check here what to do with questions
-                                    if(teamA.isChecked()){
-                                        teamId = 1;
-                                    }
-                                    else{
-                                        teamId = 0;
-                                    }
-                                    intent = new Intent(getApplicationContext(), WordsActivity.class);
-
-                                    //TODO put in shared preferences object
-                                    intent.putExtra("gameId", gameId);
-                                } else {
-                                    toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
-                                    toast.show();
-                                    return;
-                                }
-
-                                //TODO: find out about clientId and why teamId is an int
-                                //TODO create message for server
-                                //message = new EncodeMessage(gameId, clientId, teamId)
-                                //TODO take this out
-                                startActivity(intent);
-                            }
-                        });
                     }
                 }
             }
@@ -154,66 +106,78 @@ public class JoinActivity extends ServerIOActivity {
 
     @Override
     public void callback(DecodeMessage message) {
-
-
+        Log.i("callback","joinactivity");
         String teamName1, teamName2;
 
         //initialize shared preferences
-        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
         editor = prefs.edit();
 
         // if right return message from server and request type was join, start show which teams you can join
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(JOIN)){
-            if(!message.getBoolean("hasStarted")) {
-                gameId = message.getGameId();
-                teamName1 = message.getString("teamName1");
-                teamName2 = message.getString("teamName2");
-                int teamId1 = message.getInt("teamId1");
-                int teamId2 = message.getInt("teamId2");
-                clientId = message.getInt("clientId");
+            gameId = message.getGameId();
+            teamName1 = message.getString("teamName1");
+            teamName2 = message.getString("teamName2");
+            int teamId1 = message.getInt("teamId1");
+            int teamId2 = message.getInt("teamId2");
+            clientId = message.getInt("clientId");
 
-                //add to shared preferences
+            //add to shared preferences
+            editor.putString("teamName1", teamName1);
+            editor.putString("teamName2", teamName2);
+            editor.putInt("teamId1", teamId1);
+            editor.putInt("teamId2", teamId2);
+            editor.putInt("clientId", clientId);
+            editor.putInt("gameId", gameId);
+            editor.apply();
 
-                editor.putString("teamName1", teamName1);
-                editor.putString("teamName2", teamName2);
-                editor.putInt("teamId1", teamId1);
-                editor.putInt("teamId2", teamId2);
-                editor.putInt("clientId", clientId);
-                editor.apply();
+            //make radioButtons to join a team visible
+            teamA = findViewById(R.id.team_a1);
+            teamB = findViewById(R.id.team_b1);
 
-
-                intent.putExtra("gameId", gameId);
-
-                //make radioButtons to join a team visible
-                teamA = findViewById(R.id.team_a1);
-                teamB = findViewById(R.id.team_b1);
-
-                if (teamName1 != null) {
-                    teamA.setText(teamName1);
-                }
-
-                if (teamName2 != null) {
-                    teamB.setText(teamName2);
-                }
-
-                teamA.setVisibility(View.VISIBLE);
-                teamB.setVisibility(View.VISIBLE);
-
-
-                //TODO here belongs text from above
-
-            } //if game has already started
-            else {
-                intent = new Intent(getApplicationContext(), GameActivity.class);
-                intent.putExtra("gameId", gameId);
-                startActivity(intent);
-
+            if (teamName1 != null) {
+                teamA.setText(teamName1);
             }
+            if (teamName2 != null) {
+                teamB.setText(teamName2);
+            }
+
+            teamA.setVisibility(View.VISIBLE);
+            teamB.setVisibility(View.VISIBLE);
+
+            //make go button visible and implement its function
+            go = findViewById(R.id.button_go);
+            go.setVisibility(View.VISIBLE);
+            go.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int teamId;
+                    if (teamA.isChecked() || teamB.isChecked()) {
+                        if(teamA.isChecked()){
+                            teamId = 1;
+                        }
+                        else {
+                            teamId = 0;
+                        }
+
+                        //Send message to server
+                        sendMessage = new EncodeMessage(gameId, clientId, teamId);
+                        sendMessage(sendMessage);
+
+                    } else {
+                        toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    }
+
+                }
+            });
 
         }
         //game code doesn't exist, show error and set joingame button to visible again
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(JOIN)){
-            //TODO
+            toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
+            toast.show();
         }
         // if right return message from server and request type was teamjoin, proceed to next activity
         else if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){
@@ -221,27 +185,38 @@ public class JoinActivity extends ServerIOActivity {
             boolean hasStarted;
             int startTime, timePerRound, wordsPerPerson;
 
+            //retrieve values from message and put them into shared preferences
             hasStarted = message.getBoolean("hasStarted");
             startTime = message.getInt("startTime");
             timePerRound = message.getInt("timePerRound");
-
-            //TODO they should add this to message (Backendguys)
             wordsPerPerson = message.getInt("wordsPerPerson");
             editor.putInt("wordsPerPerson", wordsPerPerson);
             editor.apply();
 
-            intent.putExtra("hasStarted", hasStarted);
-            intent.putExtra("startTime", startTime);
-            intent.putExtra("timePerRound", timePerRound);
-            startActivity(intent);
+            //chek if game has started or not
+            if (!hasStarted) {
+                //create intent and start wordsActivity
+                intent = new Intent(getApplicationContext(), WordsActivity.class);
+                startActivity(intent);
+
+            } else {
+                //TODO check if GameActivity is the right activity to start
+                intent = new Intent(getApplicationContext(), GameActivity.class);
+                intent.putExtra("startTime", startTime);
+                startActivity(intent);
+            }
+
         }
         //try to send message again and show error
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
-            //TODO
+            toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
+            toast.show();
+            sendMessage(sendMessage);
         }
         //show error and go back to start
         else{
-            //TODO
+            toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
+            toast.show();
         }
 
     }

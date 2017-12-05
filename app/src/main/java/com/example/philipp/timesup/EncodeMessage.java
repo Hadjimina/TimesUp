@@ -14,20 +14,19 @@ public class EncodeMessage {
 
     //New Game
     public EncodeMessage(String teamName1, String teamName2, int timePerRound, int wordsPerPerson, String username, boolean[] rounds ){
-        setHeader("newGame", -1,-1);
+        setHeader(NetworkHelper.NEWGAME, -1,-1);
 
         JSONArray roundsJSON = new JSONArray();
         for(boolean b : rounds){
             roundsJSON.put(b);
         }
 
-        JSONObject body = new JSONObject();
 
         try {
             body.put("teamName1", teamName1);
             body.put("teamName2", teamName2);
             body.put("timePerRound", timePerRound);
-            body.put("timePerRound", wordsPerPerson);
+            body.put("wordsPerPerson", wordsPerPerson);
             body.put("username", username);
             body.put("rounds", roundsJSON);
         } catch (JSONException e) {
@@ -39,7 +38,7 @@ public class EncodeMessage {
     //Join Game
     //-1 = clientId if the client does not yet have an id
     public EncodeMessage(int gameId, String username){
-        setHeader("join", gameId, -1);
+        setHeader(NetworkHelper.JOIN, gameId, -1);
 
         try {
             body.put("username", username);
@@ -51,10 +50,10 @@ public class EncodeMessage {
 
     //Join Team
     public EncodeMessage(int gameId, int clientId, int teamId){
-        setHeader("joinTeam", gameId, clientId);
+        setHeader(NetworkHelper.TEAMJOIN, gameId, clientId);
 
         try {
-            body.put("joinTeam", teamId);
+            body.put("teamToJoin", teamId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -62,7 +61,7 @@ public class EncodeMessage {
 
     //Player Ready
     public EncodeMessage(int gameId, int clientId, String[] words){
-        setHeader("ready", gameId, clientId);
+        setHeader(NetworkHelper.READY, gameId, clientId);
 
         JSONArray wordList = new JSONArray();
         for(String s : words){
@@ -78,7 +77,7 @@ public class EncodeMessage {
 
     //Round finished
     public EncodeMessage(int gameId, int clientId, int phaseNr, int wordIndex){
-        setHeader("roundFinished", gameId, clientId);
+        setHeader(NetworkHelper.ROUNDFINISHED, gameId, clientId);
 
         try {
             body.put("phaseNr", phaseNr);
@@ -89,12 +88,13 @@ public class EncodeMessage {
     }
 
     //Misc Message (sparse)
-    // ack, unready, nextRound,
+    // ack, unready, nextRound, setup, startround
     public EncodeMessage(String messageType, int gameId, int clientId){
         setHeader(messageType, gameId, clientId);
     }
 
     private void setHeader(String requestType, int gameId, int clientId){
+        this.body = new JSONObject();
         this.requestType = requestType;
         this.gameId = gameId;
         this.clientId = clientId;

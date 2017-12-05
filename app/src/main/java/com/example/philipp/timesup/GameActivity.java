@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import static android.view.View.VISIBLE;
+import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -50,7 +51,7 @@ public class GameActivity extends ServerIOActivity {
         //wordIndex = intent.getIntExtra("wordIndex", -1);
 
         //get username
-        sharedPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        sharedPrefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
         username = sharedPrefs.getString("username", null);
         wordsPerPerson = sharedPrefs.getInt("wordsPerPerson", 0);
         words = new String[wordsPerPerson];
@@ -59,7 +60,7 @@ public class GameActivity extends ServerIOActivity {
         playerType = 0;
         count = 0;
 
-        handler = new SocketHandler(this);
+        //handler = new SocketHandler(this);
 
 
         if (playerType == 0) {
