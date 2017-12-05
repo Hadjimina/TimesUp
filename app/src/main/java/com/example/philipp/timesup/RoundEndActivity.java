@@ -109,6 +109,5 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
                 intent.putExtra("wordIndex", wordIndex);
                 startActivity(intent);
         }
-
     }
 }
