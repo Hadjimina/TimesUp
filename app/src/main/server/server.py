@@ -463,7 +463,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
             # Make sure player is not already in a team
             if clientId in team1 or clientId in team2:
-                games[gameId][clientId].put("error", ["player is already in a team", messageType])
+                games[gameId][clientId].put(("error", ["player is already in a team", messageType]))
 
             # Put player into the team (can only be 1 or 2)
             if data == 1:
@@ -477,11 +477,11 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
             # Check if the client has already submitted words
             if clientId in submittedWords.keys():
-                games[gameId][clientId].put("error", ["client has already submitted words", messageType])
+                games[gameId][clientId].put(("error", ["client has already submitted words", messageType]))
             elif clientId not in usernames.keys():
-                games[gameId][clientId].put("error", ["client has not submitted username", messageType])
+                games[gameId][clientId].put(("error", ["client has not submitted username", messageType]))
             elif (clientId not in team1) or (clientId not in team2):
-                games[gameId][clientId].put("error", ["client is not in a team", messageType])
+                games[gameId][clientId].put(("error", ["client is not in a team", messageType]))
             else:
 
                 # Add the words to the dict
@@ -491,7 +491,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 readyCount += 1
 
                 # Acknowledge wordList
-                games[gameId][clientId].put("ack", ["ready"])
+                games[gameId][clientId].put(("ack", ["ready"]))
 
                 # Test if everybody is ready
                 if userCount == readyCount:
@@ -510,7 +510,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     # Give a notification to all users
                     for user in users:
-                        games[gameId][user].put("setup", globalWordList)
+                        games[gameId][user].put(("setup", globalWordList))
 
                     # Non-deterministic choice which team starts
                     if bool(random.getrandbits(1)):
@@ -525,14 +525,14 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     # Send start signal to all users
                     for user in users:
-                        games[gameId][user].put("startRound",
-                                                [startTime, activeTeam, activePlayer, phaseNumber, wordIndex])
+                        games[gameId][user].put(("startRound",
+                                                [startTime, activeTeam, activePlayer, phaseNumber, wordIndex]))
 
         elif messageType == "unready":
 
             # Check if the player has submitted words
             if clientId not in submittedWords.keys():
-                games[gameId][clientId].put("error", ["client not submitted words", messageType])
+                games[gameId][clientId].put(("error", ["client not submitted words", messageType]))
             else:
 
                 # If yes, delete them.
@@ -542,7 +542,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 readyCount -= 1
 
                 # Acknowledge unready
-                games[gameId][clientId].put("ack", ["unready"])
+                games[gameId][clientId].put(("ack", ["unready"]))
 
         elif messageType == "ack":
 
@@ -555,17 +555,17 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
             # Send start signal to all users
             for user in users:
-                games[gameId][user].put("startRound",
-                                        [startTime, activeTeam, activePlayer, phaseNumber, wordIndex])
+                games[gameId][user].put(("startRound",
+                                        [startTime, activeTeam, activePlayer, phaseNumber, wordIndex]))
 
         elif messageType == "roundFinished":
             (newPhaseNumber, newWordIndex) = data
             if newPhaseNumber != phaseNumber:
-                games[gameId][clientId].put("error", ["wrong phaseNumber", messageType])
+                games[gameId][clientId].put(("error", ["wrong phaseNumber", messageType]))
             elif newWordIndex <= wordIndex or newWordIndex > len(globalWordList):
-                games[gameId][clientId].put("error", ["impossible wordIndex", messageType])
+                games[gameId][clientId].put(("error", ["impossible wordIndex", messageType]))
             elif clientId not in team1 and clientId not in team2:
-                games[gameId][clientId].put("error", ["unknown team", messageType])
+                games[gameId][clientId].put(("error", ["unknown team", messageType]))
             else:
 
                 if clientId in team1:
@@ -589,7 +589,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                         # Give a notification to all users
                         for user in users:
-                            games[gameId][user].put("setup", globalWordList)
+                            games[gameId][user].put(("setup", globalWordList))
 
                     wordIndex = 0
 
@@ -609,11 +609,11 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 # Find the name of the next player
                 nextPlayerName = usernames.get(nextPlayer)
                 if nextPlayerName is None:
-                    games[gameId][clientId].put("error", ["client has no username", messageType])
+                    games[gameId][clientId].put(("error", ["client has no username", messageType]))
 
                 # Broadcast next player and score to all players
                 for user in users:
-                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayerName, nextPhase])
+                    games[gameId][user].put(("roundFinished", [scoreTeam1, scoreTeam2, nextPlayerName, nextPhase]))
 
                 # If game is completely done, stop the gameThread
                 if nextPhase == -1:
@@ -631,7 +631,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             # If active player was lost stop the round
             if clientId == activePlayer:
                 for user in users:
-                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
+                    games[gameId][user].put(("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase]))
 
         elif messageType == "newClient":
 
@@ -639,13 +639,13 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             if clientId not in users:
                 users.append(clientId)
             else:
-                games[gameId][clientId].put("error", ["clientId is already in users", messageType])
+                games[gameId][clientId].put(("error", ["clientId is already in users", messageType]))
 
             # Save new user into the usernames dictionary
             usernames[clientId] = data
 
         else:
-            games[gameId][clientId].put("error", ["unknown messageType", messageType])
+            games[gameId][clientId].put(("error", ["unknown messageType", messageType]))
 
     # Loop all over again
 
