@@ -42,8 +42,8 @@ public class GameActivity extends ServerIOActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        handler = new SocketHandler();
-        handler.setCallbackActivity(this);
+        NetworkHelper.handler = new SocketHandler();
+        setCallbackActivity(this);
 
         //get gameId and clientId
         Intent intent = getIntent();
@@ -128,9 +128,9 @@ public class GameActivity extends ServerIOActivity {
     }
 
     void finishRound(){
-       phaseNr = 2;
-       EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
-       handler.sendMessage(message);
+        phaseNr = 2;
+        EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
+        sendMessage(message);
     }
 
     @Override
