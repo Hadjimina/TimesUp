@@ -187,56 +187,53 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
 
 def client(request, gameId, clientId):
-    try:
-        socket_active = True
-        while True:
+    socket_active = True
+    while True:
 
-            if socket_active:
+        if socket_active:
 
-                # See for changes for TIMEOUT long
-                r, w, x = select.select([request], [], [], TIMEOUT)
-                if r:
-                    # If something changed, read
+            # See for changes for TIMEOUT long
+            r, w, x = select.select([request], [], [], TIMEOUT)
+            if r:
+                # If something changed, read
 
-                    length = request.recv(4).decode()
+                length = request.recv(4).decode()
 
-                    print("length {}".format(length))
+                print("length {}".format(length))
 
-                    message = request.recv(int(length))
+                message = request.recv(int(length))
 
-                    print("received {}".format(message.decode()))
+                print("received {}".format(message.decode()))
 
-                    # If the message is None, the socket is broken
-                    if not message:
-                        socket_active = False
-                    else:
-
-                        # Function that handles the message
-                        handleClientMessage(request, message.decode(), gameId, clientId)
-            try:
-                # Get an item from the queue
-                item = games[gameId][clientId].get_nowait()
-
-                # Ignore empty items
-                if item is None:
-                    pass
+                # If the message is None, the socket is broken
+                if not message:
+                    socket_active = False
                 else:
 
-                    # Function that handles the item
-                    handleQueueItem(request, item, gameId, clientId)
+                    # Function that handles the message
+                    handleClientMessage(request, message.decode(), gameId, clientId)
+        try:
+            # Get an item from the queue
+            item = games[gameId][clientId].get_nowait()
 
-            # If the queue was empty, do nothing
-            except queue.Empty:
+            # Ignore empty items
+            if item is None:
                 pass
+            else:
 
-            # If socket is broken, stop
-            if not socket_active:
+                # Function that handles the item
+                handleQueueItem(request, item, gameId, clientId)
 
-                # Tell the game that the connection to the client has been closed
-                gameQueues[gameId].put(("clientLost", None, clientId))
-                break
-    except Exception:
-        gameQueues[gameId].put(("clientLost", None, clientId))
+        # If the queue was empty, do nothing
+        except queue.Empty:
+            pass
+
+        # If socket is broken, stop
+        if not socket_active:
+
+            # Tell the game that the connection to the client has been closed
+            gameQueues[gameId].put(("clientLost", None, clientId))
+            break
 
 
 def handleClientMessage(request, rawMessage, gameId, clientId):
