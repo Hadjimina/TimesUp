@@ -761,20 +761,24 @@ if __name__ == "__main__":
     # Initialize colorama
     colorama.init(autoreset=True)
 
+    # Print welcome message
+    print(" _________  ___  _____ ______   _______   ________           ___  ___  ________    ")
+    print("|\___   ___\\  \|\   _ \  _   \|\  ___ \ |\   ____\         |\  \|\  \|\   __  \   ")
+    print("\|___ \  \_\ \  \ \  \\\__\ \  \ \   __/|\ \  \___|_        \ \  \\\  \ \  \|\  \  ")
+    print("     \ \  \ \ \  \ \  \\|__| \  \ \  \_|/_\ \_____  \        \ \  \\\  \ \   ____\ ")
+    print("      \ \  \ \ \  \ \  \    \ \  \ \  \_|\ \|____|\  \        \ \  \\\  \ \  \___| ")
+    print("       \ \__\ \ \__\ \__\    \ \__\ \_______\____\_\  \        \ \_______\ \__\    ")
+    print("        \|__|  \|__|\|__|     \|__|\|_______|\_________\        \|_______|\|__|    ")
+    print("                                            \|_________|                           ")
+    print("                                                                                   ")
+
     # Client Socket Waiting Time
     TIMEOUT = 0.1
 
     # Default values
     HOST = ""
     PORT = 9999
-    '''
-    server = ThreadedTCPServer((HOST, PORT), RequestHandler)
-    with server:
-        ip, port = server.server_address
-        serverThread = threading.Thread(target=server.serve_forever)
-        serverThread.daemon = True
-        serverThread.start()
-'''
+
     # Wait for incoming connections and start a new thread RequestHandler that
     # handles the request
     with socketserver.ThreadingTCPServer((HOST, PORT), RequestHandler) as server:
