@@ -12,6 +12,7 @@ import android.widget.Toast;
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
 import static com.example.philipp.timesup.NetworkHelper.READY;
+import static com.example.philipp.timesup.NetworkHelper.WORDSARRAY;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -135,6 +136,7 @@ public class WordsActivity extends ServerIOActivity {
         if (message.getRequestType().equals(READY) && message.getReturnType().equals(ACK)){
 
             //TODO get from message which role you will have
+            intent.putExtra(WORDSARRAY, wordsArray);
             startActivity(intent);
         }
         else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){

@@ -34,6 +34,8 @@ public class NetworkHelper {
 
     public static String MYPREFS = "myPrefs";
 
+    public static String WORDSARRAY = "wordsArray";
+
     public static SocketHandler handler;
 
     public void setCallback(ServerIOActivity activity){
