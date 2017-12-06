@@ -222,7 +222,7 @@ def client(request, gameId, clientId):
             else:
 
                 # Function that handles the item
-                handleQueueItem(request, item, gameId)
+                handleQueueItem(request, item, gameId, clientId)
 
         # If the queue was empty, do nothing
         except queue.Empty:
@@ -362,9 +362,9 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
         return False
 
 
-def handleQueueItem(request, item, gameId):
+def handleQueueItem(request, item, gameId, clientId):
     print("received request {} and item {}".format(request, item))
-    (requestType, data, clientId) = item
+    (requestType, data) = item
 
     if requestType == "teamJoinAck":
         [hasStarted, startTime, timePerRound, wordsPerPerson] = data
@@ -471,7 +471,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             elif data == 2:
                 team2.append(clientId)
             # Acknowledge the team assignment
-            games[gameId][clientId].put("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson])
+            games[gameId][clientId].put(("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson]))
 
         elif messageType == "ready":
 
