@@ -3,32 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="30dp"
-    android:gravity="center"
+    android:background="@drawable/orangeblack"
     tools:context="com.example.philipp.timesup.StartActivity">
 
-    <Button
-        android:id="@+id/button_create"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:text="@string/create"
-        android:textSize="20sp"
-        android:padding="15dp"
-        android:layout_marginBottom="50dp"
-        android:layout_centerHorizontal="true"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp" />
 
-    <Button
-        android:id="@+id/button_join"
-        android:layout_width="350dp"
+    <LinearLayout
+        android:id="@+id/mLlayoutBottomButtons"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/button_create"
-        android:text="@string/join"
-        android:textSize="20sp"
-        android:padding="15dp"
-        android:layout_centerHorizontal="true"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp" />
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/button_create"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create"
+            android:layout_weight="1"
+            />
+
+        <Button
+            android:id="@+id/button_join"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/join"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
 
 </RelativeLayout>
