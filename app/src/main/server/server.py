@@ -762,15 +762,15 @@ if __name__ == "__main__":
     colorama.init(autoreset=True)
 
     # Print welcome message
-    print(colorama.Back.YELLOW + " _________  ___  _____ ______   _______   ________           ___  ___  ________    ")
-    print(colorama.Back.YELLOW + "|\___   ___\\\\  \|\   _ \  _   \|\  ___ \ |\   ____\         |\  \|\  \|\   __  \   ")
-    print(colorama.Back.YELLOW + "\|___ \  \_\ \  \ \  \\\\\\__\ \  \ \   __/|\ \  \___|_        \ \  \\\\\\  \ \  \|\  \  ")
-    print(colorama.Back.YELLOW + "     \ \  \ \ \  \ \  \\\\|__| \  \ \  \_|/_\ \_____  \        \ \  \\\\\\  \ \   ____\ ")
-    print(colorama.Back.YELLOW + "      \ \  \ \ \  \ \  \    \ \  \ \  \_|\ \|____|\  \        \ \  \\\\\\  \ \  \___| ")
-    print(colorama.Back.YELLOW + "       \ \__\ \ \__\ \__\    \ \__\ \_______\____\_\  \        \ \_______\ \__\    ")
-    print(colorama.Back.YELLOW + "        \|__|  \|__|\|__|     \|__|\|_______|\_________\        \|_______|\|__|    ")
-    print(colorama.Back.YELLOW + "                                            \|_________|                           ")
-    print(colorama.Back.YELLOW + "                                                                                   ")
+    print(colorama.Style.BRIGHT + " _________  ___  _____ ______   _______   ________           ___  ___  ________    ")
+    print(colorama.Style.BRIGHT + "|\___   ___\\\\  \|\   _ \  _   \|\  ___ \ |\   ____\         |\  \|\  \|\   __  \   ")
+    print(colorama.Style.BRIGHT + "\|___ \  \_\ \  \ \  \\\\\\__\ \  \ \   __/|\ \  \___|_        \ \  \\\\\\  \ \  \|\  \  ")
+    print(colorama.Style.BRIGHT + "     \ \  \ \ \  \ \  \\\\|__| \  \ \  \_|/_\ \_____  \        \ \  \\\\\\  \ \   ____\ ")
+    print(colorama.Style.BRIGHT + "      \ \  \ \ \  \ \  \    \ \  \ \  \_|\ \|____|\  \        \ \  \\\\\\  \ \  \___| ")
+    print(colorama.Style.BRIGHT + "       \ \__\ \ \__\ \__\    \ \__\ \_______\____\_\  \        \ \_______\ \__\    ")
+    print(colorama.Style.BRIGHT + "        \|__|  \|__|\|__|     \|__|\|_______|\_________\        \|_______|\|__|    ")
+    print(colorama.Style.BRIGHT + "                                            \|_________|                           ")
+    print(colorama.Style.BRIGHT + "                                                                                   ")
 
     # Client Socket Waiting Time
     TIMEOUT = 0.1
