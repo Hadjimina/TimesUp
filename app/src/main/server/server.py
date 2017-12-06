@@ -1,4 +1,3 @@
-
 import time
 import datetime
 import threading
@@ -8,6 +7,7 @@ import queue
 import random
 import select
 from collections import deque
+import colorama
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
@@ -16,16 +16,16 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         ipAddress, port = self.client_address
 
-        print("new connection to {} at port {}".format(ipAddress, port))
+        print(colorama.Fore.GREEN + "new connection to {} at port {}".format(ipAddress, port))
 
         # Read the message
         length = int(self.request.recv(4).decode())
 
-        print("length {}".format(length))
+        print(colorama.Style.DIM + "length {}".format(length))
 
         receivedData = self.request.recv(length)
 
-        print("received {}".format(receivedData.decode()))
+        print(colorama.Style.DIM + "received {}".format(receivedData.decode()))
 
         # Turn into a JSON (a dict)
         d = json.loads(receivedData.decode())
@@ -42,14 +42,14 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Case 1: New game requested
         elif requestType == "newGame":
-            print("received requestType {}".format(requestType))
+            print(colorama.Style.DIM + "received requestType {}".format(requestType))
 
             # Create a "random" game id
             gameId = random.randrange(0, 9999)
             while gameId in games.keys():
                 gameId = random.randrange(0, 9999)
 
-            print("created new gameId {}".format(gameId))
+            print(colorama.Fore.GREEN + "created new gameId {}".format(gameId))
 
             # Create a new empty queue for the new gameId
             games[gameId] = dict()
@@ -88,7 +88,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             # Start new thread
             newGameThread.start()
 
-            print("started gameThread")
+            print(colorama.Style.DIM + "started gameThread")
 
             # The host has clientId 0
             clientId = 0
@@ -100,7 +100,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
             # Send back the gameId (host has clientId 0)
             message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
-            print("sent message: \n {}".format(message))
 
             # Initialize game thread communication queue
             games[gameId][0] = queue.Queue()
@@ -110,7 +109,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Case 2: New client connection to game
         elif requestType == "join":
-            print("received requestType {}".format(requestType))
+            print(colorama.Style.DIM + "received requestType {}".format(requestType))
 
             # Test if gameId is valid
             gameId = d.get("gameId")
@@ -199,11 +198,11 @@ def client(request, gameId, clientId):
 
                 length = request.recv(4).decode()
 
-                print("length {}".format(length))
+                print(colorama.Style.DIM + "length {}".format(length))
 
                 message = request.recv(int(length))
 
-                print("received {}".format(message.decode()))
+                print(colorama.Style.DIM + "received {}".format(message.decode()))
 
                 # If the message is None, the socket is broken
                 if not message:
@@ -283,7 +282,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
         if teamToJoin == 1 or teamToJoin == 2:
 
             # Tell the gameThread what team the player wants to join
-            print("player {} wants to join team {}".format(clientId, teamToJoin))
+            print(colorama.Fore.GREEN + "player {} wants to join team {}".format(clientId, teamToJoin))
             gameQueues[gameId].put(("teamToJoin", teamToJoin, clientId))
         else:
             message = encodeErrorMessage(requestType=requestType,
@@ -363,7 +362,6 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
 
 
 def handleQueueItem(request, item, gameId, clientId):
-    print("received request {} and item {}".format(request, item))
     (requestType, data) = item
 
     if requestType == "teamJoinAck":
@@ -669,7 +667,7 @@ def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1, teamId2, 
 
 
 def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
-    print(errorMessage)
+    print(colorama.Fore.RED + "Send new error message ({}) as a response to {} to clientId {}".format(errorMessage, requestType, clientId))
     message = dict()
     message["returnType"] = "error"
     message["requestType"] = requestType
@@ -693,6 +691,7 @@ def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wor
     body["timePerRound"] = timePerRound
     body["wordsPerPerson"] = wordsPerPerson
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -704,6 +703,7 @@ def encodeAckMessage(requestType, gameId, clientId):
     message["clientId"] = clientId
     body = dict()
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -716,6 +716,7 @@ def encodeSetupMessage(gameId, clientId, wordList):
     body = dict()
     body["wordList"] = wordList
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -732,6 +733,7 @@ def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlaye
     body["phaseNumber"] = phaseNumber
     body["wordIndex"] = wordIndex
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -747,6 +749,7 @@ def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPla
     body["nextPlayer"] = nextPlayer
     body["nextPhase"] = nextPhase
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -754,6 +757,9 @@ if __name__ == "__main__":
     # Dict that maps gameIDs to queues
     games = dict()
     gameQueues = dict()
+
+    # Initialize colorama
+    colorama.init(autoreset=True)
 
     # Client Socket Waiting Time
     TIMEOUT = 0.1
