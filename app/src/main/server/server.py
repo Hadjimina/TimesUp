@@ -283,6 +283,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
         if teamToJoin == 1 or teamToJoin == 2:
 
             # Tell the gameThread what team the player wants to join
+            print("player {} wants to join team {}".format(clientId, teamToJoin))
             gameQueues[gameId].put(("teamToJoin", teamToJoin, clientId))
         else:
             message = encodeErrorMessage(requestType=requestType,
@@ -362,6 +363,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
 
 
 def handleQueueItem(request, item, gameId):
+    print("received request {} and item {}".format(request, item))
     (requestType, data, clientId) = item
 
     if requestType == "teamJoinAck":
