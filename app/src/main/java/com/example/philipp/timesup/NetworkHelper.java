@@ -18,7 +18,7 @@ public class NetworkHelper {
 
     public static String NEWGAME = "newGame";
 
-    public static String TEAMJOIN = "teamJoin";
+    public static String TEAMJOIN = "joinTeam";
 
     public static String READY = "ready";
 

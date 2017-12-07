@@ -34,7 +34,7 @@ public class WordsActivity extends ServerIOActivity {
     EditText editText;
     Intent intent;
     Toast toast;
-    EncodeMessage sendMessage;
+    EncodeMessage message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,8 +118,8 @@ public class WordsActivity extends ServerIOActivity {
 
 
                     //Send message to server
-                    sendMessage = new EncodeMessage(gameId, clientId, wordsArray);
-                    sendMessage(sendMessage);
+                    message = new EncodeMessage(gameId, clientId, wordsArray);
+                    sendMessage(message);
                 }
             }
         });
