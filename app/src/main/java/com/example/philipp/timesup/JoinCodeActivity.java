@@ -119,7 +119,7 @@ public class JoinCodeActivity extends ServerIOActivity {
         Log.d("TAGmessagetype", message.getRequestType());
 
         // if right return message from server, start new Activity
-        if(message.getReturnType().equals(ACK) && message.getRequestType().equals("teamJoin")){
+        if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){
 
             hasStarted = message.getBoolean("hasStarted");
             startTime = message.getInt("startTime");
