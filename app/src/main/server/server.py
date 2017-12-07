@@ -1,4 +1,3 @@
-
 import time
 import datetime
 import threading
@@ -8,6 +7,7 @@ import queue
 import random
 import select
 from collections import deque
+import colorama
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
@@ -16,16 +16,16 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         ipAddress, port = self.client_address
 
-        print("new connection to {} at port {}".format(ipAddress, port))
+        print(colorama.Fore.GREEN + "new connection to {} at port {}".format(ipAddress, port))
 
         # Read the message
         length = int(self.request.recv(4).decode())
 
-        print("length {}".format(length))
+        print(colorama.Style.DIM + "length {}".format(length))
 
         receivedData = self.request.recv(length)
 
-        print("received {}".format(receivedData.decode()))
+        print(colorama.Style.DIM + "received {}".format(receivedData.decode()))
 
         # Turn into a JSON (a dict)
         d = json.loads(receivedData.decode())
@@ -42,14 +42,14 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Case 1: New game requested
         elif requestType == "newGame":
-            print("received requestType {}".format(requestType))
+            print(colorama.Style.DIM + "received requestType {}".format(requestType))
 
             # Create a "random" game id
             gameId = random.randrange(0, 9999)
             while gameId in games.keys():
                 gameId = random.randrange(0, 9999)
 
-            print("created new gameId {}".format(gameId))
+            print(colorama.Fore.GREEN + "created new gameId {}".format(gameId))
 
             # Create a new empty queue for the new gameId
             games[gameId] = dict()
@@ -88,7 +88,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             # Start new thread
             newGameThread.start()
 
-            print("started gameThread")
+            print(colorama.Style.DIM + "started gameThread")
 
             # The host has clientId 0
             clientId = 0
@@ -100,7 +100,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
             # Send back the gameId (host has clientId 0)
             message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
             self.request.sendall(message.encode())
-            print("sent message: \n {}".format(message))
 
             # Initialize game thread communication queue
             games[gameId][0] = queue.Queue()
@@ -110,7 +109,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Case 2: New client connection to game
         elif requestType == "join":
-            print("received requestType {}".format(requestType))
+            print(colorama.Style.DIM + "received requestType {}".format(requestType))
 
             # Test if gameId is valid
             gameId = d.get("gameId")
@@ -187,56 +186,53 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
 
 def client(request, gameId, clientId):
-    try:
-        socket_active = True
-        while True:
+    socket_active = True
+    while True:
 
-            if socket_active:
+        if socket_active:
 
-                # See for changes for TIMEOUT long
-                r, w, x = select.select([request], [], [], TIMEOUT)
-                if r:
-                    # If something changed, read
+            # See for changes for TIMEOUT long
+            r, w, x = select.select([request], [], [], TIMEOUT)
+            if r:
+                # If something changed, read
 
-                    length = request.recv(4).decode()
+                length = request.recv(4).decode()
 
-                    print("length {}".format(length))
+                print(colorama.Style.DIM + "length {}".format(length))
 
-                    message = request.recv(int(length))
+                message = request.recv(int(length))
 
-                    print("received {}".format(message.decode()))
+                print(colorama.Style.DIM + "received {}".format(message.decode()))
 
-                    # If the message is None, the socket is broken
-                    if not message:
-                        socket_active = False
-                    else:
-
-                        # Function that handles the message
-                        handleClientMessage(request, message.decode(), gameId, clientId)
-            try:
-                # Get an item from the queue
-                item = games[gameId][clientId].get_nowait()
-
-                # Ignore empty items
-                if item is None:
-                    pass
+                # If the message is None, the socket is broken
+                if not message:
+                    socket_active = False
                 else:
 
-                    # Function that handles the item
-                    handleQueueItem(request, item, gameId, clientId)
+                    # Function that handles the message
+                    handleClientMessage(request, message.decode(), gameId, clientId)
+        try:
+            # Get an item from the queue
+            item = games[gameId][clientId].get_nowait()
 
-            # If the queue was empty, do nothing
-            except queue.Empty:
+            # Ignore empty items
+            if item is None:
                 pass
+            else:
 
-            # If socket is broken, stop
-            if not socket_active:
+                # Function that handles the item
+                handleQueueItem(request, item, gameId, clientId)
 
-                # Tell the game that the connection to the client has been closed
-                gameQueues[gameId].put(("clientLost", None, clientId))
-                break
-    except Exception:
-        gameQueues[gameId].put(("clientLost", None, clientId))
+        # If the queue was empty, do nothing
+        except queue.Empty:
+            pass
+
+        # If socket is broken, stop
+        if not socket_active:
+
+            # Tell the game that the connection to the client has been closed
+            gameQueues[gameId].put(("clientLost", None, clientId))
+            break
 
 
 def handleClientMessage(request, rawMessage, gameId, clientId):
@@ -286,6 +282,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
         if teamToJoin == 1 or teamToJoin == 2:
 
             # Tell the gameThread what team the player wants to join
+            print(colorama.Fore.GREEN + "player {} wants to join team {}".format(clientId, teamToJoin))
             gameQueues[gameId].put(("teamToJoin", teamToJoin, clientId))
         else:
             message = encodeErrorMessage(requestType=requestType,
@@ -464,7 +461,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
             # Make sure player is not already in a team
             if clientId in team1 or clientId in team2:
-                games[gameId][clientId].put("error", ["player is already in a team", messageType])
+                games[gameId][clientId].put(("error", ["player is already in a team", messageType]))
 
             # Put player into the team (can only be 1 or 2)
             if data == 1:
@@ -472,17 +469,17 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             elif data == 2:
                 team2.append(clientId)
             # Acknowledge the team assignment
-            games[gameId][clientId].put("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson])
+            games[gameId][clientId].put(("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson]))
 
         elif messageType == "ready":
 
             # Check if the client has already submitted words
             if clientId in submittedWords.keys():
-                games[gameId][clientId].put("error", ["client has already submitted words", messageType])
+                games[gameId][clientId].put(("error", ["client has already submitted words", messageType]))
             elif clientId not in usernames.keys():
-                games[gameId][clientId].put("error", ["client has not submitted username", messageType])
+                games[gameId][clientId].put(("error", ["client has not submitted username", messageType]))
             elif (clientId not in team1) or (clientId not in team2):
-                games[gameId][clientId].put("error", ["client is not in a team", messageType])
+                games[gameId][clientId].put(("error", ["client is not in a team", messageType]))
             else:
 
                 # Add the words to the dict
@@ -492,7 +489,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 readyCount += 1
 
                 # Acknowledge wordList
-                games[gameId][clientId].put("ack", ["ready"])
+                games[gameId][clientId].put(("ack", ["ready"]))
 
                 # Test if everybody is ready
                 if userCount == readyCount:
@@ -511,7 +508,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     # Give a notification to all users
                     for user in users:
-                        games[gameId][user].put("setup", globalWordList)
+                        games[gameId][user].put(("setup", globalWordList))
 
                     # Non-deterministic choice which team starts
                     if bool(random.getrandbits(1)):
@@ -526,14 +523,14 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     # Send start signal to all users
                     for user in users:
-                        games[gameId][user].put("startRound",
-                                                [startTime, activeTeam, activePlayer, phaseNumber, wordIndex])
+                        games[gameId][user].put(("startRound",
+                                                [startTime, activeTeam, activePlayer, phaseNumber, wordIndex]))
 
         elif messageType == "unready":
 
             # Check if the player has submitted words
             if clientId not in submittedWords.keys():
-                games[gameId][clientId].put("error", ["client not submitted words", messageType])
+                games[gameId][clientId].put(("error", ["client not submitted words", messageType]))
             else:
 
                 # If yes, delete them.
@@ -543,7 +540,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 readyCount -= 1
 
                 # Acknowledge unready
-                games[gameId][clientId].put("ack", ["unready"])
+                games[gameId][clientId].put(("ack", ["unready"]))
 
         elif messageType == "ack":
 
@@ -556,17 +553,17 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
             # Send start signal to all users
             for user in users:
-                games[gameId][user].put("startRound",
-                                        [startTime, activeTeam, activePlayer, phaseNumber, wordIndex])
+                games[gameId][user].put(("startRound",
+                                        [startTime, activeTeam, activePlayer, phaseNumber, wordIndex]))
 
         elif messageType == "roundFinished":
             (newPhaseNumber, newWordIndex) = data
             if newPhaseNumber != phaseNumber:
-                games[gameId][clientId].put("error", ["wrong phaseNumber", messageType])
+                games[gameId][clientId].put(("error", ["wrong phaseNumber", messageType]))
             elif newWordIndex <= wordIndex or newWordIndex > len(globalWordList):
-                games[gameId][clientId].put("error", ["impossible wordIndex", messageType])
+                games[gameId][clientId].put(("error", ["impossible wordIndex", messageType]))
             elif clientId not in team1 and clientId not in team2:
-                games[gameId][clientId].put("error", ["unknown team", messageType])
+                games[gameId][clientId].put(("error", ["unknown team", messageType]))
             else:
 
                 if clientId in team1:
@@ -590,7 +587,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                         # Give a notification to all users
                         for user in users:
-                            games[gameId][user].put("setup", globalWordList)
+                            games[gameId][user].put(("setup", globalWordList))
 
                     wordIndex = 0
 
@@ -610,11 +607,11 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 # Find the name of the next player
                 nextPlayerName = usernames.get(nextPlayer)
                 if nextPlayerName is None:
-                    games[gameId][clientId].put("error", ["client has no username", messageType])
+                    games[gameId][clientId].put(("error", ["client has no username", messageType]))
 
                 # Broadcast next player and score to all players
                 for user in users:
-                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayerName, nextPhase])
+                    games[gameId][user].put(("roundFinished", [scoreTeam1, scoreTeam2, nextPlayerName, nextPhase]))
 
                 # If game is completely done, stop the gameThread
                 if nextPhase == -1:
@@ -632,7 +629,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             # If active player was lost stop the round
             if clientId == activePlayer:
                 for user in users:
-                    games[gameId][user].put("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase])
+                    games[gameId][user].put(("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase]))
 
         elif messageType == "newClient":
 
@@ -640,13 +637,13 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             if clientId not in users:
                 users.append(clientId)
             else:
-                games[gameId][clientId].put("error", ["clientId is already in users", messageType])
+                games[gameId][clientId].put(("error", ["clientId is already in users", messageType]))
 
             # Save new user into the usernames dictionary
             usernames[clientId] = data
 
         else:
-            games[gameId][clientId].put("error", ["unknown messageType", messageType])
+            games[gameId][clientId].put(("error", ["unknown messageType", messageType]))
 
     # Loop all over again
 
@@ -670,7 +667,7 @@ def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1, teamId2, 
 
 
 def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
-    print(errorMessage)
+    print(colorama.Fore.RED + "Send new error message ({}) as a response to {} to clientId {}".format(errorMessage, requestType, clientId))
     message = dict()
     message["returnType"] = "error"
     message["requestType"] = requestType
@@ -694,6 +691,7 @@ def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wor
     body["timePerRound"] = timePerRound
     body["wordsPerPerson"] = wordsPerPerson
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -705,6 +703,7 @@ def encodeAckMessage(requestType, gameId, clientId):
     message["clientId"] = clientId
     body = dict()
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -717,6 +716,7 @@ def encodeSetupMessage(gameId, clientId, wordList):
     body = dict()
     body["wordList"] = wordList
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -733,6 +733,7 @@ def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlaye
     body["phaseNumber"] = phaseNumber
     body["wordIndex"] = wordIndex
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -748,6 +749,7 @@ def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPla
     body["nextPlayer"] = nextPlayer
     body["nextPhase"] = nextPhase
     message["body"] = body
+    print(colorama.Style.DIM + "Send new message: {}".format(message))
     return json.dumps(message) + "\q"
 
 
@@ -756,20 +758,27 @@ if __name__ == "__main__":
     games = dict()
     gameQueues = dict()
 
+    # Initialize colorama
+    colorama.init(autoreset=True)
+
+    # Print welcome message
+    print(colorama.Style.BRIGHT + " _________  ___  _____ ______   _______   ________           ___  ___  ________    ")
+    print(colorama.Style.BRIGHT + "|\___   ___\\\\  \|\   _ \  _   \|\  ___ \ |\   ____\         |\  \|\  \|\   __  \   ")
+    print(colorama.Style.BRIGHT + "\|___ \  \_\ \  \ \  \\\\\\__\ \  \ \   __/|\ \  \___|_        \ \  \\\\\\  \ \  \|\  \  ")
+    print(colorama.Style.BRIGHT + "     \ \  \ \ \  \ \  \\\\|__| \  \ \  \_|/_\ \_____  \        \ \  \\\\\\  \ \   ____\ ")
+    print(colorama.Style.BRIGHT + "      \ \  \ \ \  \ \  \    \ \  \ \  \_|\ \|____|\  \        \ \  \\\\\\  \ \  \___| ")
+    print(colorama.Style.BRIGHT + "       \ \__\ \ \__\ \__\    \ \__\ \_______\____\_\  \        \ \_______\ \__\    ")
+    print(colorama.Style.BRIGHT + "        \|__|  \|__|\|__|     \|__|\|_______|\_________\        \|_______|\|__|    ")
+    print(colorama.Style.BRIGHT + "                                            \|_________|                           ")
+    print(colorama.Style.BRIGHT + "                                                                                   ")
+
     # Client Socket Waiting Time
     TIMEOUT = 0.1
 
     # Default values
     HOST = ""
     PORT = 9999
-    '''
-    server = ThreadedTCPServer((HOST, PORT), RequestHandler)
-    with server:
-        ip, port = server.server_address
-        serverThread = threading.Thread(target=server.serve_forever)
-        serverThread.daemon = True
-        serverThread.start()
-'''
+
     # Wait for incoming connections and start a new thread RequestHandler that
     # handles the request
     with socketserver.ThreadingTCPServer((HOST, PORT), RequestHandler) as server:
