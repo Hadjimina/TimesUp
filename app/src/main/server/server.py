@@ -104,6 +104,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
             # Initialize game thread communication queue
             games[gameId][0] = queue.Queue()
 
+            # Send username and clientId to gameThread
+            gameQueues[gameId].put(("newClient", username, clientId))
+
             # Do client logic
             client(self.request, gameId, clientId)
 
