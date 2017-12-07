@@ -476,6 +476,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             games[gameId][clientId].put(("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson]))
 
         elif messageType == "ready":
+            print("team1 is {} and team2 is {}".format(team1, team2))
 
             # Check if the client has already submitted words
             if clientId in submittedWords.keys():
