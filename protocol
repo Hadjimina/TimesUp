@@ -136,7 +136,7 @@ RECIEVING
 Meaning of startTime ?
 {
     "returnType":"ACK",
-    "requestType":"teamJoin",
+    "requestType":"joinTeam",
     "clientId": 000,
     "gameId":000,
     "body":
