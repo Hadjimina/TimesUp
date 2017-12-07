@@ -91,7 +91,7 @@ public class JoinCodeActivity extends ServerIOActivity {
                     toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
                     return;
                 }
-                prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE)
+                prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
                 editor = prefs.edit();
                 editor.putInt("teamId", teamId);
                 editor.apply();

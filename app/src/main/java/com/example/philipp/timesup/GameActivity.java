@@ -28,7 +28,7 @@ import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId, wordsPerPerson, wordIndex, count, phaseNr;
+    static int activeTeam, gameId, clientId, wordsPerPerson, wordIndex, count, phaseNr, teamId;
     String activePlayer;
     SharedPreferences sharedPrefs;
     String username;
@@ -59,13 +59,20 @@ public class GameActivity extends ServerIOActivity {
         words = new String[wordsPerPerson];
 
         //playerType logic
-        activeTeam = intent.getIntExtra("activeTeam", -1);
+        /*activeTeam = intent.getIntExtra("activeTeam", -1);
+        teamId = sharedPrefs.getInt("teamId", -1);
         if(username.equals(activePlayer)){
             playerType = 0;
-        } else if()
-
+        } else if(activeTeam == teamId){
+            playerType = 1;
+        }else{
+            playerType = 2;
+        }
+*/
 
         playerType = 0;
+        gameId = 1;
+        clientId=0;
         count = 0;
 
         words = new String[3];
@@ -90,7 +97,7 @@ public class GameActivity extends ServerIOActivity {
                     else{
                         word.setText("No more words..");
                         try {
-                            Thread.sleep(3000);
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -133,7 +140,7 @@ public class GameActivity extends ServerIOActivity {
     }
 
     void finishRound(){
-        phaseNr = 2;
+        phaseNr = 0;
         EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
         sendMessage(message);
     }
