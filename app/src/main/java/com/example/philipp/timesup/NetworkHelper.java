@@ -38,6 +38,8 @@ public class NetworkHelper {
 
     public static SocketHandler handler;
 
+    public static int gameId;
+
     public void setCallback(ServerIOActivity activity){
         handler.setCallbackActivity(activity);
     }

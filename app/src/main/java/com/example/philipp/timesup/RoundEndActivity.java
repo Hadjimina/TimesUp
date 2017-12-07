@@ -61,12 +61,12 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
         nextRoundButton = findViewById(R.id.start_next_round);
         System.out.println("Kunnts bis do?");
         //initialize SocketHandler & get next player
-        NetworkHelper.handler = new SocketHandler();
+        //NetworkHelper.handler = new SocketHandler();
         setCallbackActivity(this);
-
+        /*
         EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
         sendMessage(messageToSend);
-
+        */
     }
 
     public void startNextRound() {
@@ -92,6 +92,9 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
             }else{
                 nextRoundButton.setVisibility(View.VISIBLE);
             }
+        }
+        if(message.getRequestType().equals("SETUP")){
+
         }
     }
 

@@ -50,7 +50,7 @@ public class JoinCodeActivity extends ServerIOActivity {
         clientId = prefs.getInt("clientId", 0);
         teamName1 = prefs.getString("teamName1", "team1");
         teamName2 = prefs.getString("teamName2", "team2");
-        gameId = prefs.getInt("gameId", -1);
+        gameId = NetworkHelper.gameId;
 
         //set code to join the game
         code = findViewById(R.id.code);
@@ -119,7 +119,7 @@ public class JoinCodeActivity extends ServerIOActivity {
         Log.d("TAGmessagetype", message.getRequestType());
 
         // if right return message from server, start new Activity
-        if(message.getReturnType().equals(ACK) && message.getRequestType().equals("teamJoin")){
+        if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){
 
             hasStarted = message.getBoolean("hasStarted");
             startTime = message.getInt("startTime");

@@ -220,7 +220,7 @@ public class CreateActivity extends ServerIOActivity{
             Log.d("TAGmessage", "gameId: " + gameId);
             Log.d("TAGmessage", "clientId: " + clientId);
             //add retrieved information to sharedPreferences
-            editor.putInt("gameId", gameId);
+            NetworkHelper.gameId = gameId;
             editor.putInt("clientId", clientId);
 
             editor.apply();

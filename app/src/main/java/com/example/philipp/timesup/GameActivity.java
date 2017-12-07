@@ -42,7 +42,6 @@ public class GameActivity extends ServerIOActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        NetworkHelper.handler = new SocketHandler();
         setCallbackActivity(this);
 
         //get gameId and clientId
