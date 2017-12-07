@@ -44,7 +44,7 @@ public class WordsActivity extends ServerIOActivity {
         //get information from shared preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
-        gameId = prefs.getInt("gameId", 0);
+        gameId = NetworkHelper.gameId;
         clientId = prefs.getInt("clientId", 0);
 
 

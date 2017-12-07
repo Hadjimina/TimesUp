@@ -79,6 +79,7 @@ public class JoinActivity extends ServerIOActivity {
                 // if game code was set, parse it and send message to server and create intent
                 } else {
                     gameId = Integer.parseInt(gameCode);
+                    NetworkHelper.gameId = gameId;
                     //find out if username was set
                     if (username == null || username.equals("")) {
                         toast = Toast.makeText(getApplicationContext(), "please enter a name to join the game", Toast.LENGTH_LONG);
@@ -118,7 +119,6 @@ public class JoinActivity extends ServerIOActivity {
             //set button to invisible
             joinGame.setVisibility(View.GONE);
 
-            gameId = message.getGameId();
             teamName1 = message.getString("teamName1");
             teamName2 = message.getString("teamName2");
             int teamId1 = message.getInt("teamId1");
@@ -133,7 +133,6 @@ public class JoinActivity extends ServerIOActivity {
             editor.putInt("teamId1", teamId1);
             editor.putInt("teamId2", teamId2);
             editor.putInt("clientId", clientId);
-            editor.putInt(" gameId", gameId);
             editor.apply();
 
             //make radioButtons to join a team visible
