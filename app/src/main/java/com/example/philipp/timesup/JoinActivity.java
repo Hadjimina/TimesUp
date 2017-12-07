@@ -162,7 +162,7 @@ public class JoinActivity extends ServerIOActivity {
                             teamId = 1;
                         }
                         else {
-                            teamId = 0;
+                            teamId = 2;
                         }
 
                         //Send message to server
