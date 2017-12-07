@@ -303,7 +303,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
                                          clientId=clientId)
             request.sendall(message.encode())
             return False
-        if not isinstance(list, wordList):
+        if not isinstance(wordList, list):
             message = encodeErrorMessage(requestType=requestType,
                                          errorMessage="wordList is not a list",
                                          gameId=gameId,
