@@ -29,14 +29,11 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
 
     SharedPreferences mPreferences;
 
-    SocketHandler handler;
-    NetworkHelper networkHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_round_end);
-        System.out.println("DO ISCHS AKO");
 
         //initialize global variables from shared preferences
         mPreferences = getSharedPreferences("myPref", Context.MODE_PRIVATE);
@@ -62,12 +59,13 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
         nxtPlayerTxt.setText("");
 
         nextRoundButton = findViewById(R.id.start_next_round);
-
+        System.out.println("Kunnts bis do?");
         //initialize SocketHandler & get next player
+        NetworkHelper.handler = new SocketHandler();
         setCallbackActivity(this);
-        networkHelper = new NetworkHelper();
-        EncodeMessage messageToSend = new EncodeMessage(networkHelper.NEXTROUND, gameId, clientId);
-        handler.sendMessage(messageToSend);
+
+        EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
+        sendMessage(messageToSend);
 
     }
 
@@ -80,7 +78,7 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
     public void callback(DecodeMessage message) {
         //case distinction on message received
         //TODO change condition below to listen on correct incoming message type
-        if (message.getRequestType().equals(networkHelper.NEXTROUND)){
+        if (message.getRequestType().equals("nextRound")){
             //if message is normal reply of nextround
             activePlayer = message.getString("activePlayer");
             startTime = message.getInt("startTime");
