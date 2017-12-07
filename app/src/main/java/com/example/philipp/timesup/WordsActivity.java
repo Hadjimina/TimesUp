@@ -34,7 +34,7 @@ public class WordsActivity extends ServerIOActivity {
     EditText editText;
     Intent intent;
     Toast toast;
-    EncodeMessage message;
+    EncodeMessage sendMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,8 +118,8 @@ public class WordsActivity extends ServerIOActivity {
 
 
                     //Send message to server
-                    message = new EncodeMessage(gameId, clientId, wordsArray);
-                    sendMessage(message);
+                    sendMessage = new EncodeMessage(gameId, clientId, wordsArray);
+                    sendMessage(sendMessage);
                 }
             }
         });
@@ -142,7 +142,7 @@ public class WordsActivity extends ServerIOActivity {
         else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
             toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
             toast.show();
-            sendMessage(sendMessage);
+            sendMessage(message);
         } else {
             toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
             toast.show();
