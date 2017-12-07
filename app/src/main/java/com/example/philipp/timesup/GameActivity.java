@@ -58,11 +58,16 @@ public class GameActivity extends ServerIOActivity {
         wordsPerPerson = sharedPrefs.getInt("wordsPerPerson", 0);
         words = new String[wordsPerPerson];
 
+        //playerType logic
+        activeTeam = intent.getIntExtra("activeTeam", -1);
+        if(username.equals(activePlayer)){
+            playerType = 0;
+        } else if()
+
 
         playerType = 0;
         count = 0;
 
-        //handler = new SocketHandler(this);
         words = new String[3];
         words[0] = "chätzli";
         words[1] = "hund";
