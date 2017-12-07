@@ -83,7 +83,7 @@ public class JoinActivity extends ServerIOActivity {
                     if (username == null || username.equals("")) {
                         toast = Toast.makeText(getApplicationContext(), "please enter a name to join the game", Toast.LENGTH_LONG);
                         toast.show();
-                     //if username was set, proceed
+                     //if usercname was set, proceed
                     } else {
 
 
@@ -123,7 +123,9 @@ public class JoinActivity extends ServerIOActivity {
             teamName2 = message.getString("teamName2");
             int teamId1 = message.getInt("teamId1");
             int teamId2 = message.getInt("teamId2");
-            clientId = message.getInt("clientId");
+            clientId = message.getClientId();
+
+            Log.d("TAG-JOIN", "client id is: " + clientId);
 
             //add to shared preferences
             editor.putString("teamName1", teamName1);
@@ -131,7 +133,7 @@ public class JoinActivity extends ServerIOActivity {
             editor.putInt("teamId1", teamId1);
             editor.putInt("teamId2", teamId2);
             editor.putInt("clientId", clientId);
-            editor.putInt("gameId", gameId);
+            editor.putInt(" gameId", gameId);
             editor.apply();
 
             //make radioButtons to join a team visible
