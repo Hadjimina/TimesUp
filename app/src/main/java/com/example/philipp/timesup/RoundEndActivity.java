@@ -36,6 +36,7 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_round_end);
+        System.out.println("DO ISCHS AKO");
 
         //initialize global variables from shared preferences
         mPreferences = getSharedPreferences("myPref", Context.MODE_PRIVATE);

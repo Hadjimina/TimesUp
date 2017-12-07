@@ -142,7 +142,7 @@ public class WordsActivity extends ServerIOActivity {
         else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
             toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
             toast.show();
-            sendMessage(message);
+            sendMessage(sendMessage);
         } else {
             toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
             toast.show();
