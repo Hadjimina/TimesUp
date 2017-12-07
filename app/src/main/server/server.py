@@ -312,22 +312,22 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
             return False
 
         # Forward to gameThread
-        gameQueues[gameId].put(requestType, wordList, clientId)
+        gameQueues[gameId].put((requestType, wordList, clientId))
 
     elif requestType == "unready":
 
         # Forward to gameThread
-        gameQueues[gameId].put(requestType, None, clientId)
+        gameQueues[gameId].put((requestType, None, clientId))
 
     elif requestType == "ack":
 
         # Forward to gameThread
-        gameQueues[gameId].put(requestType, None, clientId)
+        gameQueues[gameId].put((requestType, None, clientId))
 
     elif requestType == "nextRound":
 
         # Forward to gameThread
-        gameQueues[gameId].put(requestType, None, clientId)
+        gameQueues[gameId].put((requestType, None, clientId))
 
     elif requestType == "roundFinished":
 
@@ -351,7 +351,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
             return False
 
         # Forward to gameThread
-        gameQueues[gameId].put(requestType, (phaseNumber, wordIndex), clientId)
+        gameQueues[gameId].put((requestType, (phaseNumber, wordIndex), clientId))
     else:
         message = encodeErrorMessage(requestType=requestType,
                                      errorMessage="unknown requestType",
