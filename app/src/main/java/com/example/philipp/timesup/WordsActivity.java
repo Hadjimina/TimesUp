@@ -47,7 +47,8 @@ public class WordsActivity extends ServerIOActivity {
         gameId = prefs.getInt("gameId", 0);
         clientId = prefs.getInt("clientId", 0);
 
-        //initialise server connection
+
+        //initialize connection
         setCallbackActivity(this);
 
         //initialize array for words

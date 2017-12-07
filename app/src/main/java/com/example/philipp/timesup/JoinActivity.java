@@ -86,8 +86,6 @@ public class JoinActivity extends ServerIOActivity {
                      //if username was set, proceed
                     } else {
 
-                        //set button to invisible
-                        joinGame.setVisibility(View.GONE);
 
                         //send message to server
                         message = new EncodeMessage(gameId, username);
@@ -109,12 +107,17 @@ public class JoinActivity extends ServerIOActivity {
         Log.i("callback","joinactivity");
         String teamName1, teamName2;
 
+
         //initialize shared preferences
         prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
         editor = prefs.edit();
 
         // if right return message from server and request type was join, start show which teams you can join
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(JOIN)){
+
+            //set button to invisible
+            joinGame.setVisibility(View.GONE);
+
             gameId = message.getGameId();
             teamName1 = message.getString("teamName1");
             teamName2 = message.getString("teamName2");
