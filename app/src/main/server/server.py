@@ -99,7 +99,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             games[gameId][0] = queue.Queue()
 
             # Send back the gameId (host has clientId 0)
-            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port, requestType)
             self.request.sendall(message.encode())
 
             # Initialize game thread communication queue
@@ -172,7 +172,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
             games[gameId][clientId] = queue.Queue()
 
             # Send ACK back the client
-            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port)
+            message = encodeJoinMessage(gameId, clientId, teamName1, teamName2, 1, 2, port, requestType)
             self.request.sendall(message.encode())
 
             # Send username and clientId to gameThread
@@ -655,10 +655,10 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
 # JSON encoding functions
 
-def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1, teamId2, port):
+def encodeJoinMessage(gameId, clientId, teamName1, teamName2, teamId1, teamId2, port, requestType):
     message = dict()
     message["returnType"] = "ACK"
-    message["requestType"] = "newGame"
+    message["requestType"] = requestType
     message["gameId"] = gameId
     message["clientId"] = clientId
     body = dict()
