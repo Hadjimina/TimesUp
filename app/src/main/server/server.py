@@ -18,8 +18,14 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         print(colorama.Fore.GREEN + "new connection to {} at port {}".format(ipAddress, port))
 
-        # Read the message
-        length = int(self.request.recv(4).decode())
+        try:
+            # Read the message
+            length = int(self.request.recv(4).decode())
+        except ValueError:
+            message = encodeErrorMessage(requestType="",
+                                         errorMessage="Wrong format (no requestType)")
+            self.request.sendall(message.encode())
+            return
 
         print(colorama.Style.DIM + "length {}".format(length))
 
@@ -199,14 +205,14 @@ def client(request, gameId, clientId):
             r, w, x = select.select([request], [], [], TIMEOUT)
             if r:
                 # If something changed, read
-
-                length = request.recv(4).decode()
+                try:
+                    length = int(request.recv(4).decode())
+                except ValueError:
+                    gameQueues[gameId].put(("clientLost", None, clientId))
 
                 print(colorama.Style.DIM + "length {}".format(length))
 
-
-
-                message = request.recv(int(length))
+                message = request.recv(length)
 
                 print(colorama.Style.DIM + "received {}".format(message.decode()))
 
@@ -627,7 +633,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
         elif messageType == "clientLost":
 
             # Remove client from all lists
-            users.remove(clientId)
+            if clientId in users:
+                users.remove(clientId)
             if clientId in team1:
                 team1.remove(clientId)
             if clientId in team2:
