@@ -63,6 +63,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 teamName2 = body["teamName2"]
                 timePerRound = body["timePerRound"]
                 wordsPerPerson = body["wordsPerPerson"]
+                username = body["username"]
 
             # In case any of the lookups would fail --> return error message
             except KeyError:
