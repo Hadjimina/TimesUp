@@ -483,8 +483,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 games[gameId][clientId].put(("error", ["client has already submitted words", messageType]))
             elif clientId not in usernames.keys():
                 games[gameId][clientId].put(("error", ["client has not submitted username", messageType]))
-            elif (clientId not in team1) or (clientId not in team2):
-                games[gameId][clientId].put(("error", ["client is not in a team", messageType]))
+            elif (clientId not in team1) and (clientId not in team2):
+                games[gameId][clientId].put(("error", ["client {} is not in a team".format(clientID), messageType]))
             else:
 
                 # Add the words to the dict
