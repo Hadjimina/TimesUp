@@ -204,6 +204,8 @@ def client(request, gameId, clientId):
 
                 print(colorama.Style.DIM + "length {}".format(length))
 
+
+
                 message = request.recv(int(length))
 
                 print(colorama.Style.DIM + "received {}".format(message.decode()))
@@ -687,7 +689,7 @@ def encodeErrorMessage(requestType, errorMessage, gameId=-1, clientId=-1):
 def encodeTeamJoinAck(gameId, clientId, hasStarted, startTime, timePerRound, wordsPerPerson):
     message = dict()
     message["returnType"] = "ACK"
-    message["requestType"] = "teamJoin"
+    message["requestType"] = "joinTeam"
     message["gameId"] = gameId
     message["clientId"] = clientId
     body = dict()
