@@ -10,6 +10,8 @@ package com.example.philipp.timesup;
 
 public class NetworkHelper {
 
+    //sending and receiving messages
+
     public static String ERROR = "error";
 
     public static String ACK = "ACK";
@@ -36,9 +38,35 @@ public class NetworkHelper {
 
     public static String WORDSARRAY = "wordsArray";
 
+
     public static SocketHandler handler;
 
+
+    //game values
+
     public static int GAMEID;
+
+    public static int CLIENTID;
+
+    public static int TIMEPERROUND;
+
+    public static int WORDSPERPERSON;
+
+    public static String TEAMNAME1;
+
+    public static String TEAMNAME2;
+
+    public static int BELONGSTOTEAM; //teamId of the chosen Team
+
+    public static String USERNAME;
+
+    public static int TEAMID1 = 1;
+
+    public static int TEAMID2 = 2;
+
+    public static boolean[] ROUNDS;
+
+    public static String[] WORDS;
 
     public void setCallback(ServerIOActivity activity){
         handler.setCallbackActivity(activity);
