@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 
@@ -29,7 +30,7 @@ import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
 public class JoinCodeActivity extends ServerIOActivity {
     TextView code;
     Intent intent;
-    int gameId, clientId;
+    int clientId;
     String teamName1, teamName2;
     RadioButton teamA, teamB;
     Button go;
@@ -50,11 +51,10 @@ public class JoinCodeActivity extends ServerIOActivity {
         clientId = prefs.getInt("clientId", 0);
         teamName1 = prefs.getString("teamName1", "team1");
         teamName2 = prefs.getString("teamName2", "team2");
-        gameId = NetworkHelper.gameId;
 
         //set code to join the game
         code = findViewById(R.id.code);
-        code.setText(String.valueOf(gameId));
+        code.setText(String.valueOf(GAMEID));
 
 
         //initialise server connection
@@ -97,7 +97,7 @@ public class JoinCodeActivity extends ServerIOActivity {
                 editor.apply();
 
                 //create message and send it to server
-                sendMessage = new EncodeMessage(gameId, clientId, teamId);
+                sendMessage = new EncodeMessage(GAMEID, clientId, teamId);
                 sendMessage(sendMessage);
                 Log.d("TAGsent", sendMessage.toString());
 
@@ -142,14 +142,16 @@ public class JoinCodeActivity extends ServerIOActivity {
         }
         //else try to send message to server again and show error
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
-            toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
-            toast.show();
-            sendMessage(sendMessage);
+            //now implemented in websocket
+            //toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
+            //toast.show();
+            //sendMessage(sendMessage);
         }
         //show error and go back to start
         else {
-            toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
-            toast.show();
+            //now implented in websocke
+            //toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
+            //toast.show();
         }
     }
 }

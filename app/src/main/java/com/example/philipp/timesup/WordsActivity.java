@@ -3,6 +3,7 @@ package com.example.philipp.timesup;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 import static com.example.philipp.timesup.NetworkHelper.READY;
 import static com.example.philipp.timesup.NetworkHelper.WORDSARRAY;
 
@@ -25,11 +27,11 @@ import static com.example.philipp.timesup.NetworkHelper.WORDSARRAY;
 
 public class WordsActivity extends ServerIOActivity {
     SharedPreferences prefs;
-    int wordsPerPerson, gameId, clientId;
+    int wordsPerPerson, clientId;
     String [] wordsArray;
     String numberOfWordsString, getWordsString1, getWordsString2;
     int counter = 0;
-    Button enterButton;
+    Button enterButton, yesButton;
     TextView numberOfWords, enterWords;
     EditText editText;
     Intent intent;
@@ -44,7 +46,6 @@ public class WordsActivity extends ServerIOActivity {
         //get information from shared preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
-        gameId = NetworkHelper.gameId;
         clientId = prefs.getInt("clientId", 0);
 
 
@@ -70,6 +71,10 @@ public class WordsActivity extends ServerIOActivity {
         editText = findViewById(R.id.enter_word_edit);
 
 
+        //initialize yesbutton
+        yesButton = findViewById(R.id.button_yes);
+
+
         //initialze intent
         intent = new Intent(getApplicationContext(), RoundEndActivity.class);
 
@@ -86,7 +91,9 @@ public class WordsActivity extends ServerIOActivity {
                         //add word to array and clear edittext
                         wordsArray[counter] = String.valueOf(editText.getText());
                         editText.setText("");
+                        Log.d("TAG-WORDS", "first case: counter before update is: " + counter);
                         counter++;
+                        Log.d("TAG-WORDS", "first case: counter after update is: " + counter + " words per person: " + wordsPerPerson);
                         numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                         numberOfWords.setText(numberOfWordsString);
                     } else {
@@ -98,11 +105,15 @@ public class WordsActivity extends ServerIOActivity {
                 else {
                     //add word to array
                     wordsArray[counter] = String.valueOf(editText.getText());
+                    Log.d("TAG-WORDS", "2nd case: counter before update is: " + counter);
                     counter++;
+                    Log.d("TAG-WORDS", "second case: counter is: " + counter);
                     numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                     numberOfWords.setText(numberOfWordsString);
                     enterWords.setText("Are those words correct?");
-                    enterButton.setText("Yes");
+                    enterButton.setVisibility(View.INVISIBLE);
+                    yesButton.setText("YES!");
+                    yesButton.setVisibility(View.VISIBLE);
                     editText.setText(wordsArray[0].toString());
                     editText.append("\n");
 
@@ -110,20 +121,26 @@ public class WordsActivity extends ServerIOActivity {
                         editText.append(wordsArray[i].toString() + "\n");
 
                     }
-                    for(int i = 0; i < wordsPerPerson; i++){
-                        int start = editText.getLayout().getLineStart(i);
-                        int end = editText.getLayout().getLineEnd(i);
-                        wordsArray[i] = editText.getText().subSequence(start, end).toString();
-
-                    }
 
 
-                    //Send message to server
-                    sendMessage = new EncodeMessage(gameId, clientId, wordsArray);
-                    sendMessage(sendMessage);
                 }
             }
         });
+
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            for(int i = 0; i < wordsPerPerson; i++) {
+                int start = editText.getLayout().getLineStart(i);
+                int end = editText.getLayout().getLineEnd(i);
+                wordsArray[i] = editText.getText().subSequence(start, end).toString();
+            }
+                //Send message to server
+                sendMessage = new EncodeMessage(GAMEID, clientId, wordsArray);
+                sendMessage(sendMessage);
+            }
+        });
+
 
 
 
@@ -141,12 +158,14 @@ public class WordsActivity extends ServerIOActivity {
             startActivity(intent);
         }
         else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
-            toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
-            toast.show();
-            sendMessage(sendMessage);
+            //now implemnted in websocket
+            //toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
+            //toast.show();
+            //sendMessage(sendMessage);
         } else {
-            toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
-            toast.show();
+            //now implemented in websocket
+            //toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
+            //toast.show();
         }
 
     }
