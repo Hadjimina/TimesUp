@@ -209,6 +209,7 @@ def client(request, gameId, clientId):
                     length = int(request.recv(4).decode())
                 except ValueError:
                     gameQueues[gameId].put(("clientLost", None, clientId))
+                    return
 
                 print(colorama.Style.DIM + "length {}".format(length))
 
@@ -631,6 +632,10 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     return
 
         elif messageType == "clientLost":
+            print(colorama.Fore.RED + "Client with Id {} has been lost!".format(clientId))
+
+            # Delete client communication queue
+            del games[gameId][clientId]
 
             # Remove client from all lists
             if clientId in users:
