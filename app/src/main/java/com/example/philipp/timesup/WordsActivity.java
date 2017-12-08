@@ -43,6 +43,10 @@ public class WordsActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_words);
 
+
+        //add code to actionbar
+        getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
+
         //get information from shared preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
@@ -168,5 +172,12 @@ public class WordsActivity extends ServerIOActivity {
             //toast.show();
         }
 
+    }
+    @Override
+    public void onBackPressed() {
+        toast = Toast.makeText(getApplicationContext(), "Going back to start activity", Toast.LENGTH_LONG);
+        toast.show();
+        intent = new Intent(getApplicationContext(), StartActivity.class);
+        startActivity(intent);
     }
 }

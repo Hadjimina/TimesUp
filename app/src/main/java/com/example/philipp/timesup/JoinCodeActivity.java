@@ -1,5 +1,6 @@
 package com.example.philipp.timesup;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -56,6 +57,7 @@ public class JoinCodeActivity extends ServerIOActivity {
         code = findViewById(R.id.code);
         code.setText(String.valueOf(GAMEID));
 
+        getSupportActionBar().setSubtitle("Game code:" +  GAMEID);
 
         //initialise server connection
         setCallbackActivity(this);
@@ -153,5 +155,13 @@ public class JoinCodeActivity extends ServerIOActivity {
             //toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
             //toast.show();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        toast = Toast.makeText(getApplicationContext(), "Going back to start activity", Toast.LENGTH_LONG);
+        toast.show();
+        intent = new Intent(getApplicationContext(), StartActivity.class);
+        startActivity(intent);
     }
 }

@@ -92,8 +92,7 @@
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/radiogroup"
-                android:text="@string/join_game"
-                android:layout_marginBottom="50dp"/>
+                android:text="@string/join_game" />
 
             <Button
                 android:id="@+id/button_go"
@@ -101,8 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/radiogroup"
                 android:text="@string/go"
-                android:visibility="invisible"
-                android:layout_marginBottom="50dp"/>
+                android:visibility="invisible" />
 
     </RelativeLayout>
 </ScrollView>
