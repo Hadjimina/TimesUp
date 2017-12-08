@@ -11,20 +11,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static com.example.philipp.timesup.NetworkHelper.ACK;
-import static com.example.philipp.timesup.NetworkHelper.BELONGSTOTEAM;
-import static com.example.philipp.timesup.NetworkHelper.CLIENTID;
-import static com.example.philipp.timesup.NetworkHelper.ERROR;
-import static com.example.philipp.timesup.NetworkHelper.GAMEID;
-import static com.example.philipp.timesup.NetworkHelper.JOIN;
-import static com.example.philipp.timesup.NetworkHelper.TEAMID1;
-import static com.example.philipp.timesup.NetworkHelper.TEAMID2;
-import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
-import static com.example.philipp.timesup.NetworkHelper.TEAMNAME1;
-import static com.example.philipp.timesup.NetworkHelper.TEAMNAME2;
-import static com.example.philipp.timesup.NetworkHelper.TIMEPERROUND;
-import static com.example.philipp.timesup.NetworkHelper.USERNAME;
-import static com.example.philipp.timesup.NetworkHelper.WORDSPERPERSON;
+import static com.example.philipp.timesup.NetworkHelper.*;
+
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -233,11 +221,5 @@ public class JoinActivity extends ServerIOActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        toast = Toast.makeText(getApplicationContext(), "Going back to start activity", Toast.LENGTH_LONG);
-        toast.show();
-        intent = new Intent(getApplicationContext(), StartActivity.class);
-        startActivity(intent);
-    }
+
 }

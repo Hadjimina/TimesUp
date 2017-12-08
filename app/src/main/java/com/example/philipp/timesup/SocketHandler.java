@@ -1,23 +1,29 @@
 package com.example.philipp.timesup;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage> {
 
-    private static final String SERVER_IP = "46.101.97.34";
-    private String SERVER_PORT = "9999";
+    private static String SERVERIP = NetworkHelper.SERVERIP;
+    private static String SERVERPORT = NetworkHelper.SERVERPORT;
 
     private ServerIOActivity callbackActivity;
     private NetClient nc;
 
     public SocketHandler() {
-
-        Log.i("Websocket", "initialized without callback!");
         this.execute();
     }
 
@@ -33,6 +39,24 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
 
     }
 
+    public void disconnect(){
+        this.cancel(true);
+        if(nc != null){
+            Log.i("Websocket","disconnecting");
+            nc.disConnectWithServer();
+
+        }else{
+            Log.i("Websocket","tried to disconnect even though no connection was established");
+        }
+    }
+
+    public boolean isConnected(){
+        if(nc != null){
+            return nc.isConnected();
+        }
+        return false;
+    }
+
     public void setCallbackActivity(ServerIOActivity callbackActivity) {
         this.callbackActivity = callbackActivity;
     }
@@ -40,18 +64,19 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     // (re)initialize netClient
     public void initNetClient(String port){
 
-        SERVER_PORT = port;
-        nc = new NetClient(SERVER_IP, Integer.parseInt(SERVER_PORT));
+        if(isConnected()){
+            Log.e("Websocket","Sockethandler reinitialized! Are you really really sure you want this?");
+        }
 
+        SERVERPORT = port;
+        nc = new NetClient(SERVERIP, Integer.parseInt(SERVERPORT));
     }
-
-
 
 
     @Override
     protected DecodeMessage doInBackground(Void... params) {
 
-        initNetClient(SERVER_PORT);
+        initNetClient(SERVERPORT);
 
         String message = "";
         int charsRead = 0;
@@ -67,7 +92,6 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
                         DecodeMessage decodeMessage = new DecodeMessage(message.substring(0, message.length() - 2));
 
                         publishProgress(decodeMessage);
-
 
                         //reset values
                         message = "";
@@ -95,7 +119,36 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
     protected void onProgressUpdate(DecodeMessage... values) {
         super.onProgressUpdate(values);
 
-        Log.i("websocket", "Got message: "+values[0].getRawString());
+        //Check if some error occured
+        if(values[0].getRequestType().equals(NetworkHelper.ERROR)){
+            try {
+                Toast.makeText(callbackActivity, values[0].getBody().getString(NetworkHelper.ERRORType),
+                            Toast.LENGTH_LONG).show();
+                Log.e("Websocket", "Error Type: "+ values[0].getBody().getString(NetworkHelper.ERRORType));
+
+                //Show alert if some error occured
+                AlertDialog.Builder builder = new AlertDialog.Builder(callbackActivity);
+                builder.setMessage("The following error occured: "+values[0].getBody().getString(NetworkHelper.ERRORType))
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                //restart app if an error occured
+                                Intent i = callbackActivity.getPackageManager()
+                                        .getLaunchIntentForPackage( callbackActivity.getPackageName() );
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                callbackActivity.startActivity(i);
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+        Log.i("Websocket", "Got message: "+values[0].getRawString());
         callbackActivity.callback(values[0]);
     }
 

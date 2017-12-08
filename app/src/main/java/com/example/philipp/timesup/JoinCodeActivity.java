@@ -161,11 +161,5 @@ public class JoinCodeActivity extends ServerIOActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        toast = Toast.makeText(getApplicationContext(), "Going back to start activity", Toast.LENGTH_LONG);
-        toast.show();
-        intent = new Intent(getApplicationContext(), StartActivity.class);
-        startActivity(intent);
-    }
+
 }

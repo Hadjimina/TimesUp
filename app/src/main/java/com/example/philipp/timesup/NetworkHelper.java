@@ -10,9 +10,9 @@ package com.example.philipp.timesup;
 
 public class NetworkHelper {
 
-    //sending and receiving messages
-
     public static String ERROR = "error";
+
+    public static String ERRORType = "errorType";
 
     public static String ACK = "ACK";
 
@@ -38,9 +38,11 @@ public class NetworkHelper {
 
     public static String WORDSARRAY = "wordsArray";
 
+    public static String SERVERIP = "46.101.97.34";
+
+    public static String SERVERPORT = "9999";
 
     public static SocketHandler handler;
-
 
     //game values
 

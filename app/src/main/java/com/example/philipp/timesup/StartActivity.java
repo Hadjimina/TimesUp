@@ -25,16 +25,12 @@ public class StartActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-
-
         create = findViewById(R.id.button_create);
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //initialize connection
-                NetworkHelper.handler = new SocketHandler();
-                setCallbackActivity(StartActivity.this);
+                initAndStartSocket();
 
                 //change to createGame class
                 intent = new Intent(getApplicationContext(), CreateActivity.class);
@@ -46,9 +42,8 @@ public class StartActivity extends ServerIOActivity {
         join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //initialize connection
-                NetworkHelper.handler = new SocketHandler();
-                setCallbackActivity(StartActivity.this);
+
+                initAndStartSocket();
 
                 intent = new Intent(getApplicationContext(), JoinActivity.class);
                 startActivity(intent);
@@ -60,5 +55,16 @@ public class StartActivity extends ServerIOActivity {
     @Override
     public void callback(DecodeMessage message) {
         Log.i("callback","start");
+    }
+
+    public void initAndStartSocket(){
+        if(NetworkHelper.handler == null){
+
+            Log.i("Websocket","should now connect");
+            //initialize connection
+            //Socket started as soon as SocketHandler object is created
+            NetworkHelper.handler = new SocketHandler();
+            setCallbackActivity(StartActivity.this);
+        }
     }
 }
