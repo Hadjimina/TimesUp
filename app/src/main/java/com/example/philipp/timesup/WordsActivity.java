@@ -31,7 +31,7 @@ public class WordsActivity extends ServerIOActivity {
     String [] wordsArray;
     String numberOfWordsString, getWordsString1, getWordsString2;
     int counter = 0;
-    Button enterButton;
+    Button enterButton, yesButton;
     TextView numberOfWords, enterWords;
     EditText editText;
     Intent intent;
@@ -71,6 +71,10 @@ public class WordsActivity extends ServerIOActivity {
         editText = findViewById(R.id.enter_word_edit);
 
 
+        //initialize yesbutton
+        yesButton = findViewById(R.id.button_yes);
+
+
         //initialze intent
         intent = new Intent(getApplicationContext(), RoundEndActivity.class);
 
@@ -87,8 +91,9 @@ public class WordsActivity extends ServerIOActivity {
                         //add word to array and clear edittext
                         wordsArray[counter] = String.valueOf(editText.getText());
                         editText.setText("");
+                        Log.d("TAG-WORDS", "first case: counter before update is: " + counter);
                         counter++;
-                        Log.d("TAG-WORDS", "first case: counter is: " + counter);
+                        Log.d("TAG-WORDS", "first case: counter after update is: " + counter + " words per person: " + wordsPerPerson);
                         numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                         numberOfWords.setText(numberOfWordsString);
                     } else {
@@ -100,12 +105,15 @@ public class WordsActivity extends ServerIOActivity {
                 else {
                     //add word to array
                     wordsArray[counter] = String.valueOf(editText.getText());
+                    Log.d("TAG-WORDS", "2nd case: counter before update is: " + counter);
                     counter++;
                     Log.d("TAG-WORDS", "second case: counter is: " + counter);
                     numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                     numberOfWords.setText(numberOfWordsString);
                     enterWords.setText("Are those words correct?");
-                    enterButton.setText("Yes");
+                    enterButton.setVisibility(View.INVISIBLE);
+                    yesButton.setText("YES!");
+                    yesButton.setVisibility(View.VISIBLE);
                     editText.setText(wordsArray[0].toString());
                     editText.append("\n");
 
@@ -113,20 +121,26 @@ public class WordsActivity extends ServerIOActivity {
                         editText.append(wordsArray[i].toString() + "\n");
 
                     }
-                    for(int i = 0; i < wordsPerPerson; i++){
-                        int start = editText.getLayout().getLineStart(i);
-                        int end = editText.getLayout().getLineEnd(i);
-                        wordsArray[i] = editText.getText().subSequence(start, end).toString();
-
-                    }
 
 
-                    //Send message to server
-                    sendMessage = new EncodeMessage(GAMEID, clientId, wordsArray);
-                    sendMessage(sendMessage);
                 }
             }
         });
+
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            for(int i = 0; i < wordsPerPerson; i++) {
+                int start = editText.getLayout().getLineStart(i);
+                int end = editText.getLayout().getLineEnd(i);
+                wordsArray[i] = editText.getText().subSequence(start, end).toString();
+            }
+                //Send message to server
+                sendMessage = new EncodeMessage(GAMEID, clientId, wordsArray);
+                sendMessage(sendMessage);
+            }
+        });
+
 
 
 
