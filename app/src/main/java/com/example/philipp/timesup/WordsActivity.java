@@ -3,6 +3,7 @@ package com.example.philipp.timesup;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 import static com.example.philipp.timesup.NetworkHelper.READY;
 import static com.example.philipp.timesup.NetworkHelper.WORDSARRAY;
 
@@ -25,7 +27,7 @@ import static com.example.philipp.timesup.NetworkHelper.WORDSARRAY;
 
 public class WordsActivity extends ServerIOActivity {
     SharedPreferences prefs;
-    int wordsPerPerson, gameId, clientId;
+    int wordsPerPerson, clientId;
     String [] wordsArray;
     String numberOfWordsString, getWordsString1, getWordsString2;
     int counter = 0;
@@ -44,7 +46,6 @@ public class WordsActivity extends ServerIOActivity {
         //get information from shared preferences
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
-        gameId = NetworkHelper.gameId;
         clientId = prefs.getInt("clientId", 0);
 
 
@@ -87,6 +88,7 @@ public class WordsActivity extends ServerIOActivity {
                         wordsArray[counter] = String.valueOf(editText.getText());
                         editText.setText("");
                         counter++;
+                        Log.d("TAG-WORDS", "first case: counter is: " + counter);
                         numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                         numberOfWords.setText(numberOfWordsString);
                     } else {
@@ -99,6 +101,7 @@ public class WordsActivity extends ServerIOActivity {
                     //add word to array
                     wordsArray[counter] = String.valueOf(editText.getText());
                     counter++;
+                    Log.d("TAG-WORDS", "second case: counter is: " + counter);
                     numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                     numberOfWords.setText(numberOfWordsString);
                     enterWords.setText("Are those words correct?");
@@ -119,7 +122,7 @@ public class WordsActivity extends ServerIOActivity {
 
 
                     //Send message to server
-                    sendMessage = new EncodeMessage(gameId, clientId, wordsArray);
+                    sendMessage = new EncodeMessage(GAMEID, clientId, wordsArray);
                     sendMessage(sendMessage);
                 }
             }
@@ -141,12 +144,14 @@ public class WordsActivity extends ServerIOActivity {
             startActivity(intent);
         }
         else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
-            toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
-            toast.show();
-            sendMessage(sendMessage);
+            //now implemnted in websocket
+            //toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
+            //toast.show();
+            //sendMessage(sendMessage);
         } else {
-            toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
-            toast.show();
+            //now implemented in websocket
+            //toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
+            //toast.show();
         }
 
     }

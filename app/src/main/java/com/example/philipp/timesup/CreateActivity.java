@@ -12,6 +12,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.NEWGAME;
 
@@ -220,7 +221,7 @@ public class CreateActivity extends ServerIOActivity{
             Log.d("TAGmessage", "gameId: " + gameId);
             Log.d("TAGmessage", "clientId: " + clientId);
             //add retrieved information to sharedPreferences
-            NetworkHelper.gameId = gameId;
+            GAMEID = gameId;
             editor.putInt("clientId", clientId);
 
             editor.apply();
@@ -229,9 +230,10 @@ public class CreateActivity extends ServerIOActivity{
         }
         //else try to send message to server again
         else {
-            sendMessage(sendMessage);
-            toast = Toast.makeText(getApplicationContext(), "error contacting server, trying to send message again", Toast.LENGTH_LONG);
-            toast.show();
+            //now implemented in websocket
+            //sendMessage(sendMessage);
+            //toast = Toast.makeText(getApplicationContext(), "error contacting server, trying to send message again", Toast.LENGTH_LONG);
+            //toast.show();
         }
 
 

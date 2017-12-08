@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
+import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 import static com.example.philipp.timesup.NetworkHelper.JOIN;
 import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
@@ -47,8 +48,6 @@ public class JoinActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
 
-        gameId = 0;
-
         //create texteditfields for code and username
         codeEdit = findViewById(R.id.game_code_edit);
         nameEdit = findViewById(R.id.enter_name_edit);
@@ -78,8 +77,7 @@ public class JoinActivity extends ServerIOActivity {
 
                 // if game code was set, parse it and send message to server and create intent
                 } else {
-                    gameId = Integer.parseInt(gameCode);
-                    NetworkHelper.gameId = gameId;
+                    GAMEID = Integer.parseInt(gameCode);
                     //find out if username was set
                     if (username == null || username.equals("")) {
                         toast = Toast.makeText(getApplicationContext(), "please enter a name to join the game", Toast.LENGTH_LONG);
@@ -89,7 +87,7 @@ public class JoinActivity extends ServerIOActivity {
 
 
                         //send message to server
-                        message = new EncodeMessage(gameId, username);
+                        message = new EncodeMessage(GAMEID, username);
                         sendMessage(message);
 
                         intent = new Intent(getApplicationContext(), WordsActivity.class);
@@ -165,7 +163,7 @@ public class JoinActivity extends ServerIOActivity {
                         }
 
                         //Send message to server
-                        sendMessage = new EncodeMessage(gameId, clientId, teamId);
+                        sendMessage = new EncodeMessage(GAMEID, clientId, teamId);
                         sendMessage(sendMessage);
 
                     } else {
@@ -180,8 +178,9 @@ public class JoinActivity extends ServerIOActivity {
         }
         //game code doesn't exist, show error and set joingame button to visible again
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(JOIN)){
-            toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
-            toast.show();
+            //now implemented in WebSocket
+            //toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
+            //toast.show();
         }
         // if right return message from server and request type was teamjoin, proceed to next activity
         else if(message.getReturnType().equals(ACK) && message.getRequestType().equals(TEAMJOIN)){
@@ -213,14 +212,16 @@ public class JoinActivity extends ServerIOActivity {
         }
         //try to send message again and show error
         else if(message.getReturnType().equals(ERROR) && message.getRequestType().equals(TEAMJOIN)){
-            toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
-            toast.show();
-            sendMessage(sendMessage);
+            //now implemented in Websocket
+            //toast = Toast.makeText(getApplicationContext(), "error with joining a team", Toast.LENGTH_LONG);
+            //toast.show();
+            //sendMessage(sendMessage);
         }
         //show error and go back to start
         else{
-            toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
-            toast.show();
+            //now implemented in websocket
+            //toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
+            //toast.show();
         }
 
     }
