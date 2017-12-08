@@ -203,7 +203,6 @@ public class JoinActivity extends ServerIOActivity {
                 startActivity(intent);
 
             } else {
-                //TODO check if GameActivity is the right activity to start
                 intent = new Intent(getApplicationContext(), GameActivity.class);
                 intent.putExtra("startTime", startTime);
                 startActivity(intent);
