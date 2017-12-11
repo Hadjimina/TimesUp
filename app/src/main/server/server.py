@@ -421,7 +421,9 @@ def handleQueueItem(request, item, gameId, clientId):
 
     elif requestType == "roundFinished":
         [scoreTeam1, scoreTeam2, nextPlayer, nextPhase] = data
-        message = encodeRoundFinishedMessage(scoreTeam1=scoreTeam1,
+        message = encodeRoundFinishedMessage(gameId=gameId,
+                                             clientId=clientId,
+                                             scoreTeam1=scoreTeam1,
                                              scoreTeam2=scoreTeam2,
                                              nextPlayer=nextPlayer,
                                              nextPhase=nextPhase)
