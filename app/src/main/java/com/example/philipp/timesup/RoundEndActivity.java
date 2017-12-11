@@ -36,7 +36,7 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
         setContentView(R.layout.activity_round_end);
 
         //initialize global variables from shared static NetworkHelper Class
-        networkHelper = new NetworkHelper();
+        //networkHelper = new NetworkHelper();
 
         teamName1 = networkHelper.TEAMNAME1;
         teamName2 = networkHelper.TEAMNAME2;
@@ -65,12 +65,11 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
 
         System.out.println("Kunnts bis do?");
         //initialize SocketHandler & get next player
-        //NetworkHelper.handler = new SocketHandler();
         setCallbackActivity(this);
-        /*
+
         EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
         sendMessage(messageToSend);
-        */
+
     }
 
     @Override
@@ -89,9 +88,11 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
             //TODO Case distinction on phaseNumber
             phaseTxt.setText("Phase: " + phaseNumber);
             if(username.equals(activePlayer)){
-                nextRoundButton.setVisibility(View.GONE);
-            }else{
                 nextRoundButton.setVisibility(View.VISIBLE);
+
+            }else{
+                nextRoundButton.setVisibility(View.GONE);
+
             }
         }
         if(message.getReturnType().equals(networkHelper.SETUP)){
