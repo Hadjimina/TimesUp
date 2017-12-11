@@ -410,7 +410,9 @@ def handleQueueItem(request, item, gameId, clientId):
 
     elif requestType == "startRound":
         [startTime, activeTeam, activePlayer, phaseNumber, wordIndex] = data
-        message = encodeStartRoundMessage(startTime=startTime,
+        message = encodeStartRoundMessage(gameId=gameId,
+                                          clientId=clientId,
+                                          startTime=startTime,
                                           activeTeam=activeTeam,
                                           activePlayer=activePlayer,
                                           phaseNumber=phaseNumber,
