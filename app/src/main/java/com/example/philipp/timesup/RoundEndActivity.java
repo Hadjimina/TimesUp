@@ -35,6 +35,9 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_round_end);
 
+        //Set this Activity as CallbackActivity
+        setCallbackActivity(this);
+
         //initialize global variables from shared static NetworkHelper Class
         //networkHelper = new NetworkHelper();
 
@@ -62,13 +65,6 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
         phaseTxt.setText("Phase: loading...");
 
         nextRoundButton = findViewById(R.id.start_next_round);
-
-        System.out.println("Kunnts bis do?");
-        //initialize SocketHandler & get next player
-        setCallbackActivity(this);
-
-        EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
-        sendMessage(messageToSend);
 
     }
 
@@ -101,6 +97,13 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
             words = message.getStringArray(networkHelper.WORDSARRAY);
             //TODO stimmt Words oder sind das die einzelnen Wörter?
             networkHelper.WORDS = words;
+
+            //if we receive Setup BCAST make NextRound Servercall
+            EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
+            sendMessage(messageToSend);
+        }
+        else{
+            System.out.print("wrong message received in EndRoundActivity: " + message.getReturnType() + " " + message.getRequestType());
         }
     }
 
