@@ -8,13 +8,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.NumberPicker;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.CLIENTID;
 import static com.example.philipp.timesup.NetworkHelper.GAMEID;
-import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 import static com.example.philipp.timesup.NetworkHelper.NEWGAME;
+import static com.example.philipp.timesup.NetworkHelper.ROUNDS;
+import static com.example.philipp.timesup.NetworkHelper.TEAMNAME1;
+import static com.example.philipp.timesup.NetworkHelper.TEAMNAME2;
+import static com.example.philipp.timesup.NetworkHelper.TIMEPERROUND;
+import static com.example.philipp.timesup.NetworkHelper.USERNAME;
+import static com.example.philipp.timesup.NetworkHelper.WORDSPERPERSON;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -29,37 +35,32 @@ Contains settings for new game (Time per round, rounds, team names)
 
 public class CreateActivity extends ServerIOActivity{
 
-    //public EncodeMessage(boolean[] rounds, String teamName1, String teamName2, int timePerRound, String username, int wordsPerPerson){
     boolean[] rounds = {true,true,true,true,true};
     CheckBox explain, pantomime, oneWord, freeze, sounds;
     EditText team1Edit, team2Edit, usernameEdit, timeEdit, wordsEdit;
-    String teamName1, teamName2, username;
+    String teamName1, teamName2, username, time, words;
     int timePerRound, wordsPerPerson;
-    NumberPicker minutes, seconds, words;
     Button cancel, finish;
     Intent intent;
     Toast toast;
     EncodeMessage sendMessage;
     SharedPreferences.Editor editor;
+    ImageButton infoTimePerPerson, infoRounds, infoWords;
+    Boolean DEBUG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        DEBUG = true;
+
         setCallbackActivity(this);
-        //TODO: solve bug when pressing finish and nothing at all is filled in
 
-        //timepicker
-/*
-        minutes = (NumberPicker) findViewById(R.id.minute_picker);
-
-        seconds = (NumberPicker) findViewById(R.id.seconds_picker);*/
-
+        //time picker
         timeEdit = findViewById(R.id.time);
 
         //set on click listeners for checkboxes about rounds
-
         explain = findViewById(R.id.explain);
         explain.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,26 +102,42 @@ public class CreateActivity extends ServerIOActivity{
         });
 
         //EditText fields
-
         team1Edit = findViewById(R.id.team_a);
-
         team2Edit = findViewById(R.id.team_b);
-
         usernameEdit = findViewById(R.id.username);
 
         //Words per Person
-
-        //words = (NumberPicker) findViewById(R.id.number_picker);
-
         wordsEdit = findViewById(R.id.words_number);
 
-
+        //initialise infobuttons
+        infoTimePerPerson = findViewById(R.id.info_time_round);
+        infoTimePerPerson.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toast = Toast.makeText(getApplicationContext(), "Time which each person has per round to do explain the words. Recommended are 30 to 120 seconds", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+        infoRounds = findViewById(R.id.info_rounds);
+        infoRounds.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toast = Toast.makeText(getApplicationContext(), "The rounds through which the game will go through. Recommendation: choose at least EXPLAIN and PANTOMIME, as the game builds up on them", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+        infoWords = findViewById(R.id.info_words);
+        infoWords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toast = Toast.makeText(getApplicationContext(), "The number of words each player enters in the game. Choose a number according to how much time you have. Recommendation: 4 - 6", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
 
 
         //initialize shared preferences object
-        editor = getSharedPreferences(MYPREFS, MODE_PRIVATE).edit();
-
-
+        //editor = getSharedPreferences(MYPREFS, MODE_PRIVATE).edit();
 
         //cancel Button goes back to StartActivity
         cancel = findViewById(R.id.button_cancel);
@@ -139,68 +156,79 @@ public class CreateActivity extends ServerIOActivity{
             public void onClick(View view) {
                 intent = new Intent(getApplicationContext(), JoinCodeActivity.class);
 
-                //read teamnames and username and add them to shared preferences
-                teamName1 = team1Edit.getText().toString();
-                teamName2 = team2Edit.getText().toString();
-                username = usernameEdit.getText().toString();
-                editor.putString("teamName1", teamName1);
+                if(DEBUG) {
+                    teamName1 = "Team A";
+                    teamName2 = "Team B";
+                    username = "Tyler, the Creator";
+                    timePerRound = 60;
+                    wordsPerPerson = 3;
+                }
+
+                //read team names and username and add them to shared preferences
+                if (!DEBUG) {
+                    time = timeEdit.getText().toString();
+                    teamName1 = team1Edit.getText().toString();
+                    teamName2 = team2Edit.getText().toString();
+                    words = wordsEdit.getText().toString();
+                    username = usernameEdit.getText().toString();
+
+                    if (time == null || time.equals("") || time.equals("0")) {
+                        toast = Toast.makeText(getApplicationContext(), "Please enter a time per round", Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    } else {
+                        timePerRound = Integer.parseInt(time);
+                    }
+
+                    if (teamName1 == null || teamName1.equals("")) {
+                        toast = Toast.makeText(getApplicationContext(), "Please enter Name for Team A", Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    }
+
+                    if (teamName2 == null || teamName2.equals("")) {
+                        toast = Toast.makeText(getApplicationContext(), "Please enter Name for Team B", Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    }
+
+                    if(words == null || words.equals("")) {
+                        toast = Toast.makeText(getApplicationContext(), "Please enter how many words per person", Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    } else {
+                        wordsPerPerson = Integer.parseInt(words);
+                    }
+
+                    if (username == null || username.equals("")) {
+                        toast = Toast.makeText(getApplicationContext(), "Please enter a username", Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    }
+
+                }
+                TEAMNAME1 = teamName1;
+                TEAMNAME2 = teamName2;
+                USERNAME = username;
+                ROUNDS = rounds;
+                TIMEPERROUND = timePerRound;
+                WORDSPERPERSON = wordsPerPerson;
+                /*editor.putString("teamName1", teamName1);
                 editor.putString("teamName2", teamName2);
-                editor.putString("username", username);
-
-
+                editor.putString("username", username);*/
                 //add rounds to shared preferences
-                editor.putString("rounds", rounds.toString());
-                Log.d("Rounds", rounds.toString());
-
-
-                if (teamName1 == null) {
-                    toast = Toast.makeText(getApplicationContext(), "Please enter Name for Team A", Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-
-                if (teamName2 == null) {
-                    toast = Toast.makeText(getApplicationContext(), "Please enter Name for Team B", Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-
-                if (username == null) {
-                    toast = Toast.makeText(getApplicationContext(), "Please enter a username", Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-
-                if (timeEdit != null && !timeEdit.equals("")) {
-                    //parse time per round and put into shared preferences
-                    timePerRound = Integer.parseInt(timeEdit.getText().toString());
-                    editor.putInt("timePerRound", timePerRound);
-                }
-
+                //editor.putString("rounds", rounds.toString());
+                //editor.putInt("wordsPerPerson", wordsPerPerson);
 
                 //parse words per person and put into shared preferences
-                wordsPerPerson = Integer.parseInt(wordsEdit.getText().toString());
-                editor.putInt("wordsPerPerson", wordsPerPerson);
 
-                if (timePerRound == 0 || timeEdit == null && timeEdit.equals("")) {
-                    toast = Toast.makeText(getApplicationContext(), "Please enter the time per round", Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-
-                if (wordsPerPerson == 0) {
-                    toast = Toast.makeText(getApplicationContext(), "Please enter a number of words per person", Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-
-                Log.d("CREATE", rounds.toString() + teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
+                Log.d("CREATE",  teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
 
                 //apply shared preferences
-                editor.apply();
+                //editor.apply();
 
                 //Send message to server
-                sendMessage = new EncodeMessage(teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds);
+                sendMessage = new EncodeMessage(TEAMNAME1, TEAMNAME2, TIMEPERROUND, WORDSPERPERSON, USERNAME, ROUNDS);
                 sendMessage(sendMessage);
 
             }
@@ -222,11 +250,13 @@ public class CreateActivity extends ServerIOActivity{
             Log.d("TAGmessage", "clientId: " + clientId);
             //add retrieved information to sharedPreferences
             GAMEID = gameId;
-            editor.putInt("clientId", clientId);
+            CLIENTID = clientId;
+            //editor.putInt("clientId", clientId);
 
-            editor.apply();
+            //editor.apply();
 
             startActivity(intent);
+            Log.d("TAG-GAMEVALUES", "gameId, clientId, teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds" +  " " + GAMEID + " " + CLIENTID + " " + TEAMNAME1 + " " + TEAMNAME2 + " " + TIMEPERROUND +  " " +  WORDSPERPERSON);
         }
         //else try to send message to server again
         else {

@@ -11,12 +11,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static com.example.philipp.timesup.NetworkHelper.ACK;
-import static com.example.philipp.timesup.NetworkHelper.ERROR;
-import static com.example.philipp.timesup.NetworkHelper.GAMEID;
-import static com.example.philipp.timesup.NetworkHelper.JOIN;
-import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
-import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
+import static com.example.philipp.timesup.NetworkHelper.*;
+
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -65,10 +61,10 @@ public class JoinActivity extends ServerIOActivity {
 
 
                 //add to shared Preferences
-                prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
+                /*prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
                 editor = prefs.edit();
                 editor.putString("username", username);
-                editor.apply();
+                editor.apply();*/
 
                 //find out if game code was set
                 if (gameCode == null || gameCode.equals("")) {
@@ -84,17 +80,13 @@ public class JoinActivity extends ServerIOActivity {
                         toast.show();
                      //if usercname was set, proceed
                     } else {
-
+                        USERNAME = username;
 
                         //send message to server
-                        message = new EncodeMessage(GAMEID, username);
+                        message = new EncodeMessage(GAMEID, USERNAME);
                         sendMessage(message);
 
                         intent = new Intent(getApplicationContext(), WordsActivity.class);
-
-
-
-
                     }
                 }
             }
@@ -106,10 +98,9 @@ public class JoinActivity extends ServerIOActivity {
         Log.i("callback","joinactivity");
         String teamName1, teamName2;
 
-
         //initialize shared preferences
-        prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
-        editor = prefs.edit();
+        /*prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
+        editor = prefs.edit();*/
 
         // if right return message from server and request type was join, start show which teams you can join
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(JOIN)){
@@ -122,26 +113,31 @@ public class JoinActivity extends ServerIOActivity {
             int teamId1 = message.getInt("teamId1");
             int teamId2 = message.getInt("teamId2");
             clientId = message.getClientId();
+            CLIENTID = clientId;
+            TEAMNAME1 = teamName1;
+            TEAMNAME2 = teamName2;
+            TEAMID1 = teamId1;
+            TEAMID2 = teamId2;
 
             Log.d("TAG-JOIN", "client id is: " + clientId);
 
             //add to shared preferences
-            editor.putString("teamName1", teamName1);
+            /*editor.putString("teamName1", teamName1);
             editor.putString("teamName2", teamName2);
             editor.putInt("teamId1", teamId1);
             editor.putInt("teamId2", teamId2);
             editor.putInt("clientId", clientId);
-            editor.apply();
+            editor.apply();*/
 
             //make radioButtons to join a team visible
             teamA = findViewById(R.id.team_a1);
             teamB = findViewById(R.id.team_b1);
 
             if (teamName1 != null) {
-                teamA.setText(teamName1);
+                teamA.setText(TEAMNAME1);
             }
             if (teamName2 != null) {
-                teamB.setText(teamName2);
+                teamB.setText(TEAMNAME2);
             }
 
             teamA.setVisibility(View.VISIBLE);
@@ -153,23 +149,21 @@ public class JoinActivity extends ServerIOActivity {
             go.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int teamId;
                     if (teamA.isChecked() || teamB.isChecked()) {
                         if(teamA.isChecked()){
-                            teamId = 1;
+                            BELONGSTOTEAM = TEAMID1;
                         }
                         else {
-                            teamId = 2;
+                            BELONGSTOTEAM = TEAMID2;
                         }
 
                         //Send message to server
-                        sendMessage = new EncodeMessage(GAMEID, clientId, teamId);
+                        sendMessage = new EncodeMessage(GAMEID, CLIENTID, BELONGSTOTEAM);
                         sendMessage(sendMessage);
 
                     } else {
                         toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
                         toast.show();
-                        return;
                     }
 
                 }
@@ -193,17 +187,18 @@ public class JoinActivity extends ServerIOActivity {
             startTime = message.getInt("startTime");
             timePerRound = message.getInt("timePerRound");
             wordsPerPerson = message.getInt("wordsPerPerson");
-            editor.putInt("wordsPerPerson", wordsPerPerson);
-            editor.apply();
+            /*editor.putInt("wordsPerPerson", wordsPerPerson);
+            editor.apply();*/
+            WORDSPERPERSON = wordsPerPerson;
+            TIMEPERROUND = timePerRound;
 
-            //chek if game has started or not
+            //check if game has started or not
             if (!hasStarted) {
                 //create intent and start wordsActivity
                 intent = new Intent(getApplicationContext(), WordsActivity.class);
                 startActivity(intent);
 
             } else {
-                //TODO check if GameActivity is the right activity to start
                 intent = new Intent(getApplicationContext(), GameActivity.class);
                 intent.putExtra("startTime", startTime);
                 startActivity(intent);
@@ -225,4 +220,6 @@ public class JoinActivity extends ServerIOActivity {
         }
 
     }
+
+
 }

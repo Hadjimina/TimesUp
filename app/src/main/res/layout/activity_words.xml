@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="@string/enter_words"
         android:labelFor="@+id/enter_word_edit"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:textColor="#000000" />
 
     <EditText

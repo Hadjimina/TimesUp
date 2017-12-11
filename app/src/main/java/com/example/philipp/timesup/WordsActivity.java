@@ -11,10 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.CLIENTID;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
 import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 import static com.example.philipp.timesup.NetworkHelper.READY;
+import static com.example.philipp.timesup.NetworkHelper.WORDS;
 import static com.example.philipp.timesup.NetworkHelper.WORDSARRAY;
+import static com.example.philipp.timesup.NetworkHelper.WORDSPERPERSON;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -43,14 +46,19 @@ public class WordsActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_words);
 
-        //get information from shared preferences
-        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
-        clientId = prefs.getInt("clientId", 0);
 
+        //add code to actionbar
+        getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
+
+        //get information from shared preferences
+        /*prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
+        clientId = prefs.getInt("clientId", 0);*/
 
         //initialize connection
         setCallbackActivity(this);
+
+        wordsPerPerson = WORDSPERPERSON;
 
         //initialize array for words
         wordsArray = new String[wordsPerPerson];
@@ -61,6 +69,7 @@ public class WordsActivity extends ServerIOActivity {
         getWordsString2 = getString(R.string.words_entered2);
         numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
         numberOfWords.setText(numberOfWordsString);
+
 
         //set view for textedit
         enterWords = findViewById(R.id.enter_words);
@@ -79,7 +88,6 @@ public class WordsActivity extends ServerIOActivity {
         intent = new Intent(getApplicationContext(), RoundEndActivity.class);
 
         //set on click listener for enterbutton
-        //TODO shouldn't this be a toggle button? to make "unready" thing happening
         enterButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -91,9 +99,7 @@ public class WordsActivity extends ServerIOActivity {
                         //add word to array and clear edittext
                         wordsArray[counter] = String.valueOf(editText.getText());
                         editText.setText("");
-                        Log.d("TAG-WORDS", "first case: counter before update is: " + counter);
                         counter++;
-                        Log.d("TAG-WORDS", "first case: counter after update is: " + counter + " words per person: " + wordsPerPerson);
                         numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                         numberOfWords.setText(numberOfWordsString);
                     } else {
@@ -105,9 +111,7 @@ public class WordsActivity extends ServerIOActivity {
                 else {
                     //add word to array
                     wordsArray[counter] = String.valueOf(editText.getText());
-                    Log.d("TAG-WORDS", "2nd case: counter before update is: " + counter);
                     counter++;
-                    Log.d("TAG-WORDS", "second case: counter is: " + counter);
                     numberOfWordsString = counter + " " + getWordsString1 + " " + wordsPerPerson + " " + getWordsString2;
                     numberOfWords.setText(numberOfWordsString);
                     enterWords.setText("Are those words correct?");
@@ -121,8 +125,6 @@ public class WordsActivity extends ServerIOActivity {
                         editText.append(wordsArray[i].toString() + "\n");
 
                     }
-
-
                 }
             }
         });
@@ -130,35 +132,33 @@ public class WordsActivity extends ServerIOActivity {
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            for(int i = 0; i < wordsPerPerson; i++) {
-                int start = editText.getLayout().getLineStart(i);
-                int end = editText.getLayout().getLineEnd(i);
-                wordsArray[i] = editText.getText().subSequence(start, end).toString();
-            }
+                for(int i = 0; i < wordsPerPerson; i++) {
+                    int start = editText.getLayout().getLineStart(i);
+                    int end = editText.getLayout().getLineEnd(i);
+                    wordsArray[i] = editText.getText().subSequence(start, end).toString();
+                }
+                WORDS = wordsArray;
                 //Send message to server
-                sendMessage = new EncodeMessage(GAMEID, clientId, wordsArray);
+                sendMessage = new EncodeMessage(GAMEID, CLIENTID, wordsArray);
                 sendMessage(sendMessage);
+                Log.d("TAG-WORDS", "sendig message, pressed YES");
             }
         });
-
-
-
-
 
     }
 
     @Override
     public void callback(DecodeMessage message) {
 
+        Log.d("TAG-WORDS", "got callback");
 
         if (message.getRequestType().equals(READY) && message.getReturnType().equals(ACK)){
-
             //TODO get from message which role you will have
             intent.putExtra(WORDSARRAY, wordsArray);
             startActivity(intent);
         }
         else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
-            //now implemnted in websocket
+            //now implemented in websocket
             //toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
             //toast.show();
             //sendMessage(sendMessage);
@@ -169,4 +169,7 @@ public class WordsActivity extends ServerIOActivity {
         }
 
     }
+
 }
+
+

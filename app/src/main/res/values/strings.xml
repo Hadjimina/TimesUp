@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">TimesUp</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+
     <!--Strings for TextViews -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="enter_words">Enter your words</string>
@@ -15,6 +15,7 @@
     <string name="game_code">This is the code for your game</string>
     <string name="words_entered1">out of</string>
     <string name="words_entered2">words entered</string>
+
 
     <!-- Strings for buttons -->
     <string name="enter">Enter</string>

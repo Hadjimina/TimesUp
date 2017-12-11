@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
 public class NetClient {
@@ -37,6 +38,8 @@ public class NetClient {
                 socket = new Socket(this.host, this.port);
                 out = new PrintWriter(socket.getOutputStream());
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                Log.i("Websocket","connected to server");
+
             }
         } catch (IOException e) {
             //TODO add error message
@@ -44,18 +47,23 @@ public class NetClient {
         }
     }
 
+    public boolean isConnected(){
+        return socket.isConnected();
+    }
+
     public BufferedReader getBufferedReader() {
         return in;
     }
 
 
-    private void disConnectWithServer() {
+    public void disConnectWithServer() {
         if (socket != null) {
             if (socket.isConnected()) {
                 try {
                     in.close();
                     out.close();
                     socket.close();
+                    Log.i("Websocket","disconnected from server");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -67,13 +75,20 @@ public class NetClient {
         if (message != null) {
 
 
-            //prepend size of string (padded)
-            String length = String.valueOf(message.length());
-            length = String.format("%4s", length);
 
-            out.write(length + message);
-            out.flush();
-            Log.i("Websocket sending", message);
+
+            try {
+                //prepend size of string (padded)
+                String length = String.valueOf((message).getBytes("UTF-8").length);
+                length = String.format("%4s", length);
+
+                out.write(length + message);
+                out.flush();
+                Log.i("Websocket", "Sending: "+message);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
 
 
         }

@@ -11,10 +11,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
+import static com.example.philipp.timesup.NetworkHelper.BELONGSTOTEAM;
+import static com.example.philipp.timesup.NetworkHelper.CLIENTID;
 import static com.example.philipp.timesup.NetworkHelper.ERROR;
 import static com.example.philipp.timesup.NetworkHelper.GAMEID;
-import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
+import static com.example.philipp.timesup.NetworkHelper.TEAMID1;
+import static com.example.philipp.timesup.NetworkHelper.TEAMID2;
 import static com.example.philipp.timesup.NetworkHelper.TEAMJOIN;
+import static com.example.philipp.timesup.NetworkHelper.TEAMNAME1;
+import static com.example.philipp.timesup.NetworkHelper.TEAMNAME2;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -47,15 +52,16 @@ public class JoinCodeActivity extends ServerIOActivity {
 
 
         //retrieve information from shared Preferences
-        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        /*prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         clientId = prefs.getInt("clientId", 0);
         teamName1 = prefs.getString("teamName1", "team1");
-        teamName2 = prefs.getString("teamName2", "team2");
+        teamName2 = prefs.getString("teamName2", "team2");*/
 
         //set code to join the game
         code = findViewById(R.id.code);
         code.setText(String.valueOf(GAMEID));
 
+        getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
 
         //initialise server connection
         setCallbackActivity(this);
@@ -66,11 +72,11 @@ public class JoinCodeActivity extends ServerIOActivity {
         teamB = findViewById(R.id.team_b1);
 
         if (teamName1 != null) {
-            teamA.setText(teamName1);
+            teamA.setText(TEAMNAME1);
         }
 
         if (teamName2 != null) {
-            teamB.setText(teamName2);
+            teamB.setText(TEAMNAME2);
         }
 
         //set go button
@@ -78,26 +84,26 @@ public class JoinCodeActivity extends ServerIOActivity {
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int teamId;
                 if (teamA.isChecked() || teamB.isChecked()) {
                     if(teamA.isChecked()){
-                        teamId = 1;
+                        BELONGSTOTEAM = TEAMID1;
                     }
                     else{
-                        teamId = 2;
+                        BELONGSTOTEAM = TEAMID2;
                     }
 
                 } else {
                     toast = Toast.makeText(getApplicationContext(), "please select a team", Toast.LENGTH_LONG);
+                    toast.show();
                     return;
                 }
-                prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
+                /*prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
                 editor = prefs.edit();
-                editor.putInt("teamId", teamId);
-                editor.apply();
+                editor.putInt("teamId", BELONGSTOTEAM);
+                editor.apply();*/
 
                 //create message and send it to server
-                sendMessage = new EncodeMessage(GAMEID, clientId, teamId);
+                sendMessage = new EncodeMessage(GAMEID, CLIENTID, BELONGSTOTEAM);
                 sendMessage(sendMessage);
                 Log.d("TAGsent", sendMessage.toString());
 
@@ -112,8 +118,8 @@ public class JoinCodeActivity extends ServerIOActivity {
         int startTime, timePerRound, wordsPerPerson;
 
         //initialize shared preferences
-        prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
-        editor = prefs.edit();
+        /*prefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
+        editor = prefs.edit();*/
 
         Log.d("TAGmessagetype", message.getReturnType());
         Log.d("TAGmessagetype", message.getRequestType());
@@ -133,9 +139,9 @@ public class JoinCodeActivity extends ServerIOActivity {
             intent.putExtra("timePerRound", timePerRound);
 
             //put wordsPerPerson into shared preferences
-            wordsPerPerson = message.getInt("wordsPerPerson");
-            editor.putInt("wordsPerPerson", wordsPerPerson);
-            editor.apply();
+            //wordsPerPerson = message.getInt("wordsPerPerson");
+            /*editor.putInt("wordsPerPerson", wordsPerPerson);
+            editor.apply();*/
 
             //start next activity
             startActivity(intent);
@@ -154,4 +160,6 @@ public class JoinCodeActivity extends ServerIOActivity {
             //toast.show();
         }
     }
+
+
 }

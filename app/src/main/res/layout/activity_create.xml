@@ -1,215 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/SonucScrollView"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:isScrollContainer="true"
-    android:scrollbars="vertical"
     android:layout_gravity="center"
+    android:isScrollContainer="true"
     android:orientation="vertical"
-    >
+    android:scrollbars="vertical">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="30dp"
-    tools:context="com.example.philipp.timesup.CreateActivity"
-    android:orientation="vertical">
-
-    <!-- TIME PER ROUND -->
-
-    <TextView
-        android:id="@+id/time_round"
-        android:layout_width="wrap_content"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/time_per_round"
-        android:textSize="16sp"
-        android:textColor="#000000"/>
+        android:layout_margin="30dp"
+        android:orientation="vertical"
+        tools:context="com.example.philipp.timesup.CreateActivity">
 
-    <EditText
-        android:id="@+id/time"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20sp"
-        android:ems="10"
-        android:hint="@string/seconds"
-        android:inputType="time"
-        android:layout_below="@id/time_round" />
+        <TextView
+            android:id="@+id/popup_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
-    <!--<NumberPicker
-        android:id="@+id/minute_picker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/time"
-        android:layout_marginStart="22dp" />
+        <!-- TIME PER ROUND -->
 
-    <TextView
-        android:id="@+id/colon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=":"
-        android:layout_below="@id/create_game"
-        android:layout_toRightOf="@id/minute_picker"/>
+        <TextView
+            android:id="@+id/time_round"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time_per_round"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
+        <ImageButton
+            android:id="@+id/info_time_round"
+            android:layout_width="20sp"
+            android:layout_height="20sp"
+            android:layout_toRightOf="@id/time_round"
+            android:src="@drawable/info_button" />
 
-    <NumberPicker
-        android:id="@+id/seconds_picker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/time"
-        android:layout_marginStart="22dp"
-        android:layout_toRightOf="@id/colon" />-->
+        <EditText
+            android:id="@+id/time"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/time_round"
+            android:layout_marginBottom="20sp"
+            android:ems="10"
+            android:hint="@string/seconds"
+            android:inputType="time" />
 
-     <!--CHOOSE ROUNDS -->
+        <!--CHOOSE ROUNDS -->
 
-    <TextView
-        android:id="@+id/rounds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/rounds"
-        android:textSize="16sp"
-        android:layout_marginBottom="10dp"
-        android:textColor="#000000"
-        android:layout_below="@id/time" />
+        <TextView
+            android:id="@+id/rounds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/time"
+            android:layout_marginBottom="10dp"
+            android:text="@string/rounds"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
-    <CheckBox
-        android:id="@+id/explain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/explain"
-        android:layout_below="@id/rounds"
-        android:checked="true"/>
+        <ImageButton
+            android:id="@+id/info_rounds"
+            android:layout_width="20sp"
+            android:layout_height="20sp"
+            android:layout_below="@id/time"
+            android:layout_toRightOf="@id/rounds"
+            android:src="@drawable/info_button" />
 
-    <CheckBox
-        android:id="@+id/panto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/pantomime"
-        android:layout_below="@id/explain"
-        android:checked="true"/>
+        <CheckBox
+            android:id="@+id/explain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rounds"
+            android:checked="true"
+            android:text="@string/explain" />
 
-    <CheckBox
-        android:id="@+id/one_word"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/one_word"
-        android:layout_below="@id/panto"
-        android:checked="true"/>
+        <CheckBox
+            android:id="@+id/panto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/explain"
+            android:checked="true"
+            android:text="@string/pantomime" />
 
-    <CheckBox
-        android:id="@+id/freeze"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/freeze"
-        android:layout_below="@id/one_word"
-        android:checked="true"/>
+        <CheckBox
+            android:id="@+id/one_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/panto"
+            android:checked="true"
+            android:text="@string/one_word" />
 
-    <CheckBox
-        android:id="@+id/sound"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sounds"
-        android:layout_marginBottom="20dp"
-        android:layout_below="@id/freeze"
-        android:checked="true"/>
+        <CheckBox
+            android:id="@+id/freeze"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/one_word"
+            android:checked="true"
+            android:text="@string/freeze" />
 
-
-     <!--TEAM NAMES -->
-
-    <TextView
-        android:id="@+id/team_names"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/team_names"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_below="@id/sound" />
-
-    <EditText
-        android:id="@+id/team_a"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/team_a"
-        android:layout_below="@id/team_names"/>
-
-    <EditText
-        android:id="@+id/team_b"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/team_b"
-        android:layout_marginBottom="20dp"
-        android:layout_below="@id/team_a"/>
+        <CheckBox
+            android:id="@+id/sound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/freeze"
+            android:layout_marginBottom="20dp"
+            android:checked="true"
+            android:text="@string/sounds" />
 
 
-     <!--WORDS PER PERSON -->
+        <!--TEAM NAMES -->
 
-    <TextView
-        android:id="@+id/words_per_pers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/words_per_person"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_below="@id/team_b" />
+        <TextView
+            android:id="@+id/team_names"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sound"
+            android:text="@string/team_names"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
-    <EditText
-        android:id="@+id/words_number"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="number"
-        android:hint="@string/five"
-        android:layout_marginBottom="20dp"
-        android:layout_below="@id/words_per_pers"/>
+        <EditText
+            android:id="@+id/team_a"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/team_names"
+            android:hint="@string/team_a" />
 
-    <!--<NumberPicker
-        android:id="@+id/number_picker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/words_number"
-        android:layout_marginStart="22dp" />-->
+        <EditText
+            android:id="@+id/team_b"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/team_a"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/team_b" />
 
 
+        <!--WORDS PER PERSON -->
 
-     <!--ENTER YOUR NAME -->
-    <TextView
-        android:id="@+id/enter_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/enter_name"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_below="@id/words_number" />
+        <TextView
+            android:id="@+id/words_per_pers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/team_b"
+            android:text="@string/words_per_person"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="350sp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:hint="@string/username"
-        android:layout_below="@id/enter_name"/>
+        <ImageButton
+            android:id="@+id/info_words"
+            android:layout_width="20sp"
+            android:layout_height="20sp"
+            android:layout_below="@id/team_b"
+            android:layout_toRightOf="@id/words_per_pers"
+            android:src="@drawable/info_button" />
 
-     <!-- CANCEL AND FINISH BUTTON -->
-    <Button
-        android:id="@+id/button_cancel"
-        android:layout_width="165dp"
-        android:layout_height="wrap_content"
-        android:text="@string/cancel"
-        android:layout_below="@id/username"
-        android:layout_marginBottom="50dp"/>
-
-    <Button
-        android:id="@+id/button_finish"
-        android:layout_width="165dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/username"
-        android:layout_toRightOf="@id/button_cancel"
-        android:text="@string/finish"
-        android:layout_marginBottom="50dp"/>
+        <EditText
+            android:id="@+id/words_number"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/words_per_pers"
+            android:layout_marginBottom="20dp"
+            android:ems="10"
+            android:hint="@string/five"
+            android:inputType="number" />
 
 
-</RelativeLayout>
+        <!--ENTER YOUR NAME -->
+        <TextView
+            android:id="@+id/enter_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/words_number"
+            android:text="@string/enter_name"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="350sp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/enter_name"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/username" />
+
+        <!-- CANCEL AND FINISH BUTTON -->
+        <Button
+            android:id="@+id/button_cancel"
+            android:layout_width="165dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/username"
+            android:layout_marginBottom="50dp"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/button_finish"
+            android:layout_width="165dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/username"
+            android:layout_marginBottom="50dp"
+            android:layout_toRightOf="@id/button_cancel"
+            android:text="@string/finish" />
+
+
+    </RelativeLayout>
 </ScrollView>
