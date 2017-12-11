@@ -142,7 +142,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                                              gameId=gameId)
                 self.request.sendall(message.encode())
                 return
-            games[gameId][clientId] += 1
+            games[gameId]["userCount"] += 1
 
             # Get the teamNames
             teamName1 = games[gameId].get("teamName1")
@@ -518,6 +518,9 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     random.shuffle(globalWordList)
                     random.shuffle(team1)
                     random.shuffle(team2)
+
+                    # Wait to ensure all clients are ready
+                    time.sleep(0.5)
 
                     # Give a notification to all users
                     for user in users:
