@@ -99,7 +99,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             # The host has clientId 0
             clientId = 0
-            games[gameId]["userCount"] = 1
 
             # Setup communication queue
             games[gameId][0] = queue.Queue()
@@ -143,7 +142,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                                              gameId=gameId)
                 self.request.sendall(message.encode())
                 return
-            games[gameId]["userCount"] += 1
+            games[gameId][clientId] += 1
 
             # Get the teamNames
             teamName1 = games[gameId].get("teamName1")
@@ -396,7 +395,7 @@ def handleQueueItem(request, item, gameId, clientId):
         request.sendall(message.encode())
 
     elif requestType == "ack":
-        [ackResponse] = data
+        ackResponse = data
         message = encodeAckMessage(requestType=ackResponse,
                                    gameId=gameId,
                                    clientId=clientId)
@@ -503,7 +502,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 readyCount += 1
 
                 # Acknowledge wordList
-                games[gameId][clientId].put(("ack", ["ready"]))
+                games[gameId][clientId].put(("ack", "ready"))
 
                 # Test if everybody is ready
                 if userCount == readyCount:
@@ -554,7 +553,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 readyCount -= 1
 
                 # Acknowledge unready
-                games[gameId][clientId].put(("ack", ["unready"]))
+                games[gameId][clientId].put(("ack", "unready"))
 
         elif messageType == "ack":
 
@@ -660,6 +659,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
             # Save new user into the usernames dictionary
             usernames[clientId] = data
+            userCount += 1
+            games[gameId]["userCount"] = userCount
 
         else:
             games[gameId][clientId].put(("error", ["unknown messageType", messageType]))
