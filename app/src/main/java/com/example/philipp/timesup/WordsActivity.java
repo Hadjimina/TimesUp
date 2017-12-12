@@ -138,6 +138,10 @@ public class WordsActivity extends ServerIOActivity {
                 int start = editText.getLayout().getLineStart(i);
                 int end = editText.getLayout().getLineEnd(i);
                 wordsArray[i] = editText.getText().subSequence(start, end).toString();
+                if(wordsArray[i] == null){
+                    toast = Toast.makeText(getApplicationContext(), "Please don't delete any words", Toast.LENGTH_LONG);
+                    return;
+                }
             }
                 //Send message to server
                 sendMessage = new EncodeMessage(GAMEID, clientId, wordsArray);
