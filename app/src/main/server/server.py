@@ -514,7 +514,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 if userCount == readyCount:
 
                     # If everybody is ready, create the globalWordList
-                    for words in submittedWords.items():
+                    for key, words in submittedWords.items():
                         globalWordList.append(words)
 
                     # Start with the first word
