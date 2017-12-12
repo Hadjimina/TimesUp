@@ -539,7 +539,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                         activePlayer = team2[0]
 
                     # Get the current time
-                    startTime = datetime.time()
+                    startTime = int(round(time.time()*1000))
 
                     # Send start signal to all users
                     for user in users:
