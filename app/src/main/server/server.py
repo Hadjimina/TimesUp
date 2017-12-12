@@ -1,5 +1,4 @@
 import time
-import datetime
 import threading
 import socketserver
 import json
@@ -421,12 +420,13 @@ def handleQueueItem(request, item, gameId, clientId):
         request.sendall(message.encode())
 
     elif requestType == "roundFinished":
-        [scoreTeam1, scoreTeam2, nextPlayer, nextPhase] = data
+        [scoreTeam1, scoreTeam2, nextPlayerId, nextPlayerName, nextPhase] = data
         message = encodeRoundFinishedMessage(gameId=gameId,
                                              clientId=clientId,
                                              scoreTeam1=scoreTeam1,
                                              scoreTeam2=scoreTeam2,
-                                             nextPlayer=nextPlayer,
+                                             nextPlayerId=nextPlayerId,
+                                             nextPlayerName=nextPlayerName,
                                              nextPhase=nextPhase)
         request.sendall(message.encode())
 
@@ -447,12 +447,13 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
     startTime = -1  # Indicates the time the game has started (-1 if not yet)
     userCount = 0  # Indicated how many users are currently connected
     phaseNumber = -1  # Specified which phase the game is currently in
+    wordIndex = -1 # Specified which word is currently the next
     scoreTeam1 = 0  # Current score for team 1
     scoreTeam2 = 0  # Current score for team 2
     activeTeam = -1  # Specifies which team is currently active
     activePlayerId = -1  # Specifies which player is currently active
     activePlayerName = "" # Specifies which player (name) is currently active
-    nextPlayer = -1  # Specifies which player is active next
+    activePlayer = -1  # Specifies which player is active next
     nextPhase = 0  # Specified the next phase to be played
     phases = list()  # A list of all played phases in this game
 
@@ -513,7 +514,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 # Test if everybody is ready
                 if userCount == readyCount:
 
-                    # If everybody is ready, create the globalWordList
                     for key, words in submittedWords.items():
                         globalWordList.append(words)
 
@@ -535,23 +535,22 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     # Non-deterministic choice which team starts
                     if bool(random.getrandbits(1)):
                         activeTeam = 1
-                        activePlayerId = team1[0]
+                        prevPlayer = team2[0]
                     else:
                         activeTeam = 2
-                        activePlayerId = team2[0]
+                        prevPlayer = team1[0]
 
-                    activePlayerName = usernames.get(activePlayerId)
+                    # Get the first phase
+                    phaseNumber = phases.pop()
 
-                    if activePlayerName is None:
-                        games[gameId][clientId].put(("error", ["client {} does not have a username".format(activePlayerId), messageType]))
+                    # Start from the beginning
+                    wordIndex = 0
 
-                    # Get the current time
-                    startTime = int(round(time.time()*1000))
+                    # Put the fake "roundFinished" in the queue
+                    gameQueues[gameId].put(("roundFinished", (phaseNumber, wordIndex), prevPlayer))
 
-                    # Send start signal to all users
-                    for user in users:
-                        games[gameId][user].put(("startRound",
-                                                [startTime, activeTeam, activePlayerId, activePlayerName, phaseNumber, wordIndex]))
+                    # And read it out of the queue
+                    continue
 
         elif messageType == "unready":
 
@@ -593,6 +592,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 games[gameId][clientId].put(("error", ["unknown team", messageType]))
             else:
 
+                # Set the score and the new active team
                 if clientId in team1:
                     scoreTeam1 += (newWordIndex - wordIndex)
                     activeTeam = 2
@@ -625,20 +625,21 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Get the next active player
                 if activeTeam == 1:
-                    nextPlayer = team1.popleft()
-                    team1.append(nextPlayer)
+                    activePlayer = team1.popleft()
+                    team1.append(activePlayer)
                 elif activeTeam == 2:
-                    nextPlayer = team2.popleft()
-                    team2.append(nextPlayer)
+                    activePlayer = team2.popleft()
+                    team2.append(activePlayer)
 
                 # Find the name of the next player
-                nextPlayerName = usernames.get(nextPlayer)
-                if nextPlayerName is None:
+                activePlayerName = usernames.get(activePlayer)
+                if activePlayerName is None:
                     games[gameId][clientId].put(("error", ["client has no username", messageType]))
 
                 # Broadcast next player and score to all players
                 for user in users:
-                    games[gameId][user].put(("roundFinished", [scoreTeam1, scoreTeam2, nextPlayerName, nextPhase]))
+                    games[gameId][user].put(("roundFinished",
+                                             [scoreTeam1, scoreTeam2, activePlayerId, activePlayerName, nextPhase]))
 
                 # If game is completely done, stop the gameThread
                 if nextPhase == -1:
@@ -661,7 +662,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             # If active player was lost stop the round
             if clientId == activePlayerId:
                 for user in users:
-                    games[gameId][user].put(("roundFinished", [scoreTeam1, scoreTeam2, nextPlayer, nextPhase]))
+                    games[gameId][user].put(("roundFinished",
+                                             [scoreTeam1, scoreTeam2, activePlayerId, activePlayerName, nextPhase]))
 
         elif messageType == "newClient":
 
@@ -772,7 +774,7 @@ def encodeStartRoundMessage(gameId, clientId, startTime, activeTeam, activePlaye
     return json.dumps(message) + "\q"
 
 
-def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPlayer, nextPhase):
+def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPlayerId, nextPlayerName, nextPhase):
     message = dict()
     message["returnType"] = "roundFinished"
     message["requestType"] = "roundFinished"
@@ -781,7 +783,8 @@ def encodeRoundFinishedMessage(gameId, clientId, scoreTeam1, scoreTeam2, nextPla
     body = dict()
     body["scoreTeam1"] = scoreTeam1
     body["scoreTeam2"] = scoreTeam2
-    body["nextPlayer"] = nextPlayer
+    body["nextPlayerId"] = nextPlayerId
+    body["nextPlayerName"] = nextPlayerName
     body["nextPhase"] = nextPhase
     message["body"] = body
     print(colorama.Style.DIM + "Send new message: {}".format(message))

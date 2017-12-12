@@ -213,7 +213,8 @@ wordIndex is the current start index in the wordlist
     {
         "startTime": 000,
         "activeTeam":000,
-        "activePlayer":"someName",
+        "activePlayerId": 000,
+        "activePlayerName":"someName",
         "phaseNumber": 000,
         "wordIndex":000
     }
@@ -235,7 +236,8 @@ if the game is over the phase wil be "over"
     {
         "scoreTeam1": 000,
         "scoreTeam2": 000,
-        "nextPlayer": "someName",
+        "nextPlayerId": 000,
+        "nextPlayerName": "someName",
         "nextPhase": "somePhase"
     }
 }
