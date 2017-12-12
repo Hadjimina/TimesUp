@@ -149,7 +149,7 @@ The value in "teamToJoin" is some teamId we got when we joined the game
     "gameId":       000,
     "body":
     {
-        "hastStarted":      True,
+        "hasStarted":      True,
         "startTime":        000,
         "timePerRound":     60,
         "wordsPerPerson":   000

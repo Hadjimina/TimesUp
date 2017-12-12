@@ -80,7 +80,7 @@ public class EncodeMessage {
         setHeader(NetworkHelper.ROUNDFINISHED, gameId, clientId);
 
         try {
-            body.put("phaseNr", phaseNr);
+            body.put("phaseNumber", phaseNr);
             body.put("wordIndex", wordIndex);
         } catch (JSONException e) {
             e.printStackTrace();
