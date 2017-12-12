@@ -474,6 +474,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
     elif rounds[4]:
         phases.append(5)
 
+    print("phases is {}".format(phases))
+
     while True:
 
         # Wait for something to be written in the queue
@@ -594,6 +596,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     print("new phase needs to be started")
 
                     # Check if all phases finished
+                    print("phases is {}".format(phases))
                     if not phases:
                         print("no more additional phases")
                         nextPhase = -1
