@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import static android.view.View.VISIBLE;
-import static com.example.philipp.timesup.NetworkHelper.MYPREFS;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -46,41 +45,29 @@ public class GameActivity extends ServerIOActivity {
 
         //get gameId and clientId
         Intent intent = getIntent();
-        gameId = intent.getIntExtra("gameId", -1);
-        clientId = intent.getIntExtra("clientId", -1);
+        gameId = NetworkHelper.GAMEID;
+        clientId = NetworkHelper.CLIENTID;
         //TODO: get wordarray & active player & wordIndex & phaseNumber from intent of GameEndActivity
-        //wordIndex = intent.getIntExtra("wordIndex", -1);
+        wordIndex = intent.getIntExtra("wordIndex", -1);
 
-        //get username
-        sharedPrefs = getSharedPreferences(MYPREFS, MODE_PRIVATE);
-        username = sharedPrefs.getString("username", null);
-        wordsPerPerson = sharedPrefs.getInt("wordsPerPerson", 0);
-        words = new String[wordsPerPerson];
+
 
         //playerType logic
-        /*activeTeam = intent.getIntExtra("activeTeam", -1);
-        teamId = sharedPrefs.getInt("teamId", -1);
+        activeTeam = intent.getIntExtra("activeTeam", -1);
         if(username.equals(activePlayer)){
             playerType = 0;
-        } else if(activeTeam == teamId){
+        } else if(activeTeam == NetworkHelper.BELONGSTOTEAM){
             playerType = 1;
         }else{
             playerType = 2;
         }
-*/
 
-        playerType = 0;
-        gameId = 1;
-        clientId=0;
-        count = 0;
 
-        words = new String[3];
-        words[0] = "chätzli";
-        words[1] = "hund";
-        words[2] = "david";
+        words = NetworkHelper.WORDS;
 
         if (playerType == 0) {
             TextView discipline = findViewById(R.id.discipline);
+            discipline.setText(getDisciplineString(phaseNr));
             word = findViewById(R.id.wordToGuess);
             word.setVisibility(VISIBLE);
             discipline.setVisibility((VISIBLE));
@@ -122,12 +109,14 @@ public class GameActivity extends ServerIOActivity {
 
         //setup timer
         final TextView timer = findViewById(R.id.timer);
-        timer.setText("00:30");
+        timer.setText(getTimerString(NetworkHelper.TIMEPERROUND));
 
-        new CountDownTimer(30000, 1000) {
+        new CountDownTimer(NetworkHelper.TIMEPERROUND*1000, 1000) {
+            int timeLeft = NetworkHelper.TIMEPERROUND;
 
             public void onTick(long millisUntilFinished) {
-                timer.setText("00:" + millisUntilFinished / 1000);
+                timeLeft--;
+                timer.setText(getTimerString(timeLeft));
             }
 
             public void onFinish() {
@@ -160,5 +149,28 @@ public class GameActivity extends ServerIOActivity {
             startActivity(intent);
         }
 
+    }
+
+    String getDisciplineString(int phaseNr){
+        switch (phaseNr){
+            case 0 : return "explain";
+            case 1 : return "mime";
+            case 2 : return "one word";
+            case 3 : return "freeze";
+            case 4 : return "only sounds";
+            default: return "wrong phase";
+        }
+    }
+
+    String getTimerString(int seconds){
+        if(seconds < 60){
+            return "00:"+seconds;
+        }
+        else if(seconds < 600){
+            return "0"+seconds/60+":"+seconds%60;
+        }
+        else{
+            return seconds/60+":"+seconds%60;
+        }
     }
 }
