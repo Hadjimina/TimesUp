@@ -455,6 +455,12 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
     phases = list()  # A list of all played phases in this game
 
     # Initialization
+    print("rounds is {}".format(rounds))
+    print("round[0] is {}".format(rounds[0]))
+    print("round[1] is {}".format(rounds[1]))
+    print("round[2] is {}".format(rounds[2]))
+    print("round[3] is {}".format(rounds[3]))
+    print("round[4] is {}".format(rounds[4]))
 
     # Find starting phase
     if rounds[0]:
