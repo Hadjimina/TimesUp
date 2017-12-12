@@ -101,8 +101,9 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         //case distinction on message received
         //TODO make handling if receive ERROR message
-        if(message.getRequestType().equals(NetworkHelper.ROUNDFINISHED)){
-            nextPlayerName = message.getString("nextPlayer");
+        if(message.getReturnType().equals(NetworkHelper.ROUNDFINISHED)){
+            System.out.println("DAS ERREICHTS");
+            nextPlayerName = message.getString("nextPlayerName");
             phaseNumber = message.getInt("nextPhase");
             nxtPlayerTxt.setText("Next Player: " + nextPlayerName);
             //TODO Case distinction on phaseNumber

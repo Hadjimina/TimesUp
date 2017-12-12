@@ -142,7 +142,7 @@ public class WordsActivity extends ServerIOActivity {
             for(int i = 0; i < wordsPerPerson; i++) {
                 int start = editText.getLayout().getLineStart(i);
                 int end = editText.getLayout().getLineEnd(i);
-                wordsArray[i] = editText.getText().subSequence(start, end-2).toString();
+                wordsArray[i] = editText.getText().subSequence(start, end-1).toString();
                 if(wordsArray[i].equals("\n")){
                     toast = Toast.makeText(getApplicationContext(), "Please don't delete any words", Toast.LENGTH_LONG);
                     toast.show();
