@@ -793,6 +793,9 @@ if __name__ == "__main__":
     HOST = ""
     PORT = 9999
 
+    # To avoid annoying already in use message
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+
     # Wait for incoming connections and start a new thread RequestHandler that
     # handles the request
     with socketserver.ThreadingTCPServer((HOST, PORT), RequestHandler) as server:
