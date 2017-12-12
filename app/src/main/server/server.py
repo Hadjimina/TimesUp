@@ -473,6 +473,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
         # Wait for something to be written in the queue
         (messageType, data, clientId) = gameQueues[gameId].get()
 
+        print(colorama.Fore.YELLOW + "getting {} from client {} with content {}".format(messageType, clientId, data))
+
         if messageType == "teamToJoin":
 
             # Make sure player is not already in a team
