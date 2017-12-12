@@ -325,11 +325,6 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
         # Forward to gameThread
         gameQueues[gameId].put((requestType, wordList, clientId))
 
-    elif requestType == "unready":
-
-        # Forward to gameThread
-        gameQueues[gameId].put((requestType, None, clientId))
-
     elif requestType == "ack":
 
         # Forward to gameThread
@@ -548,22 +543,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     # And read it out of the queue
                     continue
-
-        elif messageType == "unready":
-
-            # Check if the player has submitted words
-            if clientId not in submittedWords.keys():
-                games[gameId][clientId].put(("error", ["client not submitted words", messageType]))
-            else:
-
-                # If yes, delete them.
-                del submittedWords[clientId]
-
-                # One less player ready
-                readyCount -= 1
-
-                # Acknowledge unready
-                games[gameId][clientId].put(("ack", "unready"))
 
         elif messageType == "ack":
 
