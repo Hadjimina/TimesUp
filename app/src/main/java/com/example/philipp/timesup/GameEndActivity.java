@@ -51,9 +51,9 @@ public class GameEndActivity extends AppCompatActivity implements Button.OnClick
 
         //Set Text
         if (score1 > score2) {
-            winnerTxt.setText(teamName1 + " has won!");
+            winnerTxt.setText(teamName1 + " win!");
         } else if (score2 > score1) {
-            winnerTxt.setText(teamName2 + " has won!");
+            winnerTxt.setText(teamName2 + " win!");
         } else {
             winnerTxt.setText("It's a draw!");
         }

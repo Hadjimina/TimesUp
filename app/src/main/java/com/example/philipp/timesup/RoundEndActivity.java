@@ -78,10 +78,28 @@ public class RoundEndActivity extends ServerIOActivity  {
                         intent2.putExtra("activeTeam", activeTeam);
                         intent2.putExtra("phaseNumber", phaseNumber);
                         intent2.putExtra("wordIndex", wordIndex);
+                        intent2.putExtra("phaseName", getPhaseName(phaseNumber));
                         startActivity(intent2);
                 }
             }
         });
+    }
+
+    public String getPhaseName(int phaseNr){
+        switch(phaseNr){
+            case 1:
+                return "Explain";
+            case 2:
+                return "Pantomime";
+            case 3:
+                return "One Word";
+            case 4:
+                return "Freeze";
+            case 5:
+                return "Sounds";
+            default:
+                return Integer.toString(phaseNr);
+        }
     }
 
     @Override
@@ -103,7 +121,7 @@ public class RoundEndActivity extends ServerIOActivity  {
 
             nxtPlayerTxt.setText("Next Player: " + activePlayerName);
             //TODO Case distinction on phaseNumber
-            phaseTxt.setText("Phase: " + phaseNumber);
+            phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
             if (clientId == activePlayerId) {
                 nextRoundButton.setVisibility(View.VISIBLE);
             } else {
