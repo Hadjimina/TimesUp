@@ -2,6 +2,7 @@ package com.example.philipp.timesup;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -29,13 +30,13 @@ public class RoundEndActivity extends ServerIOActivity  {
 
     NetworkHelper networkHelper;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_round_end);
 
         //Set this Activity as CallbackActivity
+        Log.d("#RoundEndActivity", "RoundEndActivity is beeing created");
         setCallbackActivity(this);
 
         //initialize global variables from shared static NetworkHelper Class
@@ -80,17 +81,18 @@ public class RoundEndActivity extends ServerIOActivity  {
                 }
             }
         });
-
-
-
     }
 
     @Override
     public void callback(DecodeMessage message) {
+        Log.d("#RoundEndActivity", "Callback function is called with message: " + message.getReturnType());
+
         //case distinction on message received
         //TODO make handling if receive ERROR message
         if (message.getReturnType().equals(networkHelper.STARTROUND)/* && message.getRequestType().equals(networkHelper.NEXTROUND)*/) {
             //if message is normal reply of nextRound
+            Log.d("#RoundEndActivity", "STARTROUND message received!");
+
             activePlayer = message.getInt("activePlayer");
             startTime = message.getInt("startTime");
             activeTeam = message.getInt("activeTeam");
@@ -102,15 +104,14 @@ public class RoundEndActivity extends ServerIOActivity  {
             phaseTxt.setText("Phase: " + phaseNumber);
             if (clientId == activePlayer) {
                 nextRoundButton.setVisibility(View.VISIBLE);
-
             } else {
                 nextRoundButton.setVisibility(View.GONE);
-
             }
         }
         if (message.getReturnType().equals(networkHelper.SETUP)) {
             //if message is Setup Broadcast
             //TODO stimmt WORDSARRAY? weil online ist wordList!
+
             words = message.getStringArray(networkHelper.WORDSARRAY);
             //TODO stimmt Words oder sind das die einzelnen Wörter?
             networkHelper.WORDS = words;
@@ -119,8 +120,7 @@ public class RoundEndActivity extends ServerIOActivity  {
             EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
             sendMessage(messageToSend);
         } else {
-            System.out.print("wrong message received in EndRoundActivity: " + message.getReturnType() + " " + message.getRequestType());
+            Log.d("#RoundEndActivity", "Received wrong message: " + message.getReturnType());
         }
     }
-
 }
