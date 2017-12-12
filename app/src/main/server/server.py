@@ -331,6 +331,7 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
         gameQueues[gameId].put((requestType, None, clientId))
 
     elif requestType == "nextRound":
+        print("put nextRound into Queue")
 
         # Forward to gameThread
         gameQueues[gameId].put((requestType, None, clientId))
@@ -403,6 +404,7 @@ def handleQueueItem(request, item, gameId, clientId):
         request.sendall(message.encode())
 
     elif requestType == "startRound":
+        print("Get startRound from Queue")
         [startTime, activeTeam, activePlayerId, activePlayerName, phaseNumber, wordIndex] = data
         message = encodeStartRoundMessage(gameId=gameId,
                                           clientId=clientId,
@@ -550,11 +552,14 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             pass
 
         elif messageType == "nextRound":
+            print("Get nextRound from Queue")
+
             # Get the current time
             startTime = int(round(time.time()*1000))
 
             # Send start signal to all users
             for user in users:
+                print("Putting startRound in Queue for user {}".format(user))
                 games[gameId][user].put(("startRound",
                                         [startTime, activeTeam, activePlayerId, activePlayerName, phaseNumber, wordIndex]))
 
