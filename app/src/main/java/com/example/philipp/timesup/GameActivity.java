@@ -27,8 +27,7 @@ import static android.view.View.VISIBLE;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId, wordsPerPerson, wordIndex, count, phaseNr, teamId;
-    String activePlayer;
+    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId;
     SharedPreferences sharedPrefs;
     String username;
     String[] words;
@@ -49,12 +48,14 @@ public class GameActivity extends ServerIOActivity {
         clientId = NetworkHelper.CLIENTID;
         //TODO: get wordarray & active player & wordIndex & phaseNumber from intent of GameEndActivity
         wordIndex = intent.getIntExtra("wordIndex", -1);
+        phaseNr = intent.getIntExtra("phaseNumber", -1);
+        activePlayerId = intent.getIntExtra("activePlayerId", -1);
 
 
 
         //playerType logic
         activeTeam = intent.getIntExtra("activeTeam", -1);
-        if(username.equals(activePlayer)){
+        if(clientId == activePlayerId){
             playerType = 0;
         } else if(activeTeam == NetworkHelper.BELONGSTOTEAM){
             playerType = 1;
@@ -128,7 +129,6 @@ public class GameActivity extends ServerIOActivity {
     }
 
     void finishRound(){
-        phaseNr = 0;
         EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
         sendMessage(message);
     }

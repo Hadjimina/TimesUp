@@ -137,6 +137,7 @@ public class WordsActivity extends ServerIOActivity {
                     int end = editText.getLayout().getLineEnd(i);
                     wordsArray[i] = editText.getText().subSequence(start, end).toString();
                 }
+
                 WORDS = wordsArray;
             for(int i = 0; i < wordsPerPerson; i++) {
                 int start = editText.getLayout().getLineStart(i);
