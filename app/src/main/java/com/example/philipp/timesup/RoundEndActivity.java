@@ -19,7 +19,7 @@ import android.widget.TextView;
  */
 
 public class RoundEndActivity extends ServerIOActivity  {
-    String teamName1, teamName2, username, activePlayerName;
+    String teamName1, teamName2, username, activePlayerName, nextPlayerName;
 
     String[] words;
 
@@ -69,18 +69,11 @@ public class RoundEndActivity extends ServerIOActivity  {
         nextRoundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switch (view.getId()) {
-                    case R.id.start_next_round:
-                        Intent intent2 = new Intent(getApplicationContext(), GameActivity.class);
-                        intent2.putExtra("activePlayerId", activePlayerId);
-                        intent2.putExtra("activePlayerName", activePlayerName);
-                        intent2.putExtra("startTime", startTime);
-                        intent2.putExtra("activeTeam", activeTeam);
-                        intent2.putExtra("phaseNumber", phaseNumber);
-                        intent2.putExtra("wordIndex", wordIndex);
-                        intent2.putExtra("phaseName", getPhaseName(phaseNumber));
-                        startActivity(intent2);
-                }
+                //Send startRound to server
+                EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
+                sendMessage(messageToSend);
+
+
             }
         });
     }
@@ -108,6 +101,19 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         //case distinction on message received
         //TODO make handling if receive ERROR message
+        if(message.getRequestType().equals(NetworkHelper.ROUNDFINISHED)){
+            nextPlayerName = message.getString("nextPlayer");
+            phaseNumber = message.getInt("nextPhase");
+            nxtPlayerTxt.setText("Next Player: " + nextPlayerName);
+            //TODO Case distinction on phaseNumber
+            phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
+            if (clientId == activePlayerId) {
+                nextRoundButton.setVisibility(View.VISIBLE);
+            } else {
+                nextRoundButton.setVisibility(View.GONE);
+            }
+        }
+
         if (message.getReturnType().equals(networkHelper.STARTROUND)/* && message.getRequestType().equals(networkHelper.NEXTROUND)*/) {
             //if message is normal reply of nextRound
             Log.d("#RoundEndActivity", "STARTROUND message received!");
@@ -119,14 +125,19 @@ public class RoundEndActivity extends ServerIOActivity  {
             phaseNumber = message.getInt("phaseNumber");
             wordIndex = message.getInt("wordIndex");
 
-            nxtPlayerTxt.setText("Next Player: " + activePlayerName);
-            //TODO Case distinction on phaseNumber
-            phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
-            if (clientId == activePlayerId) {
-                nextRoundButton.setVisibility(View.VISIBLE);
-            } else {
-                nextRoundButton.setVisibility(View.GONE);
-            }
+
+            Intent intent2 = new Intent(getApplicationContext(), GameActivity.class);
+            intent2.putExtra("activePlayerId", activePlayerId);
+            intent2.putExtra("activePlayerName", activePlayerName);
+            intent2.putExtra("startTime", startTime);
+            intent2.putExtra("activeTeam", activeTeam);
+            intent2.putExtra("phaseNumber", phaseNumber);
+            intent2.putExtra("wordIndex", wordIndex);
+            intent2.putExtra("phaseName", getPhaseName(phaseNumber));
+            startActivity(intent2);
+
+
+
         }
         if (message.getReturnType().equals(networkHelper.SETUP)) {
             //if message is Setup Broadcast
@@ -137,8 +148,7 @@ public class RoundEndActivity extends ServerIOActivity  {
             networkHelper.WORDS = words;
 
             //if we receive Setup BCAST make NextRound Servercall
-            EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
-            sendMessage(messageToSend);
+
         } else {
             Log.d("#RoundEndActivity", "Received wrong message: " + message.getReturnType());
         }
