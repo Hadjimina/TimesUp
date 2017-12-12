@@ -331,7 +331,6 @@ def handleClientMessage(request, rawMessage, gameId, clientId):
         gameQueues[gameId].put((requestType, None, clientId))
 
     elif requestType == "nextRound":
-        print("put nextRound into Queue")
 
         # Forward to gameThread
         gameQueues[gameId].put((requestType, None, clientId))
@@ -404,7 +403,6 @@ def handleQueueItem(request, item, gameId, clientId):
         request.sendall(message.encode())
 
     elif requestType == "startRound":
-        print("Get startRound from Queue")
         [startTime, activeTeam, activePlayerId, activePlayerName, phaseNumber, wordIndex] = data
         message = encodeStartRoundMessage(gameId=gameId,
                                           clientId=clientId,
@@ -455,12 +453,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
     phases = list()  # A list of all played phases in this game
 
     # Initialization
-    print("rounds is {}".format(rounds))
-    print("round[0] is {}".format(rounds[0]))
-    print("round[1] is {}".format(rounds[1]))
-    print("round[2] is {}".format(rounds[2]))
-    print("round[3] is {}".format(rounds[3]))
-    print("round[4] is {}".format(rounds[4]))
 
     # Find starting phase
     if rounds[0]:
@@ -473,8 +465,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
         phases.append(4)
     if rounds[4]:
         phases.append(5)
-
-    print("phases is {}".format(phases))
 
     while True:
 
@@ -498,7 +488,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             games[gameId][clientId].put(("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson]))
 
         elif messageType == "ready":
-            print("team1 is {} and team2 is {}".format(team1, team2))
 
             # Check if the client has already submitted words
             if clientId in submittedWords.keys():
@@ -562,14 +551,12 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             pass
 
         elif messageType == "nextRound":
-            print("Get nextRound from Queue")
 
             # Get the current time
             startTime = int(round(time.time()*1000))
 
             # Send start signal to all users
             for user in users:
-                print("Putting startRound in Queue for user {}".format(user))
                 games[gameId][user].put(("startRound",
                                         [startTime, activeTeam, activePlayerId, activePlayerName, phaseNumber, wordIndex]))
 
@@ -593,17 +580,12 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Check if round finished
                 if newWordIndex == wordIndex:
-                    print("new phase needs to be started")
 
                     # Check if all phases finished
-                    print("phases is {}".format(phases))
                     if not phases:
-                        print("no more additional phases")
                         nextPhase = -1
                     else:
-                        print("phases contains {}".format(phases))
                         nextPhase = phases.pop()
-                        print("nextPhase is {}".format(nextPhase))
 
                         # Get a new permutation the word list
                         random.shuffle(globalWordList)
@@ -641,8 +623,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 if nextPhase == -1:
                     print(colorama.Fore.GREEN + "GAME IS FINISHED")
                     return
-
-                print("roundFinished handling done")
 
         elif messageType == "clientLost":
             print(colorama.Fore.RED + "Client with Id {} has been lost!".format(clientId))
