@@ -585,12 +585,16 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Check if round finished
                 if newWordIndex == wordIndex:
+                    print("new phase needs to be started")
 
                     # Check if all phases finished
                     if not phases:
+                        print("no more additional phases")
                         nextPhase = -1
                     else:
+                        print("phases contains {}".format(phases))
                         nextPhase = phases.pop()
+                        print("nextPhase is {}".format(nextPhase))
 
                         # Get a new permutation the word list
                         random.shuffle(globalWordList)
@@ -626,7 +630,10 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # If game is completely done, stop the gameThread
                 if nextPhase == -1:
+                    print(colorama.Fore.GREEN + "GAME IS FINISHED")
                     return
+
+                print("roundFinished handling done")
 
         elif messageType == "clientLost":
             print(colorama.Fore.RED + "Client with Id {} has been lost!".format(clientId))
