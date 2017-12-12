@@ -465,13 +465,13 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
     # Find starting phase
     if rounds[0]:
         phases.append(1)
-    elif rounds[1]:
+    if rounds[1]:
         phases.append(2)
-    elif rounds[2]:
+    if rounds[2]:
         phases.append(3)
-    elif rounds[3]:
+    if rounds[3]:
         phases.append(4)
-    elif rounds[4]:
+    if rounds[4]:
         phases.append(5)
 
     print("phases is {}".format(phases))
@@ -545,7 +545,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                         prevPlayer = team1[0]
 
                     # Get the first phase
-                    phaseNumber = phases.pop()
+                    phaseNumber = -1
 
                     # Start from the beginning
                     wordIndex = 0
