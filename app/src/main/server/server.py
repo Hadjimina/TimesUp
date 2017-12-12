@@ -447,12 +447,12 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
     startTime = -1  # Indicates the time the game has started (-1 if not yet)
     userCount = 0  # Indicated how many users are currently connected
     phaseNumber = -1  # Specified which phase the game is currently in
-    wordIndex = -1 # Specified which word is currently the next
+    wordIndex = -1  # Specified which word is currently the next
     scoreTeam1 = 0  # Current score for team 1
     scoreTeam2 = 0  # Current score for team 2
     activeTeam = -1  # Specifies which team is currently active
     activePlayerId = -1  # Specifies which player is currently active
-    activePlayerName = "" # Specifies which player (name) is currently active
+    activePlayerName = ""  # Specifies which player (name) is currently active
     activePlayer = -1  # Specifies which player is active next
     nextPhase = 0  # Specified the next phase to be played
     phases = list()  # A list of all played phases in this game
@@ -516,9 +516,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     for key, words in submittedWords.items():
                         globalWordList.append(words)
-
-                    # Start with the first word
-                    wordIndex = 0
 
                     # Get a permutation the word list and player lists
                     random.shuffle(globalWordList)
@@ -586,7 +583,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             (newPhaseNumber, newWordIndex) = data
             if newPhaseNumber != phaseNumber:
                 games[gameId][clientId].put(("error", ["wrong phaseNumber", messageType]))
-            elif newWordIndex <= wordIndex or newWordIndex > len(globalWordList):
+            elif newWordIndex < wordIndex or newWordIndex > len(globalWordList):
                 games[gameId][clientId].put(("error", ["impossible wordIndex", messageType]))
             elif clientId not in team1 and clientId not in team2:
                 games[gameId][clientId].put(("error", ["unknown team", messageType]))
