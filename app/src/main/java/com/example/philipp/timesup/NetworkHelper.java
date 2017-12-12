@@ -36,7 +36,7 @@ public class NetworkHelper {
 
     public static String MYPREFS = "myPrefs";
 
-    public static String WORDSARRAY = "wordsArray";
+    public static String WORDSARRAY = "wordList";
 
     public static String SERVERIP = "46.101.97.34";
 

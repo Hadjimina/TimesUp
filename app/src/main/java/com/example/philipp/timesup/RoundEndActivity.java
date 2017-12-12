@@ -17,12 +17,12 @@ import android.widget.TextView;
  Shows current scores and which player is next
  */
 
-public class RoundEndActivity extends ServerIOActivity implements Button.OnClickListener{
-    String teamName1, teamName2, activePlayer, username;
+public class RoundEndActivity extends ServerIOActivity  {
+    String teamName1, teamName2, username;
 
     String[] words;
 
-    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex;
+    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayer;
 
     TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt;
     Button nextRoundButton;
@@ -65,6 +65,23 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
         phaseTxt.setText("Phase: loading...");
 
         nextRoundButton = findViewById(R.id.start_next_round);
+        nextRoundButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (view.getId()) {
+                    case R.id.start_next_round:
+                        Intent intent2 = new Intent(getApplicationContext(), GameActivity.class);
+                        intent2.putExtra("activePlayer", activePlayer);
+                        intent2.putExtra("startTime", startTime);
+                        intent2.putExtra("activeTeam", activeTeam);
+                        intent2.putExtra("phaseNumber", phaseNumber);
+                        intent2.putExtra("wordIndex", wordIndex);
+                        startActivity(intent2);
+                }
+            }
+        });
+
+
 
     }
 
@@ -72,9 +89,9 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
     public void callback(DecodeMessage message) {
         //case distinction on message received
         //TODO make handling if receive ERROR message
-        if (message.getReturnType().equals(networkHelper.STARTROUND) && message.getRequestType().equals(networkHelper.NEXTROUND)){
+        if (message.getReturnType().equals(networkHelper.STARTROUND)/* && message.getRequestType().equals(networkHelper.NEXTROUND)*/) {
             //if message is normal reply of nextRound
-            activePlayer = message.getString("activePlayer");
+            activePlayer = message.getInt("activePlayer");
             startTime = message.getInt("startTime");
             activeTeam = message.getInt("activeTeam");
             phaseNumber = message.getInt("phaseNumber");
@@ -83,15 +100,15 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
             nxtPlayerTxt.setText("Next Player: " + activePlayer);
             //TODO Case distinction on phaseNumber
             phaseTxt.setText("Phase: " + phaseNumber);
-            if(username.equals(activePlayer)){
+            if (clientId == activePlayer) {
                 nextRoundButton.setVisibility(View.VISIBLE);
 
-            }else{
+            } else {
                 nextRoundButton.setVisibility(View.GONE);
 
             }
         }
-        if(message.getReturnType().equals(networkHelper.SETUP)){
+        if (message.getReturnType().equals(networkHelper.SETUP)) {
             //if message is Setup Broadcast
             //TODO stimmt WORDSARRAY? weil online ist wordList!
             words = message.getStringArray(networkHelper.WORDSARRAY);
@@ -101,24 +118,9 @@ public class RoundEndActivity extends ServerIOActivity implements Button.OnClick
             //if we receive Setup BCAST make NextRound Servercall
             EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
             sendMessage(messageToSend);
-        }
-        else{
+        } else {
             System.out.print("wrong message received in EndRoundActivity: " + message.getReturnType() + " " + message.getRequestType());
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        // if button is clicked start new round
-        switch(view.getId()) {
-            case R.id.start_next_round:
-                Intent intent2 = new Intent(getApplicationContext(), GameActivity.class);
-                intent2.putExtra("activePlayer", activePlayer);
-                intent2.putExtra("startTime", startTime);
-                intent2.putExtra("activeTeam", activeTeam);
-                intent2.putExtra("phaseNumber", phaseNumber);
-                intent2.putExtra("wordIndex", wordIndex);
-                startActivity(intent2);
-        }
-    }
 }
