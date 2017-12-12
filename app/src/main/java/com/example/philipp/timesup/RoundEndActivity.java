@@ -19,11 +19,11 @@ import android.widget.TextView;
  */
 
 public class RoundEndActivity extends ServerIOActivity  {
-    String teamName1, teamName2, username;
+    String teamName1, teamName2, username, activePlayerName;
 
     String[] words;
 
-    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayer;
+    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayerId;
 
     TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt;
     Button nextRoundButton;
@@ -72,7 +72,8 @@ public class RoundEndActivity extends ServerIOActivity  {
                 switch (view.getId()) {
                     case R.id.start_next_round:
                         Intent intent2 = new Intent(getApplicationContext(), GameActivity.class);
-                        intent2.putExtra("activePlayer", activePlayer);
+                        intent2.putExtra("activePlayerId", activePlayerId);
+                        intent2.putExtra("activePlayerName", activePlayerName);
                         intent2.putExtra("startTime", startTime);
                         intent2.putExtra("activeTeam", activeTeam);
                         intent2.putExtra("phaseNumber", phaseNumber);
@@ -93,16 +94,17 @@ public class RoundEndActivity extends ServerIOActivity  {
             //if message is normal reply of nextRound
             Log.d("#RoundEndActivity", "STARTROUND message received!");
 
-            activePlayer = message.getInt("activePlayer");
+            activePlayerId = message.getInt("activePlayerId");
+            activePlayerName = message.getString("activePlayerName");
             startTime = message.getInt("startTime");
             activeTeam = message.getInt("activeTeam");
             phaseNumber = message.getInt("phaseNumber");
             wordIndex = message.getInt("wordIndex");
 
-            nxtPlayerTxt.setText("Next Player: " + activePlayer);
+            nxtPlayerTxt.setText("Next Player: " + activePlayerName);
             //TODO Case distinction on phaseNumber
             phaseTxt.setText("Phase: " + phaseNumber);
-            if (clientId == activePlayer) {
+            if (clientId == activePlayerId) {
                 nextRoundButton.setVisibility(View.VISIBLE);
             } else {
                 nextRoundButton.setVisibility(View.GONE);
