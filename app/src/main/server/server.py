@@ -597,7 +597,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     print(colorama.Fore.YELLOW + "new active team is team {}".format(activeTeam))
 
                 # Check if round finished
-                if newWordIndex == wordIndex:
+                if newWordIndex == len(globalWordList):
 
                     # Check if all phases finished
                     if not phases:
