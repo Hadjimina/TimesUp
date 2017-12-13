@@ -147,14 +147,19 @@ public class GameActivity extends ServerIOActivity {
             int nextPlayerId = message.getInt("nextPlayerId");
             int nextPhase = message.getInt("nextPhase");
             flag = 1;
-            Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
-            intent.putExtra("scoreTeam1", scoreTeam1);
-            intent.putExtra("scoreTeam2", scoreTeam2);
-            intent.putExtra("nextPlayerName", nextPlayer);
-            intent.putExtra("nextPhase", nextPhase);
-            intent.putExtra("nextPlayerId", nextPlayerId);
-            intent.putExtra("flag", flag);
-            startActivity(intent);
+            if(nextPhase == -1){
+                Intent intent = new Intent(getApplicationContext(), GameEndActivity.class);
+            }
+            else {
+                Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
+                intent.putExtra("scoreTeam1", scoreTeam1);
+                intent.putExtra("scoreTeam2", scoreTeam2);
+                intent.putExtra("nextPlayerName", nextPlayer);
+                intent.putExtra("nextPhase", nextPhase);
+                intent.putExtra("nextPlayerId", nextPlayerId);
+                intent.putExtra("flag", flag);
+                startActivity(intent);
+            }
         }
 
     }
