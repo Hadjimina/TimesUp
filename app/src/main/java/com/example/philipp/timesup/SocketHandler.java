@@ -2,7 +2,6 @@ package com.example.philipp.timesup;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,8 +10,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage> {
@@ -134,10 +131,7 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
                             public void onClick(DialogInterface dialog, int id) {
 
                                 //restart app if an error occured
-                                Intent i = callbackActivity.getPackageManager()
-                                        .getLaunchIntentForPackage( callbackActivity.getPackageName() );
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                callbackActivity.startActivity(i);
+                                callbackActivity.doRestart(callbackActivity.getApplicationContext());
                             }
                         });
                 AlertDialog alert = builder.create();
