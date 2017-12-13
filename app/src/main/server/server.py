@@ -551,7 +551,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     phaseNumber = -1
 
                     # Start from the beginning
-                    wordIndex = 0
+                    wordIndex = len(globalWordList)
 
                     # Put the fake "roundFinished" in the queue
                     gameQueues[gameId].put(("roundFinished", (phaseNumber, wordIndex), prevPlayer))
@@ -597,7 +597,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     print(colorama.Fore.YELLOW + "new active team is team {}".format(activeTeam))
 
                 # Check if round finished
-                if newWordIndex == wordIndex:
+                if newWordIndex == len(globalWordList):
 
                     # Check if all phases finished
                     if not phases:
