@@ -166,10 +166,8 @@ public class CreateActivity extends ServerIOActivity{
                     username = "Tyler, the Creator";
                     timePerRound = 20;
                     wordsPerPerson = 2;
-                }
-
-                //read team names and username and add them to shared preferences
-                if (!DEBUG) {
+                } else {
+                    //set time, teamNames, no of words etc
                     time = timeEdit.getText().toString();
                     teamName1 = team1Edit.getText().toString();
                     teamName2 = team2Edit.getText().toString();
@@ -217,19 +215,8 @@ public class CreateActivity extends ServerIOActivity{
                 ROUNDS = rounds;
                 TIMEPERROUND = timePerRound;
                 WORDSPERPERSON = wordsPerPerson;
-                /*editor.putString("teamName1", teamName1);
-                editor.putString("teamName2", teamName2);
-                editor.putString("username", username);*/
-                //add rounds to shared preferences
-                //editor.putString("rounds", rounds.toString());
-                //editor.putInt("wordsPerPerson", wordsPerPerson);
-
-                //parse words per person and put into shared preferences
 
                 Log.d("CREATE",  teamName1 + teamName2 + timePerRound + username + wordsPerPerson);
-
-                //apply shared preferences
-                //editor.apply();
 
                 //Send message to server
                 sendMessage = new EncodeMessage(TEAMNAME1, TEAMNAME2, TIMEPERROUND, WORDSPERPERSON, USERNAME, ROUNDS);
@@ -255,21 +242,9 @@ public class CreateActivity extends ServerIOActivity{
             //add retrieved information to sharedPreferences
             GAMEID = gameId;
             CLIENTID = clientId;
-            //editor.putInt("clientId", clientId);
-
-            //editor.apply();
 
             startActivity(intent);
             Log.d("TAG-GAMEVALUES", "gameId, clientId, teamName1, teamName2, timePerRound, wordsPerPerson, username, rounds" +  " " + GAMEID + " " + CLIENTID + " " + TEAMNAME1 + " " + TEAMNAME2 + " " + TIMEPERROUND +  " " +  WORDSPERPERSON);
         }
-        //else try to send message to server again
-        else {
-            //now implemented in websocket
-            //sendMessage(sendMessage);
-            //toast = Toast.makeText(getApplicationContext(), "error contacting server, trying to send message again", Toast.LENGTH_LONG);
-            //toast.show();
-        }
-
-
     }
 }

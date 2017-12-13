@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-/*
+/**
 Activity to choose between creating or joining a game.
 First Activity
 Comes before JoinActivity or CreateActivity

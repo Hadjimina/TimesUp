@@ -1,7 +1,6 @@
 package com.example.philipp.timesup;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 
 import static com.example.philipp.timesup.NetworkHelper.ACK;
 import static com.example.philipp.timesup.NetworkHelper.CLIENTID;
-import static com.example.philipp.timesup.NetworkHelper.ERROR;
 import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 import static com.example.philipp.timesup.NetworkHelper.READY;
 import static com.example.philipp.timesup.NetworkHelper.WORDS;
@@ -30,8 +28,8 @@ import static com.example.philipp.timesup.NetworkHelper.WORDSPERPERSON;
  */
 
 public class WordsActivity extends ServerIOActivity {
-    SharedPreferences prefs;
-    int wordsPerPerson, clientId;
+
+    int wordsPerPerson;
     String [] wordsArray;
     String numberOfWordsString, getWordsString1, getWordsString2;
     int counter = 0;
@@ -49,14 +47,8 @@ public class WordsActivity extends ServerIOActivity {
 
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
         //add code to actionbar
         getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
-
-        //get information from shared preferences
-        /*prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        wordsPerPerson = prefs.getInt("wordsPerPerson", 5);
-        clientId = prefs.getInt("clientId", 0);*/
 
         //initialize connection
         setCallbackActivity(this);
@@ -173,19 +165,7 @@ public class WordsActivity extends ServerIOActivity {
             intent.putExtra(WORDSARRAY, wordsArray);
             startActivity(intent);
         }
-        else if (message.getRequestType().equals(READY) && message.getReturnType().equals(ERROR)){
-            //now implemented in websocket
-            //toast = Toast.makeText(getApplicationContext(), "error with being ready", Toast.LENGTH_LONG);
-            //toast.show();
-            //sendMessage(sendMessage);
-        } else {
-            //now implemented in websocket
-            //toast = Toast.makeText(getApplicationContext(), "pretty much everything went wrong with contacting the server", Toast.LENGTH_LONG);
-            //toast.show();
-        }
-
     }
-
 }
 
 
