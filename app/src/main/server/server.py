@@ -448,7 +448,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
     activeTeam = -1  # Specifies which team is currently active
     activePlayerId = -1  # Specifies which player is currently active
     activePlayerName = ""  # Specifies which player (name) is currently active
-    activePlayer = -1  # Specifies which player is active next
     nextPhase = 0  # Specified the next phase to be played
     phases = list()  # A list of all played phases in this game
 
@@ -585,7 +584,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     if not phases:
                         nextPhase = -1
                     else:
-                        nextPhase = phases.pop()
+                        nextPhase = phases.pop(0)
+                        phaseNumber = nextPhase
 
                         # Get a new permutation the word list
                         random.shuffle(globalWordList)
@@ -603,14 +603,14 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Get the next active player
                 if activeTeam == 1:
-                    activePlayer = team1.popleft()
-                    team1.append(activePlayer)
+                    activePlayerId = team1.popleft()
+                    team1.append(activePlayerId)
                 elif activeTeam == 2:
-                    activePlayer = team2.popleft()
-                    team2.append(activePlayer)
+                    activePlayerId = team2.popleft()
+                    team2.append(activePlayerId)
 
                 # Find the name of the next player
-                activePlayerName = usernames.get(activePlayer)
+                activePlayerName = usernames.get(activePlayerId)
                 if activePlayerName is None:
                     games[gameId][clientId].put(("error", ["client has no username", messageType]))
 
