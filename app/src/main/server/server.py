@@ -672,6 +672,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
             games[gameId][clientId].put(("clientLost", None))
 
+            userCount -= 1
+
             # Remove client from all lists
             if clientId in users:
                 users.remove(clientId)
