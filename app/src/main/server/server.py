@@ -551,7 +551,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     phaseNumber = -1
 
                     # Start from the beginning
-                    wordIndex = 0
+                    wordIndex = len(globalWordList)
 
                     # Put the fake "roundFinished" in the queue
                     gameQueues[gameId].put(("roundFinished", (phaseNumber, wordIndex), prevPlayer))
