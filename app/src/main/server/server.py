@@ -585,6 +585,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                         nextPhase = -1
                     else:
                         nextPhase = phases.pop(0)
+                        phaseNumber = nextPhase
 
                         # Get a new permutation the word list
                         random.shuffle(globalWordList)
