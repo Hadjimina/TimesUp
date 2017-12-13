@@ -3,7 +3,6 @@ package com.example.philipp.timesup;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -19,7 +18,7 @@ import android.widget.TextView;
  Shows final scores
  */
 
-public class GameEndActivity extends AppCompatActivity implements Button.OnClickListener {
+public class GameEndActivity extends ServerIOActivity implements Button.OnClickListener {
 
     String teamName1, teamName2;
     int score1, score2;
@@ -74,5 +73,10 @@ public class GameEndActivity extends AppCompatActivity implements Button.OnClick
                 Intent intent2 = new Intent(getApplicationContext(), StartActivity.class);
                 startActivity(intent2);
         }
+    }
+
+    @Override
+    public void callback(DecodeMessage message) {
+
     }
 }

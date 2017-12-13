@@ -1,5 +1,6 @@
 package com.example.philipp.timesup;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -29,13 +30,14 @@ public class RoundEndActivity extends ServerIOActivity  {
     TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt;
     Button nextRoundButton;
 
+    ProgressDialog progressdialog;
+
     NetworkHelper networkHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_round_end);
-
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Set this Activity as CallbackActivity
@@ -43,8 +45,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         setCallbackActivity(this);
 
         //initialize global variables from shared static NetworkHelper Class
-        //networkHelper = new NetworkHelper();
-
         teamName1 = networkHelper.TEAMNAME1;
         teamName2 = networkHelper.TEAMNAME2;
         gameId = networkHelper.GAMEID;
@@ -93,7 +93,13 @@ public class RoundEndActivity extends ServerIOActivity  {
             setTextMethod();
         }
 
-
+        //Set info ProgressDialog "waiting for others" if last Activity was WordActivity
+        if(fromGAFlag == 0){
+            progressdialog = new ProgressDialog(this);
+            progressdialog.setMessage("Please wait for other Players to finish their words.");
+            progressdialog.setCancelable(false);
+            progressdialog.show();
+        }
     }
 
     public String getPhaseName(int phaseNr){
@@ -159,7 +165,10 @@ public class RoundEndActivity extends ServerIOActivity  {
             //TODO stimmt Words oder sind das die einzelnen Wörter?
             NetworkHelper.WORDS = words;
 
-            //if we receive Setup BCAST make NextRound Servercall
+            //if we receive Setup BCAST and last Activity was WordsActivity dismiss ProgressDialog
+            if(fromGAFlag == 0){
+                progressdialog.dismiss();
+            }
 
         } else {
             Log.d("#RoundEndActivity", "Received wrong message: " + message.getReturnType());
