@@ -2,6 +2,7 @@ package com.example.philipp.timesup;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -52,6 +53,9 @@ public class CreateActivity extends ServerIOActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+
+
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         DEBUG = true;
 
@@ -160,8 +164,8 @@ public class CreateActivity extends ServerIOActivity{
                     teamName1 = "Team A";
                     teamName2 = "Team B";
                     username = "Tyler, the Creator";
-                    timePerRound = 60;
-                    wordsPerPerson = 3;
+                    timePerRound = 20;
+                    wordsPerPerson = 2;
                 }
 
                 //read team names and username and add them to shared preferences
