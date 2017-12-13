@@ -32,8 +32,6 @@ public class RoundEndActivity extends ServerIOActivity  {
 
     ProgressDialog progressdialog;
 
-    NetworkHelper networkHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +43,11 @@ public class RoundEndActivity extends ServerIOActivity  {
         setCallbackActivity(this);
 
         //initialize global variables from shared static NetworkHelper Class
-        teamName1 = networkHelper.TEAMNAME1;
-        teamName2 = networkHelper.TEAMNAME2;
-        gameId = networkHelper.GAMEID;
-        clientId = networkHelper.CLIENTID;
-        username = networkHelper.USERNAME;
+        teamName1 = NetworkHelper.TEAMNAME1;
+        teamName2 = NetworkHelper.TEAMNAME2;
+        gameId = NetworkHelper.GAMEID;
+        clientId = NetworkHelper.CLIENTID;
+        username = NetworkHelper.USERNAME;
 
         nextRoundButton = findViewById(R.id.start_next_round);
         nextRoundButton.setOnClickListener(new View.OnClickListener() {
@@ -58,8 +56,6 @@ public class RoundEndActivity extends ServerIOActivity  {
                 //Send startRound to server
                 EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
                 sendMessage(messageToSend);
-
-
             }
         });
 
@@ -143,7 +139,6 @@ public class RoundEndActivity extends ServerIOActivity  {
             phaseNumber = message.getInt("phaseNumber");
             wordIndex = message.getInt("wordIndex");
 
-
             Intent intent2 = new Intent(getApplicationContext(), GameActivity.class);
             intent2.putExtra("activePlayerId", activePlayerId);
             intent2.putExtra("activePlayerName", activePlayerName);
@@ -153,10 +148,8 @@ public class RoundEndActivity extends ServerIOActivity  {
             intent2.putExtra("wordIndex", wordIndex);
             intent2.putExtra("phaseName", getPhaseName(phaseNumber));
             startActivity(intent2);
-
-
-
         }
+
         if (message.getReturnType().equals(NetworkHelper.SETUP)) {
             //if message is Setup Broadcast
             //TODO stimmt WORDSARRAY? weil online ist wordList!
