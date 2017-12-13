@@ -427,7 +427,16 @@ def handleQueueItem(request, item, gameId, clientId):
 
         # Check if the phase was the last one
         if nextPhase == -1:
+            # Delete client communication queue
+            del games[gameId][clientId]
+
             return
+
+    elif requestType == "clientLost":
+        # Delete client communication queue
+        del games[gameId][clientId]
+
+        return
 
 
 def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerson):
@@ -661,8 +670,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
         elif messageType == "clientLost":
             print(colorama.Fore.RED + "Client with Id {} has been lost!".format(clientId))
 
-            # Delete client communication queue
-            del games[gameId][clientId]
+            games[gameId][clientId].put(("clientLost", None))
 
             # Remove client from all lists
             if clientId in users:
@@ -671,6 +679,12 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 team1.remove(clientId)
             if clientId in team2:
                 team2.remove(clientId)
+
+            if not users:
+                time.sleep(2)
+                print(colorama.Fore.RED + "game with id {} has lost all its players. GameThread will now destroy itself".format(gameId))
+                del games[gameId]
+                return
 
             # If active player was lost stop the round
             if clientId == activePlayerId:
