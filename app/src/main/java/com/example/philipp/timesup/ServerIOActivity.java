@@ -48,8 +48,9 @@ abstract public class ServerIOActivity extends AppCompatActivity{
 
                         isIntent = true;
 
-                        //restart app if an error occured
-                       doRestart(getApplicationContext());
+
+
+                        doRestart(getApplicationContext());
                     }
                 })
                 .setNegativeButton("No",new DialogInterface.OnClickListener() {
@@ -61,8 +62,12 @@ abstract public class ServerIOActivity extends AppCompatActivity{
         alert.show();
     }
 
-    public static void doRestart(Context c) {
-        String TAG = "HABASCH";
+    public void doRestart(Context c) {
+        Intent intent = new Intent(c, StartActivity.class);
+        intent.putExtra("isRestart", true);
+        startActivity(intent);
+
+        String TAG = "Restart";
         try {
             //check if the context is given
             if (c != null) {
@@ -101,15 +106,8 @@ abstract public class ServerIOActivity extends AppCompatActivity{
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        if(!isIntent){
-            NetworkHelper.handler.cancel(true);
-            NetworkHelper.handler.disconnect();
-        }
-        isIntent = false;
-
-        //TODO Send disconnect message
-        super.onDestroy();
+    public void disconnect(){
+        NetworkHelper.handler.cancel(true);
+        NetworkHelper.handler.disconnect();
     }
-}
+    }

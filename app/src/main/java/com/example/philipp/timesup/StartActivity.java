@@ -1,5 +1,6 @@
 package com.example.philipp.timesup;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -25,8 +26,18 @@ public class StartActivity extends ServerIOActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        Intent i = getIntent();
+        boolean isRestart = i.getBooleanExtra("isRestart", false);
+        if(isRestart){
+            ProgressDialog progress=new ProgressDialog(this);
+            progress.setMessage("Reconnecting");
+            progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progress.setIndeterminate(true);
+            progress.setProgress(0);
+            progress.show();
+        }
 
         create = findViewById(R.id.button_create);
         create.setOnClickListener(new View.OnClickListener() {
@@ -69,5 +80,7 @@ public class StartActivity extends ServerIOActivity {
             NetworkHelper.handler = new SocketHandler();
             setCallbackActivity(StartActivity.this);
         }
+
+        NetworkHelper.handler.reconnect();
     }
 }
