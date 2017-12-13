@@ -67,7 +67,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         Intent intent = getIntent();
         score1 = intent.getIntExtra("scoreTeam1", 0);
         score2 = intent.getIntExtra("scoreTeam2", 0);
-        nextPlayerId = intent.getIntExtra("nextPlayerId", -1);
 
         //initialize TextViews & button
         team1Txt = findViewById(R.id.team1_text);
@@ -90,6 +89,7 @@ public class RoundEndActivity extends ServerIOActivity  {
             phaseNumber = intent.getIntExtra("nextPhase", -1);
             score1 = intent.getIntExtra("score1", 0);
             score2 = intent.getIntExtra("score2", 0);
+            nextPlayerId = intent.getIntExtra("nextPlayerId", -1);
             setTextMethod();
         }
 
