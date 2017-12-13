@@ -24,7 +24,7 @@ public class RoundEndActivity extends ServerIOActivity  {
 
     String[] words;
 
-    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayerId, fromGAFlag;
+    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayerId, nextPlayerId, fromGAFlag;
 
     TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt;
     Button nextRoundButton;
@@ -65,8 +65,8 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         //get scores from Intent
         Intent intent = getIntent();
-        score1 = intent.getIntExtra("score1", 0);
-        score2 = intent.getIntExtra("score2", 0);
+        score1 = intent.getIntExtra("scoreTeam1", 0);
+        score2 = intent.getIntExtra("scoreTeam2", 0);
 
         //initialize TextViews & button
         team1Txt = findViewById(R.id.team1_text);
@@ -84,10 +84,12 @@ public class RoundEndActivity extends ServerIOActivity  {
         //get Next player and next phase from Intent if from game activity
         fromGAFlag = intent.getIntExtra("flag", 0);
         if(fromGAFlag != 0) {
+            Log.d("FLAG", "FLAGGO");
             nextPlayerName = intent.getStringExtra("nextPlayerName");
             phaseNumber = intent.getIntExtra("nextPhase", -1);
             score1 = intent.getIntExtra("score1", 0);
             score2 = intent.getIntExtra("score2", 0);
+            nextPlayerId = intent.getIntExtra("nextPlayerId", -1);
             setTextMethod();
         }
 
@@ -118,13 +120,13 @@ public class RoundEndActivity extends ServerIOActivity  {
         //case distinction on message received
         //TODO make handling if receive ERROR message
         if(message.getReturnType().equals(NetworkHelper.ROUNDFINISHED)){
-            System.out.println("DAS ERREICHTS");
             nextPlayerName = message.getString("nextPlayerName");
+            nextPlayerId = message.getInt("nextPlayerId");
             phaseNumber = message.getInt("nextPhase");
             setTextMethod();
         }
 
-        if (message.getReturnType().equals(networkHelper.STARTROUND)/* && message.getRequestType().equals(networkHelper.NEXTROUND)*/) {
+        if (message.getReturnType().equals(NetworkHelper.STARTROUND)/* && message.getRequestType().equals(NetworkHelper.NEXTROUND)*/) {
             //if message is normal reply of nextRound
             Log.d("#RoundEndActivity", "STARTROUND message received!");
 
@@ -149,13 +151,13 @@ public class RoundEndActivity extends ServerIOActivity  {
 
 
         }
-        if (message.getReturnType().equals(networkHelper.SETUP)) {
+        if (message.getReturnType().equals(NetworkHelper.SETUP)) {
             //if message is Setup Broadcast
             //TODO stimmt WORDSARRAY? weil online ist wordList!
 
-            words = message.getStringArray(networkHelper.WORDSARRAY);
+            words = message.getStringArray(NetworkHelper.WORDSARRAY);
             //TODO stimmt Words oder sind das die einzelnen Wörter?
-            networkHelper.WORDS = words;
+            NetworkHelper.WORDS = words;
 
             //if we receive Setup BCAST make NextRound Servercall
 
@@ -169,7 +171,7 @@ public class RoundEndActivity extends ServerIOActivity  {
         nxtPlayerTxt.setText("Next Player: " + nextPlayerName);
         //TODO Case distinction on phaseNumber
         phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
-        if (clientId == activePlayerId) {
+        if (clientId == nextPlayerId) {
             nextRoundButton.setVisibility(View.VISIBLE);
         } else {
             nextRoundButton.setVisibility(View.GONE);

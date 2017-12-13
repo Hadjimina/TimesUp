@@ -28,7 +28,7 @@ import static android.view.View.VISIBLE;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId, flag, timerFlag;
+    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId, nextPlayerId, flag, timerFlag;
     SharedPreferences sharedPrefs;
     String username;
     String[] words;
@@ -144,6 +144,7 @@ public class GameActivity extends ServerIOActivity {
             int scoreTeam1 = message.getInt("scoreTeam1");
             int scoreTeam2 = message.getInt("scoreTeam2");
             String nextPlayer = message.getString("nextPlayerName");
+            int nextPlayerId = message.getInt("nextPlayerId");
             int nextPhase = message.getInt("nextPhase");
             flag = 1;
             Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
@@ -151,6 +152,7 @@ public class GameActivity extends ServerIOActivity {
             intent.putExtra("scoreTeam2", scoreTeam2);
             intent.putExtra("nextPlayerName", nextPlayer);
             intent.putExtra("nextPhase", nextPhase);
+            intent.putExtra("nextPlayerId", nextPlayerId);
             intent.putExtra("flag", flag);
             startActivity(intent);
         }
