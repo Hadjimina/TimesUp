@@ -515,7 +515,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     for key, words in submittedWords.items():
                         if DEBUG:
                             print(colorama.Fore.YELLOW + "adding words {} from client {} to globalWordList".format(words, key))
-                        globalWordList.append(words)
+                        globalWordList.extend(words)
 
                     # Get a permutation the word list and player lists
                     random.shuffle(globalWordList)
