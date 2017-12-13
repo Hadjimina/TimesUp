@@ -65,8 +65,9 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         //get scores from Intent
         Intent intent = getIntent();
-        score1 = intent.getIntExtra("score1", 0);
-        score2 = intent.getIntExtra("score2", 0);
+        score1 = intent.getIntExtra("scoreTeam1", 0);
+        score2 = intent.getIntExtra("scoreTeam2", 0);
+        nextPlayerId = intent.getIntExtra("nextPlayerId", -1);
 
         //initialize TextViews & button
         team1Txt = findViewById(R.id.team1_text);
@@ -119,7 +120,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         //case distinction on message received
         //TODO make handling if receive ERROR message
         if(message.getReturnType().equals(NetworkHelper.ROUNDFINISHED)){
-            System.out.println("DAS ERREICHTS");
             nextPlayerName = message.getString("nextPlayerName");
             nextPlayerId = message.getInt("nextPlayerId");
             phaseNumber = message.getInt("nextPhase");
