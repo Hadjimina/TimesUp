@@ -508,12 +508,15 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Test if everybody is ready
                 if userCount == readyCount:
+                    print(colorama.Fore.GREEN + "ALL PLAYERS ARE READY")
 
                     for key, words in submittedWords.items():
+                        print(colorama.Fore.YELLOW + "adding words {} from client {} to globalWordList".format(words, key))
                         globalWordList.append(words)
 
                     # Get a permutation the word list and player lists
                     random.shuffle(globalWordList)
+                    print(colorama.Fore.YELLOW + "current permutation of the globalWordList is: {}".format(globalWordList))
                     random.shuffle(team1)
                     random.shuffle(team2)
 
@@ -526,9 +529,11 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     # Non-deterministic choice which team starts
                     if bool(random.getrandbits(1)):
+                        print(colorama.Fore.YELLOW + "first active team is team 1")
                         activeTeam = 1
                         prevPlayer = team2[0]
                     else:
+                        print(colorama.Fore.YELLOW + "first active team is team 2")
                         activeTeam = 2
                         prevPlayer = team1[0]
 
@@ -586,9 +591,11 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     else:
                         nextPhase = phases.pop(0)
                         phaseNumber = nextPhase
+                        print(colorama.Fore.YELLOW + "current phase is finished. Next phase is {}".format(phaseNumber))
 
                         # Get a new permutation the word list
                         random.shuffle(globalWordList)
+                        print(colorama.Fore.YELLOW + "current permutation of the globalWordList is: {}".format(globalWordList))
 
                         # Give a notification to all users
                         for user in users:
@@ -598,6 +605,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Otherwise continue with the same phase but the new index
                 else:
+                    print(colorama.Fore.YELLOW + "continuing on the same phase")
                     nextPhase = phaseNumber
                     wordIndex = newWordIndex
 
