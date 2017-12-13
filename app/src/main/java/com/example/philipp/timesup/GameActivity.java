@@ -28,7 +28,7 @@ import static android.view.View.VISIBLE;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId, flag;
+    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId, flag, timerFlag;
     SharedPreferences sharedPrefs;
     String username;
     String[] words;
@@ -86,6 +86,7 @@ public class GameActivity extends ServerIOActivity {
                     }
                     else{
                         word.setText("No more words..");
+                        timerFlag = 1;
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
@@ -125,7 +126,7 @@ public class GameActivity extends ServerIOActivity {
 
             public void onFinish() {
                 timer.setText("stop!");
-                if (playerType == 0){ finishRound();}
+                if (playerType == 0 && timerFlag != 1){ finishRound();}
             }
         }.start();
 
@@ -158,11 +159,11 @@ public class GameActivity extends ServerIOActivity {
 
     String getDisciplineString(int phaseNr){
         switch (phaseNr){
-            case 0 : return "explain";
-            case 1 : return "mime";
-            case 2 : return "one word";
-            case 3 : return "freeze";
-            case 4 : return "only sounds";
+            case 1 : return "explain";
+            case 2 : return "mime";
+            case 3 : return "one word";
+            case 4 : return "freeze";
+            case 5 : return "only sounds";
             default: return "wrong phase";
         }
     }

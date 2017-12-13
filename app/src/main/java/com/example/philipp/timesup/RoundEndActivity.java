@@ -86,6 +86,8 @@ public class RoundEndActivity extends ServerIOActivity  {
         if(fromGAFlag != 0) {
             nextPlayerName = intent.getStringExtra("nextPlayerName");
             phaseNumber = intent.getIntExtra("nextPhase", -1);
+            score1 = intent.getIntExtra("score1", 0);
+            score2 = intent.getIntExtra("score2", 0);
             setTextMethod();
         }
 

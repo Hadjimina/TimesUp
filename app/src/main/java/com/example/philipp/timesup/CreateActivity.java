@@ -164,8 +164,8 @@ public class CreateActivity extends ServerIOActivity{
                     teamName1 = "Team A";
                     teamName2 = "Team B";
                     username = "Tyler, the Creator";
-                    timePerRound = 60;
-                    wordsPerPerson = 3;
+                    timePerRound = 20;
+                    wordsPerPerson = 2;
                 }
 
                 //read team names and username and add them to shared preferences
