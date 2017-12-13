@@ -23,7 +23,7 @@ public class RoundEndActivity extends ServerIOActivity  {
 
     String[] words;
 
-    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayerId;
+    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayerId, fromGAFlag;
 
     TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt;
     Button nextRoundButton;
@@ -48,6 +48,18 @@ public class RoundEndActivity extends ServerIOActivity  {
         clientId = networkHelper.CLIENTID;
         username = networkHelper.USERNAME;
 
+        nextRoundButton = findViewById(R.id.start_next_round);
+        nextRoundButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Send startRound to server
+                EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
+                sendMessage(messageToSend);
+
+
+            }
+        });
+
         //get scores from Intent
         Intent intent = getIntent();
         score1 = intent.getIntExtra("score1", 0);
@@ -65,17 +77,16 @@ public class RoundEndActivity extends ServerIOActivity  {
         nxtPlayerTxt.setText("Next Player: loading...");
         phaseTxt.setText("Phase: loading...");
 
-        nextRoundButton = findViewById(R.id.start_next_round);
-        nextRoundButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Send startRound to server
-                EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
-                sendMessage(messageToSend);
+
+        //get Next player and next phase from Intent if from game activity
+        fromGAFlag = intent.getIntExtra("flag", 0);
+        if(fromGAFlag != 0) {
+            nextPlayerName = intent.getStringExtra("nextPlayerName");
+            phaseNumber = intent.getIntExtra("nextPhase", -1);
+            setTextMethod();
+        }
 
 
-            }
-        });
     }
 
     public String getPhaseName(int phaseNr){
@@ -105,14 +116,7 @@ public class RoundEndActivity extends ServerIOActivity  {
             System.out.println("DAS ERREICHTS");
             nextPlayerName = message.getString("nextPlayerName");
             phaseNumber = message.getInt("nextPhase");
-            nxtPlayerTxt.setText("Next Player: " + nextPlayerName);
-            //TODO Case distinction on phaseNumber
-            phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
-            if (clientId == activePlayerId) {
-                nextRoundButton.setVisibility(View.VISIBLE);
-            } else {
-                nextRoundButton.setVisibility(View.GONE);
-            }
+            setTextMethod();
         }
 
         if (message.getReturnType().equals(networkHelper.STARTROUND)/* && message.getRequestType().equals(networkHelper.NEXTROUND)*/) {
@@ -152,6 +156,18 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         } else {
             Log.d("#RoundEndActivity", "Received wrong message: " + message.getReturnType());
+        }
+    }
+
+    //isch mr kei besser Name igfalle..
+    void setTextMethod(){
+        nxtPlayerTxt.setText("Next Player: " + nextPlayerName);
+        //TODO Case distinction on phaseNumber
+        phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
+        if (clientId == activePlayerId) {
+            nextRoundButton.setVisibility(View.VISIBLE);
+        } else {
+            nextRoundButton.setVisibility(View.GONE);
         }
     }
 }

@@ -469,8 +469,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
         # Wait for something to be written in the queue
         (messageType, data, clientId) = gameQueues[gameId].get()
-
-        #print(colorama.Fore.YELLOW + "getting {} from client {} with content {}".format(messageType, clientId, data))
+        if DEBUG:
+            print(colorama.Fore.YELLOW + "getting {} from client {} with content {}".format(messageType, clientId, data))
 
         if messageType == "teamToJoin":
 
@@ -502,20 +502,31 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # One more player is ready
                 readyCount += 1
+                if DEBUG:
+                    print(colorama.Fore.YELLOW + "currently {}/{} players are ready".format(readyCount, userCount))
 
                 # Acknowledge wordList
                 games[gameId][clientId].put(("ack", "ready"))
 
                 # Test if everybody is ready
                 if userCount == readyCount:
+                    print(colorama.Fore.GREEN + "ALL PLAYERS ARE READY")
 
                     for key, words in submittedWords.items():
-                        globalWordList.append(words)
+                        if DEBUG:
+                            print(colorama.Fore.YELLOW + "adding words {} from client {} to globalWordList".format(words, key))
+                        globalWordList.extend(words)
 
                     # Get a permutation the word list and player lists
                     random.shuffle(globalWordList)
+                    if DEBUG:
+                        print(colorama.Fore.YELLOW + "current permutation of the globalWordList is: {}".format(globalWordList))
                     random.shuffle(team1)
+                    if DEBUG:
+                        print(colorama.Fore.YELLOW + "the order of players in team 1 is: {}".format(team1))
                     random.shuffle(team2)
+                    if DEBUG:
+                        print(colorama.Fore.YELLOW + "the order of players in team 2 is: {}".format(team2))
 
                     # Wait to ensure all clients are ready
                     time.sleep(0.5)
@@ -526,9 +537,13 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                     # Non-deterministic choice which team starts
                     if bool(random.getrandbits(1)):
+                        if DEBUG:
+                            print(colorama.Fore.YELLOW + "first active team is team 1")
                         activeTeam = 1
                         prevPlayer = team2[0]
                     else:
+                        if DEBUG:
+                            print(colorama.Fore.YELLOW + "first active team is team 2")
                         activeTeam = 2
                         prevPlayer = team1[0]
 
@@ -577,6 +592,10 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     scoreTeam2 += (newWordIndex - wordIndex)
                     activeTeam = 1
 
+                if DEBUG:
+                    print(colorama.Fore.YELLOW + "score of team 1 is {} and score of team 2 is {}".format(scoreTeam1, scoreTeam2))
+                    print(colorama.Fore.YELLOW + "new active team is team {}".format(activeTeam))
+
                 # Check if round finished
                 if newWordIndex == wordIndex:
 
@@ -586,9 +605,13 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     else:
                         nextPhase = phases.pop(0)
                         phaseNumber = nextPhase
+                        if DEBUG:
+                            print(colorama.Fore.YELLOW + "current phase is finished. Next phase is {}".format(phaseNumber))
 
                         # Get a new permutation the word list
                         random.shuffle(globalWordList)
+                        if DEBUG:
+                            print(colorama.Fore.YELLOW + "current permutation of the globalWordList is: {}".format(globalWordList))
 
                         # Give a notification to all users
                         for user in users:
@@ -598,16 +621,27 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Otherwise continue with the same phase but the new index
                 else:
+                    if DEBUG:
+                        print(colorama.Fore.YELLOW + "continuing on the same phase")
                     nextPhase = phaseNumber
                     wordIndex = newWordIndex
 
                 # Get the next active player
+                if DEBUG:
+                    print(colorama.Fore.YELLOW + "team 1 is: {} and team 2 is: {}".format(team1, team2))
                 if activeTeam == 1:
                     activePlayerId = team1.popleft()
                     team1.append(activePlayerId)
+                    if DEBUG:
+                        print(colorama.Fore.YELLOW + "new active player is {} from team 1".format(activePlayerId))
                 elif activeTeam == 2:
                     activePlayerId = team2.popleft()
                     team2.append(activePlayerId)
+                    if DEBUG:
+                        print(colorama.Fore.YELLOW + "new active player is {} from team 2".format(activePlayerId))
+
+                if DEBUG:
+                    print(colorama.Fore.YELLOW + "team 1 is: {} and team 2 is: {}".format(team1, team2))
 
                 # Find the name of the next player
                 activePlayerName = usernames.get(activePlayerId)
@@ -791,6 +825,7 @@ if __name__ == "__main__":
 
     # Client Socket Waiting Time
     TIMEOUT = 0.1
+    DEBUG = True
 
     # Default values
     HOST = ""

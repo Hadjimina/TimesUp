@@ -27,7 +27,7 @@ import static android.view.View.VISIBLE;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId;
+    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId, flag;
     SharedPreferences sharedPrefs;
     String username;
     String[] words;
@@ -136,16 +136,18 @@ public class GameActivity extends ServerIOActivity {
     @Override
     public void callback(DecodeMessage message) {
         //new round
-        if(message.getReturnType().equals("ACK") && message.getRequestType().equals("roundFinished")){
+        if(message.getRequestType().equals("roundFinished")){
             int scoreTeam1 = message.getInt("scoreTeam1");
             int scoreTeam2 = message.getInt("scoreTeam2");
-            String nextPlayer = message.getString("nextPlayer");
-            int nextPhase = message.getInt("nexPhase");
+            String nextPlayer = message.getString("nextPlayerName");
+            int nextPhase = message.getInt("nextPhase");
+            flag = 1;
             Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
             intent.putExtra("scoreTeam1", scoreTeam1);
             intent.putExtra("scoreTeam2", scoreTeam2);
-            intent.putExtra("nextPlayer", nextPlayer);
+            intent.putExtra("nextPlayerName", nextPlayer);
             intent.putExtra("nextPhase", nextPhase);
+            intent.putExtra("flag", flag);
             startActivity(intent);
         }
 
