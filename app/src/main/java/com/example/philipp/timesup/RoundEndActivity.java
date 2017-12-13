@@ -70,12 +70,10 @@ public class RoundEndActivity extends ServerIOActivity  {
         nxtPlayerTxt = findViewById(R.id.next_player_text);
         phaseTxt = findViewById(R.id.phase_text);
 
-
         team1Txt.setText(teamName1 + " score: " + score1);
         team2Txt.setText(teamName2 + " score: " + score2);
         nxtPlayerTxt.setText("Next Player: loading...");
         phaseTxt.setText("Phase: loading...");
-
 
         //get Next player and next phase from Intent if from game activity
         fromGAFlag = intent.getIntExtra("flag", 0);
@@ -120,7 +118,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         Log.d("#RoundEndActivity", "Callback function is called with message: " + message.getReturnType());
 
         //case distinction on message received
-        //TODO make handling if receive ERROR message
         if(message.getReturnType().equals(NetworkHelper.ROUNDFINISHED)){
             nextPlayerName = message.getString("nextPlayerName");
             nextPlayerId = message.getInt("nextPlayerId");
@@ -168,10 +165,9 @@ public class RoundEndActivity extends ServerIOActivity  {
         }
     }
 
-    //isch mr kei besser Name igfalle..
+    //set the TextView values
     void setTextMethod(){
         nxtPlayerTxt.setText("Next Player: " + nextPlayerName);
-        //TODO Case distinction on phaseNumber
         phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
         if (clientId == nextPlayerId) {
             nextRoundButton.setVisibility(View.VISIBLE);
