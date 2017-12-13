@@ -1,6 +1,7 @@
 package com.example.philipp.timesup;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +35,8 @@ public class RoundEndActivity extends ServerIOActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_round_end);
+
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Set this Activity as CallbackActivity
         Log.d("#RoundEndActivity", "RoundEndActivity is beeing created");

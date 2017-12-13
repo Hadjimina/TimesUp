@@ -2,6 +2,7 @@ package com.example.philipp.timesup;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -41,6 +42,8 @@ public class GameActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         setCallbackActivity(this);
+
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //get gameId and clientId
         Intent intent = getIntent();

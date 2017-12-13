@@ -2,6 +2,7 @@ package com.example.philipp.timesup;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -50,6 +51,7 @@ public class JoinCodeActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_code);
 
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //retrieve information from shared Preferences
         /*prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
