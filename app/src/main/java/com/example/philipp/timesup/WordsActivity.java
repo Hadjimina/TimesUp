@@ -122,10 +122,11 @@ public class WordsActivity extends ServerIOActivity {
                     yesButton.setText("YES!");
                     yesButton.setVisibility(View.VISIBLE);
                     editText.setText(wordsArray[0].toString());
-                    editText.append("\n");
 
                     for(int i = 1; i < wordsPerPerson; i++){
-                        editText.append(wordsArray[i].toString() + "\n");
+
+                        editText.append("\n");
+                        editText.append(wordsArray[i].toString());
 
                     }
                 }
