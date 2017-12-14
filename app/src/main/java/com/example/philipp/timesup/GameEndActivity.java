@@ -41,8 +41,8 @@ public class GameEndActivity extends ServerIOActivity implements Button.OnClickL
 
         //get scores from Intent
         Intent intent = getIntent();
-        score1 = intent.getIntExtra("score1", 0);
-        score2 = intent.getIntExtra("score2", 0);
+        score1 = intent.getIntExtra("scoreTeam1", 0);
+        score2 = intent.getIntExtra("scoreTeam2", 0);
 
         //initialize TextViews and Buttons
         winnerTxt = findViewById(R.id.winner_text);
@@ -53,9 +53,9 @@ public class GameEndActivity extends ServerIOActivity implements Button.OnClickL
 
         //Set Text
         if (score1 > score2) {
-            winnerTxt.setText(teamName1 + " win!");
+            winnerTxt.setText(teamName1 + " wins!");
         } else if (score2 > score1) {
-            winnerTxt.setText(teamName2 + " win!");
+            winnerTxt.setText(teamName2 + " wins!");
         } else {
             winnerTxt.setText("It's a draw!");
         }

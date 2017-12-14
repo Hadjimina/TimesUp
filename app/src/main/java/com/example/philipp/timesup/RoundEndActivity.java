@@ -174,6 +174,7 @@ public class RoundEndActivity extends ServerIOActivity  {
             //if we receive Setup BCAST and last Activity was WordsActivity dismiss ProgressDialog
             if(fromGAFlag == 0){
                 progressdialog.dismiss();
+                setTextMethod();
             }
 
         } else {

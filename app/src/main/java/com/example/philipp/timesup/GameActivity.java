@@ -1,5 +1,6 @@
 package com.example.philipp.timesup;
 
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -33,7 +34,8 @@ public class GameActivity extends ServerIOActivity {
     String username;
     String[] words;
     TextView word;
-    SocketHandler handler;
+    Button nextButton;
+    CountDownTimer countDown;
 
 
 
@@ -53,7 +55,7 @@ public class GameActivity extends ServerIOActivity {
         wordIndex = intent.getIntExtra("wordIndex", -1);
         phaseNr = intent.getIntExtra("phaseNumber", -1);
         activePlayerId = intent.getIntExtra("activePlayerId", -1);
-
+        timerFlag = 0;
 
 
         //playerType logic
@@ -65,6 +67,7 @@ public class GameActivity extends ServerIOActivity {
         }else{
             playerType = 2;
         }
+        nextButton = findViewById(R.id.nextButton);
 
 
         words = NetworkHelper.WORDS;
@@ -75,7 +78,6 @@ public class GameActivity extends ServerIOActivity {
             word = findViewById(R.id.wordToGuess);
             word.setVisibility(VISIBLE);
             discipline.setVisibility((VISIBLE));
-            Button nextButton = findViewById(R.id.nextButton);
             nextButton.setVisibility(VISIBLE);
             word.setText(words[wordIndex]);
             nextButton.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +89,7 @@ public class GameActivity extends ServerIOActivity {
                     else{
                         word.setText("No more words..");
                         timerFlag = 1;
+                        countDown.cancel();
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
@@ -116,7 +119,7 @@ public class GameActivity extends ServerIOActivity {
         final TextView timer = findViewById(R.id.timer);
         timer.setText(getTimerString(NetworkHelper.TIMEPERROUND));
 
-        new CountDownTimer(NetworkHelper.TIMEPERROUND*1000, 1000) {
+        countDown = new CountDownTimer(NetworkHelper.TIMEPERROUND*1000, 1000) {
             int timeLeft = NetworkHelper.TIMEPERROUND;
 
             public void onTick(long millisUntilFinished) {
@@ -125,11 +128,12 @@ public class GameActivity extends ServerIOActivity {
             }
 
             public void onFinish() {
+                nextButton.setVisibility(View.GONE);
                 timer.setText("stop!");
+
                 if (playerType == 0 && timerFlag != 1){ finishRound();}
             }
         }.start();
-
     }
 
     void finishRound(){
@@ -147,8 +151,12 @@ public class GameActivity extends ServerIOActivity {
             int nextPlayerId = message.getInt("nextPlayerId");
             int nextPhase = message.getInt("nextPhase");
             flag = 1;
+            countDown.cancel();
             if(nextPhase == -1){
                 Intent intent = new Intent(getApplicationContext(), GameEndActivity.class);
+                intent.putExtra("scoreTeam1", scoreTeam1);
+                intent.putExtra("scoreTeam2", scoreTeam2);
+                startActivity(intent);
             }
             else {
                 Intent intent = new Intent(getApplicationContext(), RoundEndActivity.class);
