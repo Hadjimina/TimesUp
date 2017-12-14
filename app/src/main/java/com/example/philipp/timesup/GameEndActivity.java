@@ -71,8 +71,9 @@ public class GameEndActivity extends ServerIOActivity implements Button.OnClickL
         switch (view.getId()) {
             case R.id.new_game_button:
                 //TODO evt. Einträge bei NetworkHelper löschen
-                Intent intent2 = new Intent(getApplicationContext(), StartActivity.class);
-                startActivity(intent2);
+                onBackPressed();
+                //Intent intent2 = new Intent(getApplicationContext(), StartActivity.class);
+                //startActivity(intent2);
         }
     }
 
