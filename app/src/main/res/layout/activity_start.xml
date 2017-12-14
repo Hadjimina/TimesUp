@@ -46,7 +46,8 @@
             android:layout_width="350dp"
             android:layout_height="350dp"
             android:scaleType="centerInside"
-            app:srcCompat="@drawable/orangeblack" />
+            app:srcCompat="@drawable/orangeblack"
+            android:layout_margin="8dp"/>
 
     </LinearLayout>
 
