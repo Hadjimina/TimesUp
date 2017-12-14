@@ -11,7 +11,7 @@
         android:id="@+id/team1_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/current_team_text"
         android:layout_alignParentLeft="true"
         android:layout_marginTop="50dp"
         android:textSize="25sp"
@@ -33,7 +33,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/team2_text"
         android:layout_marginTop="50dp"
-        android:text="Next Player:   loading..."
+        android:text="Next Player:"
         android:textSize="20sp" />
 
     <TextView
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/next_player_text"
         android:layout_marginTop="10dp"
-        android:text="Phase:    loading..."
+        android:text="Phase:"
         android:textSize="20sp" />
 
     <Button
@@ -54,6 +54,16 @@
         android:textSize="14sp"
         android:text="Start next round"
         android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/current_team_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_below="@+id/start_next_round"
+        android:layout_centerHorizontal="true"
+        android:text="Your Team"
+        android:textSize="20sp" />
 
 </RelativeLayout>
 

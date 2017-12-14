@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import static com.example.philipp.timesup.NetworkHelper.GAMEID;
+
 /**
  * Created by MammaGiulietta on 11.11.17.
  */
@@ -21,13 +23,13 @@ import android.widget.TextView;
  */
 
 public class RoundEndActivity extends ServerIOActivity  {
-    String teamName1, teamName2, username, activePlayerName, nextPlayerName;
+    String teamName1, teamName2, username, activePlayerName, nextPlayerName, currentTeamName;
 
     String[] words;
 
-    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayerId, nextPlayerId, fromGAFlag;
+    int score1, score2, gameId, clientId, startTime, activeTeam, phaseNumber, wordIndex, activePlayerId, nextPlayerId, fromGAFlag, currentTeamID;
 
-    TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt;
+    TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt, currentTeamTxt;
     Button nextRoundButton;
 
     ProgressDialog progressdialog;
@@ -42,13 +44,25 @@ public class RoundEndActivity extends ServerIOActivity  {
         Log.d("#RoundEndActivity", "RoundEndActivity is beeing created");
         setCallbackActivity(this);
 
+        //add code to actionbar
+        getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
+
         //initialize global variables from shared static NetworkHelper Class
         teamName1 = NetworkHelper.TEAMNAME1;
         teamName2 = NetworkHelper.TEAMNAME2;
         gameId = NetworkHelper.GAMEID;
         clientId = NetworkHelper.CLIENTID;
         username = NetworkHelper.USERNAME;
+        currentTeamID = NetworkHelper.BELONGSTOTEAM;
 
+        //Set currentTeamName
+        if(currentTeamID == 1){
+            currentTeamName = teamName1;
+        }else{
+            currentTeamName = teamName2;
+        }
+
+        //initialize Button
         nextRoundButton = findViewById(R.id.start_next_round);
         nextRoundButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,16 +78,18 @@ public class RoundEndActivity extends ServerIOActivity  {
         score1 = intent.getIntExtra("scoreTeam1", 0);
         score2 = intent.getIntExtra("scoreTeam2", 0);
 
-        //initialize TextViews & button
+        //initialize TextViews
         team1Txt = findViewById(R.id.team1_text);
         team2Txt = findViewById(R.id.team2_text);
         nxtPlayerTxt = findViewById(R.id.next_player_text);
         phaseTxt = findViewById(R.id.phase_text);
+        currentTeamTxt = findViewById(R.id.current_team_text);
 
         team1Txt.setText(teamName1 + " score: " + score1);
         team2Txt.setText(teamName2 + " score: " + score2);
-        nxtPlayerTxt.setText("Next Player: loading...");
-        phaseTxt.setText("Phase: loading...");
+        nxtPlayerTxt.setText("Next Player:");
+        phaseTxt.setText("Phase:");
+        currentTeamTxt.setText("Your Team: " + currentTeamName);
 
         //get Next player and next phase from Intent if from game activity
         fromGAFlag = intent.getIntExtra("flag", 0);
