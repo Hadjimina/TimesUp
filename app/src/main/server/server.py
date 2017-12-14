@@ -197,31 +197,39 @@ def client(request, gameId, clientId):
     socket_active = True
     while True:
 
-        if socket_active:
+        try:
+            if socket_active:
 
-            # See for changes for TIMEOUT long
-            r, w, x = select.select([request], [], [], TIMEOUT)
-            if r:
-                # If something changed, read
-                try:
-                    length = int(request.recv(4).decode())
-                except ValueError:
-                    gameQueues[gameId].put(("clientLost", None, clientId))
-                    return
+                # See for changes for TIMEOUT long
+                r, w, x = select.select([request], [], [], TIMEOUT)
+                if r:
+                    # If something changed, read
+                    try:
+                        length = int(request.recv(4).decode())
+                    except ValueError:
+                        gameQueues[gameId].put(("clientLost", None, clientId))
+                        return
 
-                print(colorama.Style.DIM + "length {}".format(length))
+                    print(colorama.Style.DIM + "length {}".format(length))
 
-                message = request.recv(length)
+                    message = request.recv(length)
 
-                print(colorama.Style.DIM + "received {}".format(message.decode()))
+                    print(colorama.Style.DIM + "received {}".format(message.decode()))
 
-                # If the message is None, the socket is broken
-                if not message:
-                    socket_active = False
-                else:
+                    # If the message is None, the socket is broken
+                    if not message:
+                        socket_active = False
+                    else:
 
-                    # Function that handles the message
-                    handleClientMessage(request, message.decode(), gameId, clientId)
+                        # Function that handles the message
+                        handleClientMessage(request, message.decode(), gameId, clientId)
+
+        except ConnectionError:
+
+            # Tell the game that the connection to the client has been closed
+            gameQueues[gameId].put(("clientLost", None, clientId))
+            break
+
         try:
             # Get an item from the queue
             item = games[gameId][clientId].get_nowait()
@@ -493,6 +501,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
             elif data == 2:
                 team2.append(clientId)
             # Acknowledge the team assignment
+            if hasStarted and startTime != -1:
+                startTime = startTime - int(round(time.time()*1000))
             games[gameId][clientId].put(("teamJoinAck", [hasStarted, startTime, timePerRound, wordsPerPerson]))
 
         elif messageType == "ready":
@@ -519,6 +529,10 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Test if everybody is ready
                 if userCount == readyCount:
+
+                    # Game has started
+                    hasStarted = True
+
                     print(colorama.Fore.GREEN + "ALL PLAYERS ARE READY")
 
                     for key, words in submittedWords.items():
@@ -593,6 +607,9 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 games[gameId][clientId].put(("error", ["unknown team", messageType]))
             else:
 
+                # Reset startTime
+                startTime = -1
+                
                 # Set the score and the new active team
                 if clientId in team1:
                     scoreTeam1 += (newWordIndex - wordIndex)
