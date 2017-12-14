@@ -184,7 +184,10 @@ public class GameActivity extends ServerIOActivity {
     }
 
     String getTimerString(int seconds){
-        if(seconds < 60){
+        if(seconds < 10){
+            return "00:0"+seconds;
+        }
+        else if(seconds < 60){
             return "00:"+seconds;
         }
         else if(seconds < 600){
