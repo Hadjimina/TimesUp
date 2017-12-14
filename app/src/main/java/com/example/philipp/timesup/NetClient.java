@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class NetClient {
@@ -16,7 +17,7 @@ public class NetClient {
     private BufferedReader in = null;
 
     private String host = null;
-
+    private boolean connectionState = false;
     private int port = 9999;
 
 
@@ -39,7 +40,7 @@ public class NetClient {
                 out = new PrintWriter(socket.getOutputStream());
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 Log.i("Websocket","connected to server");
-
+                connectionState = true;
             }
         } catch (IOException e) {
             //TODO add error message
@@ -47,8 +48,17 @@ public class NetClient {
         }
     }
 
+    public void reconnect(){
+        try {
+            Log.i("Websocket", "Reconnected to server");
+            socket.connect(new InetSocketAddress(this.host,this.port));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean isConnected(){
-        return socket.isConnected();
+        return connectionState;
     }
 
     public BufferedReader getBufferedReader() {
@@ -60,23 +70,21 @@ public class NetClient {
         if (socket != null) {
             if (socket.isConnected()) {
                 try {
-                    in.close();
-                    out.close();
+                    connectionState = false;
                     socket.close();
+                    out.close();
+                    in.close();
                     Log.i("Websocket","disconnected from server");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+
     }
 
     public void sendDataWithString(String message) {
         if (message != null) {
-
-
-
-
             try {
                 //prepend size of string (padded)
                 String length = String.valueOf((message).getBytes("UTF-8").length);

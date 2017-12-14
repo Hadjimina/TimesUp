@@ -36,8 +36,19 @@ public class SocketHandler extends AsyncTask<Void, DecodeMessage, DecodeMessage>
 
     }
 
+    public void reconnect(){
+        if(nc == null){
+            Log.i("Websocket", "net client not initialized!!");
+
+        }else if(nc.isConnected()){
+            Log.i("Websocket", "Already connected");
+        }else {
+            nc.reconnect();
+        }
+
+    }
+
     public void disconnect(){
-        this.cancel(true);
         if(nc != null){
             Log.i("Websocket","disconnecting");
             nc.disConnectWithServer();
