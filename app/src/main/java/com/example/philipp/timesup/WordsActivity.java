@@ -171,5 +171,3 @@ public class WordsActivity extends ServerIOActivity {
         }
     }
 }
-
-

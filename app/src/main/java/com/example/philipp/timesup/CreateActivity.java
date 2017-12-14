@@ -139,10 +139,6 @@ public class CreateActivity extends ServerIOActivity{
             }
         });
 
-
-        //initialize shared preferences object
-        //editor = getSharedPreferences(MYPREFS, MODE_PRIVATE).edit();
-
         //cancel Button goes back to StartActivity
         cancel = findViewById(R.id.button_cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
