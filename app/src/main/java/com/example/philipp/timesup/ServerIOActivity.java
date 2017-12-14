@@ -49,7 +49,6 @@ abstract public class ServerIOActivity extends AppCompatActivity{
                         isIntent = true;
 
 
-
                         doRestart(getApplicationContext());
                     }
                 })

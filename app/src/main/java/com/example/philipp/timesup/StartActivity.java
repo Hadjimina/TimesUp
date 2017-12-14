@@ -31,12 +31,10 @@ public class StartActivity extends ServerIOActivity {
         Intent i = getIntent();
         boolean isRestart = i.getBooleanExtra("isRestart", false);
         if(isRestart){
-            ProgressDialog progress=new ProgressDialog(this);
-            progress.setMessage("Reconnecting");
-            progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progress.setIndeterminate(true);
-            progress.setProgress(0);
-            progress.show();
+            ProgressDialog prog = new ProgressDialog(this);
+            prog.setMessage("Please wait while you get reconnected");
+            prog.setCancelable(false);
+            prog.show();
         }
 
         create = findViewById(R.id.button_create);
