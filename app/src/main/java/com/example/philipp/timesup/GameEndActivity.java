@@ -50,6 +50,7 @@ public class GameEndActivity extends ServerIOActivity implements Button.OnClickL
         team1ScoreTxt = findViewById(R.id.team1_end_score_text);
         team2ScoreTxt = findViewById(R.id.team2_end_score_text);
         newGame = findViewById(R.id.new_game_button);
+        newGame.setOnClickListener(this);
 
         //Set Text
         if (score1 > score2) {
