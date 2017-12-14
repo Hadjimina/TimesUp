@@ -41,7 +41,7 @@ abstract public class ServerIOActivity extends AppCompatActivity{
         // set title
         alertDialogBuilder.setTitle("Exit Game");
 
-        alertDialogBuilder.setMessage("Are you sure you want to return to the star screen?")
+        alertDialogBuilder.setMessage("Are you sure you want to return to the start screen?")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
