@@ -160,7 +160,7 @@ public class CreateActivity extends ServerIOActivity{
                     teamName1 = "Team A";
                     teamName2 = "Team B";
                     username = "Tyler, the Creator";
-                    timePerRound = 20;
+                    timePerRound = 90;
                     wordsPerPerson = 2;
                 } else {
                     //set time, teamNames, no of words etc
