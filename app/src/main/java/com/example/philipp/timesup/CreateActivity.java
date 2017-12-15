@@ -59,7 +59,7 @@ public class CreateActivity extends ServerIOActivity{
 
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        DEBUG = true;
+        DEBUG = false;
 
         setCallbackActivity(this);
 
@@ -189,19 +189,21 @@ public class CreateActivity extends ServerIOActivity{
             public void onClick(View view) {
                 intent = new Intent(getApplicationContext(), JoinCodeActivity.class);
 
-                if(DEBUG) {
+                //set time, teamNames, no of words etc
+                time = timeEdit.getText().toString();
+                teamName1 = team1Edit.getText().toString();
+                teamName2 = team2Edit.getText().toString();
+                words = wordsEdit.getText().toString();
+                username = usernameEdit.getText().toString();
+
+                if(time.equals("1")) {
+                    //activate DEBUG
                     teamName1 = "Team A";
                     teamName2 = "Team B";
                     username = "Tyler, the Creator";
-                    timePerRound = 90;
+                    timePerRound = 20;
                     wordsPerPerson = 2;
                 } else {
-                    //set time, teamNames, no of words etc
-                    time = timeEdit.getText().toString();
-                    teamName1 = team1Edit.getText().toString();
-                    teamName2 = team2Edit.getText().toString();
-                    words = wordsEdit.getText().toString();
-                    username = usernameEdit.getText().toString();
 
                     if (time == null || time.equals("") || time.equals("0")) {
                         toast = Toast.makeText(getApplicationContext(), "Please enter a time per round", Toast.LENGTH_LONG);
@@ -223,7 +225,7 @@ public class CreateActivity extends ServerIOActivity{
                         return;
                     }
 
-                    if(words == null || words.equals("")) {
+                    if (words == null || words.equals("")) {
                         toast = Toast.makeText(getApplicationContext(), "Please enter how many words per person", Toast.LENGTH_LONG);
                         toast.show();
                         return;
@@ -236,8 +238,8 @@ public class CreateActivity extends ServerIOActivity{
                         toast.show();
                         return;
                     }
-
                 }
+
                 TEAMNAME1 = teamName1;
                 TEAMNAME2 = teamName2;
                 USERNAME = username;
