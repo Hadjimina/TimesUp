@@ -159,7 +159,7 @@ public class CreateActivity extends ServerIOActivity{
             @Override
             public void onClick(View view) {
                 alertDialogBuilder.setTitle("Words per Person");
-                alertDialogBuilder.setMessage("The number of words each player enters in the game. Choose a number according to how much time you have. Recommendation: 4 - 6")
+                alertDialogBuilder.setMessage("The number of words each player enters in the game. Choose a number according to how much time you have to play the entire game through. Recommendation: 4 - 6")
                         .setCancelable(true)
                         .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
@@ -259,7 +259,7 @@ public class CreateActivity extends ServerIOActivity{
     @Override
     public void callback(DecodeMessage message) {
         int gameId, clientId;
-        Log.i("callback","creatActivity");
+        Log.i("callback","createActivity");
 
         // if right return message from server, start new Activity
         if(message.getReturnType().equals(ACK) && message.getRequestType().equals(NEWGAME)){

@@ -160,7 +160,6 @@
             android:layout_below="@id/team_b"
             android:layout_toRightOf="@id/words_per_pers"
             android:src="@drawable/info_button"
-            android:scaleType="fitCenter"
             android:layout_margin="3dp" />
 
         <EditText
