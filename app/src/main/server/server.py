@@ -580,6 +580,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     gameQueues[gameId].put(("roundFinished", (phaseNumber, wordIndex), prevPlayer))
 
                     # And read it out of the queue
+                    time.sleep(0.2)
                     continue
 
         elif messageType == "ack":
