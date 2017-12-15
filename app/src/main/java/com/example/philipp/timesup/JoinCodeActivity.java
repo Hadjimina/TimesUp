@@ -63,11 +63,12 @@ public class JoinCodeActivity extends ServerIOActivity {
         Log.d("TAG", teamA.toString());
         teamB = findViewById(R.id.team_b1);
 
-        if (teamName1 != null) {
+
+        if (teamA != null) {
             teamA.setText(TEAMNAME1);
         }
 
-        if (teamName2 != null) {
+        if (teamB != null) {
             teamB.setText(TEAMNAME2);
         }
 
