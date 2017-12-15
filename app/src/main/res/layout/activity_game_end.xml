@@ -39,7 +39,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/end_score_text"
         android:textSize="25sp"
-        android:text="Team1: 0" />
+        android:text="Team1: 0"
+        android:textColor= "@color/black"/>
 
     <TextView
         android:id="@+id/team2_end_score_text"
