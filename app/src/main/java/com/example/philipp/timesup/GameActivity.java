@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import static android.view.View.VISIBLE;
+import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 
 /**
  * Created by MammaGiulietta on 11.11.17.
@@ -71,6 +72,14 @@ public class GameActivity extends ServerIOActivity {
 
 
         words = NetworkHelper.WORDS;
+
+        //add code & team to actionbar
+        //Set currentTeamName
+        String teamName1 = NetworkHelper.TEAMNAME1;
+        String teamName2 = NetworkHelper.TEAMNAME2;
+        int currentTeamID = NetworkHelper.BELONGSTOTEAM;
+        String currentTeamName = currentTeamID == 1? teamName1 : teamName2;
+        getSupportActionBar().setSubtitle("Code: " +  GAMEID+", Team: "+currentTeamName);
 
         if (playerType == 0) {
             TextView discipline = findViewById(R.id.discipline);
