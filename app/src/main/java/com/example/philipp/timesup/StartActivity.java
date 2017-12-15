@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 
 /**
@@ -29,6 +28,8 @@ public class StartActivity extends ServerIOActivity {
         setContentView(R.layout.activity_start);
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        Log.d("START", "start activity running");
+
 
 
         getSupportActionBar().hide();
@@ -48,6 +49,7 @@ public class StartActivity extends ServerIOActivity {
             public void onClick(View view) {
 
                 initAndStartSocket();
+                Log.d("START", "create button clicked");
 
                 //change to createGame class
                 intent = new Intent(getApplicationContext(), CreateActivity.class);
@@ -61,6 +63,7 @@ public class StartActivity extends ServerIOActivity {
             public void onClick(View view) {
 
                 initAndStartSocket();
+                Log.d("START", "create button clicked");
 
                 intent = new Intent(getApplicationContext(), JoinActivity.class);
                 startActivity(intent);

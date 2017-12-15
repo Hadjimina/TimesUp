@@ -39,7 +39,8 @@
             android:layout_width="20sp"
             android:layout_height="20sp"
             android:layout_toRightOf="@id/time_round"
-            android:src="@drawable/info_button" />
+            android:src="@drawable/info_button"
+            android:layout_margin="3dp" />
 
         <EditText
             android:id="@+id/time"
@@ -69,7 +70,8 @@
             android:layout_height="20sp"
             android:layout_below="@id/time"
             android:layout_toRightOf="@id/rounds"
-            android:src="@drawable/info_button" />
+            android:src="@drawable/info_button"
+            android:layout_margin="3dp" />
 
         <CheckBox
             android:id="@+id/explain"
@@ -157,7 +159,8 @@
             android:layout_height="20sp"
             android:layout_below="@id/team_b"
             android:layout_toRightOf="@id/words_per_pers"
-            android:src="@drawable/info_button" />
+            android:src="@drawable/info_button"
+            android:layout_margin="3dp" />
 
         <EditText
             android:id="@+id/words_number"

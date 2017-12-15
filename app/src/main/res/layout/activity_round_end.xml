@@ -16,7 +16,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/end_score_text"
         android:textSize="25sp"
-        android:text="Team1: 0" />
+        android:text="Team1: 0"
+        android:textColor= "@color/black"/>
 
     <TextView
         android:gravity="center"
@@ -26,7 +27,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/team1_text"
         android:textSize="25sp"
-        android:text="Team2: 0" />
+        android:text="Team2: 0"
+        android:textColor= "@color/black"/>
 
 
     <LinearLayout
@@ -81,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/linLayout3"
+            android:layout_marginRight="8dp"
             android:layout_weight="0"
             android:ellipsize="end"
             android:maxLines="1"
@@ -100,7 +103,7 @@
 
     <Button
         android:id="@+id/start_next_round"
-        android:layout_width="wrap_content"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
