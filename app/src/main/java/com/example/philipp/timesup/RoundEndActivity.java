@@ -44,8 +44,7 @@ public class RoundEndActivity extends ServerIOActivity  {
         Log.d("#RoundEndActivity", "RoundEndActivity is beeing created");
         setCallbackActivity(this);
 
-        //add code to actionbar
-        getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
+
 
         //initialize global variables from shared static NetworkHelper Class
         teamName1 = NetworkHelper.TEAMNAME1;
@@ -56,11 +55,10 @@ public class RoundEndActivity extends ServerIOActivity  {
         currentTeamID = NetworkHelper.BELONGSTOTEAM;
 
         //Set currentTeamName
-        if(currentTeamID == 1){
-            currentTeamName = teamName1;
-        }else{
-            currentTeamName = teamName2;
-        }
+        currentTeamName = currentTeamID == 1? teamName1 : teamName2;
+
+        //add code & teamnam to actionbar
+        getSupportActionBar().setSubtitle("Code: " +  GAMEID+", Team: "+currentTeamName);
 
         //initialize Button
         nextRoundButton = findViewById(R.id.start_next_round);
@@ -81,15 +79,13 @@ public class RoundEndActivity extends ServerIOActivity  {
         //initialize TextViews
         team1Txt = findViewById(R.id.team1_text);
         team2Txt = findViewById(R.id.team2_text);
-        nxtPlayerTxt = findViewById(R.id.next_player_text);
-        phaseTxt = findViewById(R.id.phase_text);
-        currentTeamTxt = findViewById(R.id.current_team_text);
+        nxtPlayerTxt = findViewById(R.id.nextUserName);
+        phaseTxt = findViewById(R.id.nextPhaseName);
+        //currentTeamTxt = findViewById(R.id.current_team_text);
 
         team1Txt.setText(teamName1 + " score: " + score1);
         team2Txt.setText(teamName2 + " score: " + score2);
-        nxtPlayerTxt.setText("Next Player:");
-        phaseTxt.setText("Phase:");
-        currentTeamTxt.setText("Your Team: " + currentTeamName);
+        //currentTeamTxt.setText("Your Team: " + currentTeamName);
 
         //get Next player and next phase from Intent if from game activity
         fromGAFlag = intent.getIntExtra("flag", 0);
@@ -184,8 +180,8 @@ public class RoundEndActivity extends ServerIOActivity  {
 
     //set the TextView values
     void setTextMethod(){
-        nxtPlayerTxt.setText("Next Player: " + nextPlayerName);
-        phaseTxt.setText("Phase: " + getPhaseName(phaseNumber));
+        nxtPlayerTxt.setText(nextPlayerName);
+        phaseTxt.setText(getPhaseName(phaseNumber));
         if (clientId == nextPlayerId) {
             nextRoundButton.setVisibility(View.VISIBLE);
         } else {

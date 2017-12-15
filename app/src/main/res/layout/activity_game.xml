@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Guess the word"
+        android:text="Guess the word!"
         android:textSize="40sp"
         android:visibility="invisible"
         />
@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="It's not your turn"
+        android:text="Not your turn!"
         android:textSize="40sp"
         android:visibility="invisible"
         />

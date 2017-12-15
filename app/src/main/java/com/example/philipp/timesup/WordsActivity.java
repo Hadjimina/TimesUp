@@ -47,8 +47,13 @@ public class WordsActivity extends ServerIOActivity {
 
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        //add code to actionbar
-        getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
+        //add code & team to actionbar
+        //Set currentTeamName
+        String teamName1 = NetworkHelper.TEAMNAME1;
+        String teamName2 = NetworkHelper.TEAMNAME2;
+        int currentTeamID = NetworkHelper.BELONGSTOTEAM;
+        String currentTeamName = currentTeamID == 1? teamName1 : teamName2;
+        getSupportActionBar().setSubtitle("Code: " +  GAMEID+", Team: "+currentTeamName);
 
         //initialize connection
         setCallbackActivity(this);

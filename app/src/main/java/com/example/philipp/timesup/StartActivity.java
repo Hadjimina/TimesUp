@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 
 /**
@@ -27,6 +28,10 @@ public class StartActivity extends ServerIOActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+
+        getSupportActionBar().hide();
 
         Intent i = getIntent();
         boolean isRestart = i.getBooleanExtra("isRestart", false);

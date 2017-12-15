@@ -53,7 +53,7 @@ public class JoinCodeActivity extends ServerIOActivity {
         code = findViewById(R.id.code);
         code.setText(String.valueOf(GAMEID));
 
-        getSupportActionBar().setSubtitle("Game code: " +  GAMEID);
+        getSupportActionBar().setSubtitle("Code: " +  GAMEID);
 
         //initialise server connection
         setCallbackActivity(this);
