@@ -1,7 +1,8 @@
 package com.example.philipp.timesup;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,9 +46,10 @@ public class CreateActivity extends ServerIOActivity{
     Intent intent;
     Toast toast;
     EncodeMessage sendMessage;
-    SharedPreferences.Editor editor;
     ImageButton infoTimePerPerson, infoRounds, infoWords;
     Boolean DEBUG;
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,29 +115,60 @@ public class CreateActivity extends ServerIOActivity{
         //Words per Person
         wordsEdit = findViewById(R.id.words_number);
 
-        //initialise infobuttons
+        //alertDialog for infobuttons
+        alertDialogBuilder = new AlertDialog.Builder(this);
+
+
         infoTimePerPerson = findViewById(R.id.info_time_round);
         infoTimePerPerson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toast = Toast.makeText(getApplicationContext(), "Time which each person has per round to do explain the words. Recommended are 30 to 120 seconds", Toast.LENGTH_LONG);
-                toast.show();
+                alertDialogBuilder.setTitle("Time per Person");
+                alertDialogBuilder.setMessage("Time which each person has per round to do explain the words. Recommended are 30 to 120 seconds")
+                        .setCancelable(true)
+                        .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+                alert = alertDialogBuilder.create();
+
+                alert.show();
             }
         });
+
         infoRounds = findViewById(R.id.info_rounds);
         infoRounds.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toast = Toast.makeText(getApplicationContext(), "The rounds through which the game will go through. Recommendation: choose at least EXPLAIN and PANTOMIME, as the game builds up on them", Toast.LENGTH_LONG);
-                toast.show();
+                alertDialogBuilder.setTitle("Rounds");
+                alertDialogBuilder.setMessage("The rounds through which the game will go through. Recommendation: choose at least EXPLAIN and PANTOMIME, as the game builds up on them")
+                        .setCancelable(true)
+                        .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+                alert = alertDialogBuilder.create();
+
+                alert.show();
             }
         });
         infoWords = findViewById(R.id.info_words);
         infoWords.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toast = Toast.makeText(getApplicationContext(), "The number of words each player enters in the game. Choose a number according to how much time you have. Recommendation: 4 - 6", Toast.LENGTH_LONG);
-                toast.show();
+                alertDialogBuilder.setTitle("Words per Person");
+                alertDialogBuilder.setMessage("The number of words each player enters in the game. Choose a number according to how much time you have. Recommendation: 4 - 6")
+                        .setCancelable(true)
+                        .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+                alert = alertDialogBuilder.create();
+
+                alert.show();
             }
         });
 
