@@ -85,11 +85,11 @@ public class RoundEndActivity extends ServerIOActivity  {
             @Override
             public void onClick(View view) {
                 alertDialogBuilder.setTitle("Rounds");
-                alertDialogBuilder.setMessage("Explanation of Rounds: \n" +
-                "Explain: Simply explain the word without using it. \n" +
-                "Pantomime: Try to describe the word without speaking \n" +
-                "One Word: Use a single Word to describe the solution. Of course it should be a different word! \n" +
-                "Freeze: You're allowed to use a single posture to describe the word, but don't move! \n" +
+                alertDialogBuilder.setMessage("<B>" + "Explanation of Rounds:" + "</B>" + "\n" + "\n" +
+                "Explain: Simply explain the word without using it. \n" + "\n" +
+                "Pantomime: Try to describe the word without speaking \n" + "\n" +
+                "One Word: Use a single Word to describe the solution. Of course it should be a different word! \n" + "\n" +
+                "Freeze: You're allowed to use a single posture to describe the word, but don't move! \n" + "\n" +
                 "Sounds: Use any sounds which remind of the word in question. Talking is not allowed here! \n")
                         .setCancelable(true)
                         .setPositiveButton("Ok",new DialogInterface.OnClickListener() {

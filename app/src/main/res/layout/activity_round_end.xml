@@ -49,7 +49,7 @@
 
         <TextView
             android:id="@+id/nextUserName"
-            android:layout_width="204dp"
+            android:layout_width="196dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:layout_weight="0"
@@ -58,7 +58,7 @@
             android:paddingTop="22dp"
             android:text="None"
             android:textColor="@color/black"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -79,7 +79,7 @@
 
         <TextView
             android:id="@+id/nextPhaseName"
-            android:layout_width="209dp"
+            android:layout_width="195dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/linLayout3"
@@ -90,7 +90,7 @@
             android:paddingTop="22dp"
             android:text="None"
             android:textColor="@color/black"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
     <ImageButton
