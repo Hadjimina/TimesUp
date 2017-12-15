@@ -241,6 +241,7 @@ def client(request, gameId, clientId):
 
                 # Function that handles the item
                 handleQueueItem(request, item, gameId, clientId)
+                time.sleep(0.2)
 
         # If the queue was empty, do nothing
         except queue.Empty:
@@ -580,7 +581,6 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                     gameQueues[gameId].put(("roundFinished", (phaseNumber, wordIndex), prevPlayer))
 
                     # And read it out of the queue
-                    time.sleep(0.2)
                     continue
 
         elif messageType == "ack":
@@ -610,6 +610,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
 
                 # Reset startTime
                 startTime = -1
+                sendSetup = False
                 
                 # Set the score and the new active team
                 if clientId in team1:
@@ -641,8 +642,7 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                             print(colorama.Fore.YELLOW + "current permutation of the globalWordList is: {}".format(globalWordList))
 
                         # Give a notification to all users
-                        for user in users:
-                            games[gameId][user].put(("setup", globalWordList))
+                        sendSetup = True
 
                     wordIndex = 0
 
@@ -679,6 +679,8 @@ def gameThread(gameId, rounds, teamName1, teamName2, timePerRound, wordsPerPerso
                 for user in users:
                     games[gameId][user].put(("roundFinished",
                                              [scoreTeam1, scoreTeam2, activePlayerId, activePlayerName, nextPhase]))
+                    if sendSetup:
+                        games[gameId][user].put(("setup", globalWordList))
 
                 # If game is completely done, stop the gameThread
                 if nextPhase == -1:
