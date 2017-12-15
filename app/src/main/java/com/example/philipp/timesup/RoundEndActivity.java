@@ -1,6 +1,8 @@
 package com.example.philipp.timesup;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -35,6 +37,8 @@ public class RoundEndActivity extends ServerIOActivity  {
     ImageButton roundInfo;
 
     ProgressDialog progressdialog;
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,8 @@ public class RoundEndActivity extends ServerIOActivity  {
         username = NetworkHelper.USERNAME;
         currentTeamID = NetworkHelper.BELONGSTOTEAM;
 
+
+
         //Set currentTeamName
         currentTeamName = currentTeamID == 1? teamName1 : teamName2;
 
@@ -71,6 +77,29 @@ public class RoundEndActivity extends ServerIOActivity  {
                 //Send startRound to server
                 EncodeMessage messageToSend = new EncodeMessage("nextRound", gameId, clientId);
                 sendMessage(messageToSend);
+            }
+        });
+
+        //show info for Rounds if infoButton pressed
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        roundInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialogBuilder.setTitle("Rounds");
+                alertDialogBuilder.setMessage("Explanation of Rounds: \n" +
+                "Explain: Simply explain the word without using it. \n" +
+                "Pantomime: Try to describe the word without speaking \n" +
+                "One Word: Use a single Word to describe the solution. Of course it should be a different word! \n" +
+                "Freeze: You're allowed to use a single posture to describe the word, but don't move! \n" +
+                "Sounds: Use any sounds which remind of the word in question. Talking is not allowed here! \n")
+                        .setCancelable(true)
+                        .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+                alert = alertDialogBuilder.create();
+                alert.show();
             }
         });
 
