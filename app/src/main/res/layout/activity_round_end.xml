@@ -47,16 +47,16 @@
 
         <TextView
             android:id="@+id/nextUserName"
-            android:layout_width="wrap_content"
+            android:layout_width="204dp"
             android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
             android:layout_weight="0"
             android:ellipsize="end"
             android:maxLines="1"
             android:paddingTop="22dp"
-            android:textSize="20dp"
-            android:textColor="@color/black"
             android:text="None"
-            android:layout_marginRight="8dp"/>
+            android:textColor="@color/black"
+            android:textSize="20dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -69,25 +69,34 @@
 
         <ImageView
             android:id="@+id/nextArrowImage"
-            android:layout_width="64dp"
+            android:layout_width="155dp"
             android:layout_height="64dp"
-            app:srcCompat="@drawable/nextarrow"
             android:layout_weight="1"
-            android:ellipsize="end" />
+            android:ellipsize="end"
+            app:srcCompat="@drawable/nextarrow" />
 
         <TextView
             android:id="@+id/nextPhaseName"
-            android:layout_width="wrap_content"
+            android:layout_width="209dp"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/linLayout3"
             android:layout_weight="0"
             android:ellipsize="end"
             android:maxLines="1"
             android:paddingTop="22dp"
-            android:textSize="20dp"
-            android:textColor="@color/black"
             android:text="None"
-            android:layout_marginRight="8dp"/>
+            android:textColor="@color/black"
+            android:textSize="20dp" />
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/info_time_round2"
+        android:layout_width="20sp"
+        android:layout_height="20sp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/linLayout3"
+        android:src="@drawable/info_button" />
 
     <Button
         android:id="@+id/start_next_round"

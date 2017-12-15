@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import static com.example.philipp.timesup.NetworkHelper.GAMEID;
@@ -31,6 +32,7 @@ public class RoundEndActivity extends ServerIOActivity  {
 
     TextView team1Txt, team2Txt, nxtPlayerTxt, phaseTxt, currentTeamTxt;
     Button nextRoundButton;
+    ImageButton roundInfo;
 
     ProgressDialog progressdialog;
 
@@ -43,8 +45,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         //Set this Activity as CallbackActivity
         Log.d("#RoundEndActivity", "RoundEndActivity is beeing created");
         setCallbackActivity(this);
-
-
 
         //initialize global variables from shared static NetworkHelper Class
         teamName1 = NetworkHelper.TEAMNAME1;
@@ -81,6 +81,9 @@ public class RoundEndActivity extends ServerIOActivity  {
         team2Txt = findViewById(R.id.team2_text);
         nxtPlayerTxt = findViewById(R.id.nextUserName);
         phaseTxt = findViewById(R.id.nextPhaseName);
+        roundInfo = findViewById(R.id.info_rounds);
+        //nxtPlayerTxt = findViewById(R.id.nextUserName);
+        //phaseTxt = findViewById(R.id.nextPhaseName);
         //currentTeamTxt = findViewById(R.id.current_team_text);
 
         team1Txt.setText(teamName1 + " score: " + score1);
@@ -131,6 +134,7 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         //case distinction on message received
         if(message.getReturnType().equals(NetworkHelper.ROUNDFINISHED)){
+            Log.d("#RoundEndActivity", "message: " + message);
             nextPlayerName = message.getString("nextPlayerName");
             nextPlayerId = message.getInt("nextPlayerId");
             phaseNumber = message.getInt("nextPhase");
