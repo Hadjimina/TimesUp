@@ -44,6 +44,9 @@ public class RoundEndActivity extends ServerIOActivity  {
         Log.d("#RoundEndActivity", "RoundEndActivity is beeing created");
         setCallbackActivity(this);
 
+        //if roundFinished is not received, this will no interfere with the clientId 0
+        nextPlayerId = -1;
+
 
 
         //initialize global variables from shared static NetworkHelper Class
