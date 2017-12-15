@@ -61,8 +61,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         username = NetworkHelper.USERNAME;
         currentTeamID = NetworkHelper.BELONGSTOTEAM;
 
-
-
         //Set currentTeamName
         currentTeamName = currentTeamID == 1? teamName1 : teamName2;
 
@@ -81,6 +79,7 @@ public class RoundEndActivity extends ServerIOActivity  {
         });
 
         //show info for Rounds if infoButton pressed
+        roundInfo = findViewById(R.id.info_time_round2);
         alertDialogBuilder = new AlertDialog.Builder(this);
         roundInfo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +112,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         team2Txt = findViewById(R.id.team2_text);
         nxtPlayerTxt = findViewById(R.id.nextUserName);
         phaseTxt = findViewById(R.id.nextPhaseName);
-        roundInfo = findViewById(R.id.info_rounds);
         //nxtPlayerTxt = findViewById(R.id.nextUserName);
         //phaseTxt = findViewById(R.id.nextPhaseName);
         //currentTeamTxt = findViewById(R.id.current_team_text);
