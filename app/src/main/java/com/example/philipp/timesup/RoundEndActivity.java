@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -47,7 +46,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Set this Activity as CallbackActivity
-        Log.d("#RoundEndActivity", "RoundEndActivity is beeing created");
         setCallbackActivity(this);
 
         //if roundFinished is not received, this will no interfere with the clientId 0
@@ -123,7 +121,6 @@ public class RoundEndActivity extends ServerIOActivity  {
         //get Next player and next phase from Intent if from game activity
         fromGAFlag = intent.getIntExtra("flag", 0);
         if(fromGAFlag != 0) {
-            Log.d("FLAG", "FLAGGO");
             nextPlayerName = intent.getStringExtra("nextPlayerName");
             phaseNumber = intent.getIntExtra("nextPhase", -1);
             score1 = intent.getIntExtra("score1", 0);
@@ -160,11 +157,9 @@ public class RoundEndActivity extends ServerIOActivity  {
 
     @Override
     public void callback(DecodeMessage message) {
-        Log.d("#RoundEndActivity", "Callback function is called with message: " + message.getReturnType());
 
         //case distinction on message received
         if(message.getReturnType().equals(NetworkHelper.ROUNDFINISHED)){
-            Log.d("#RoundEndActivity", "message: " + message);
             nextPlayerName = message.getString("nextPlayerName");
             nextPlayerId = message.getInt("nextPlayerId");
             phaseNumber = message.getInt("nextPhase");
@@ -173,8 +168,6 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         if (message.getReturnType().equals(NetworkHelper.STARTROUND)/* && message.getRequestType().equals(NetworkHelper.NEXTROUND)*/) {
             //if message is normal reply of nextRound
-            Log.d("#RoundEndActivity", "STARTROUND message received!");
-
             activePlayerId = message.getInt("activePlayerId");
             activePlayerName = message.getString("activePlayerName");
             startTime = message.getInt("startTime");
@@ -195,10 +188,7 @@ public class RoundEndActivity extends ServerIOActivity  {
 
         if (message.getReturnType().equals(NetworkHelper.SETUP)) {
             //if message is Setup Broadcast
-            //TODO stimmt WORDSARRAY? weil online ist wordList!
-
             words = message.getStringArray(NetworkHelper.WORDSARRAY);
-            //TODO stimmt Words oder sind das die einzelnen Wörter?
             NetworkHelper.WORDS = words;
 
             //if we receive Setup BCAST and last Activity was WordsActivity dismiss ProgressDialog
@@ -208,7 +198,7 @@ public class RoundEndActivity extends ServerIOActivity  {
             }
 
         } else {
-            Log.d("#RoundEndActivity", "Received wrong message: " + message.getReturnType());
+
         }
     }
 
