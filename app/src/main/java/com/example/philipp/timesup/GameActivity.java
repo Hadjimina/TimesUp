@@ -2,7 +2,6 @@ package com.example.philipp.timesup;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -30,9 +29,7 @@ import static com.example.philipp.timesup.NetworkHelper.GAMEID;
 public class GameActivity extends ServerIOActivity {
 
     static int playerType = -1; // Explain(0)-, Guess(1)- or Watchtype(2)
-    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId, nextPlayerId, flag, timerFlag;
-    SharedPreferences sharedPrefs;
-    String username;
+    static int activeTeam, gameId, clientId, wordIndex, phaseNr, activePlayerId, flag, timerFlag;
     String[] words;
     TextView word;
     Button nextButton;
@@ -48,14 +45,17 @@ public class GameActivity extends ServerIOActivity {
 
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        //get gameId and clientId
+        //get parameter from intent and NetworkHelper class
         Intent intent = getIntent();
         gameId = NetworkHelper.GAMEID;
         clientId = NetworkHelper.CLIENTID;
-        //TODO: get wordarray & active player & wordIndex & phaseNumber from intent of GameEndActivity
         wordIndex = intent.getIntExtra("wordIndex", -1);
         phaseNr = intent.getIntExtra("phaseNumber", -1);
         activePlayerId = intent.getIntExtra("activePlayerId", -1);
+
+        //the timerFlag says if the activity changes because no more words
+        //or because the timer run out
+        //prevents from sending "roundFinished" message multiple times
         timerFlag = 0;
 
 
@@ -81,6 +81,8 @@ public class GameActivity extends ServerIOActivity {
         String currentTeamName = currentTeamID == 1? teamName1 : teamName2;
         getSupportActionBar().setSubtitle("Code: " +  GAMEID+", Team: "+currentTeamName);
 
+
+        //set up one of three different viewgroups depending on the playertype
         if (playerType == 0) {
             TextView discipline = findViewById(R.id.discipline);
             discipline.setText(getDisciplineString(phaseNr));
@@ -145,6 +147,7 @@ public class GameActivity extends ServerIOActivity {
         }.start();
     }
 
+    //methods gets called if either the timer run out or no more words for this phase
     void finishRound(){
         EncodeMessage message = new EncodeMessage(gameId, clientId, phaseNr, wordIndex);
         sendMessage(message);
